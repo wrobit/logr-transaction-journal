@@ -1,6 +1,6 @@
-[![Entry](public/logo.svg)](#)
-
-# Entry
+<p align="center">
+  <img src="public/logo.svg" alt="Entry" width="260" />
+</p>
 
 A minimal, personal crypto transaction journal focused on correctness, transparency, and accounting-style clarity. No hype, no trading features — just structured records, PLN valuation via NBP, and clear profit/loss.
 

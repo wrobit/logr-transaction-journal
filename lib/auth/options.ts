@@ -74,9 +74,26 @@ export const authOptions: NextAuthOptions = {
 
       return true;
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, account }) {
       if (user) {
-        token.userId = user.id;
+        if (account?.provider === "credentials") {
+          token.userId = user.id;
+          return token;
+        }
+
+        if (user.email) {
+          const dbUser = await getUserByEmail(user.email);
+          if (dbUser) {
+            token.userId = dbUser.id;
+          }
+        }
+      }
+
+      if (!token.userId && token.email) {
+        const dbUser = await getUserByEmail(token.email);
+        if (dbUser) {
+          token.userId = dbUser.id;
+        }
       }
 
       return token;

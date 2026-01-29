@@ -1,4 +1,7 @@
 # ENTRY — the crypto journal
+
+![Entry logo](public/logo.svg)
+
 A minimal, personal crypto transaction journal focused on correctness, transparency, and accounting-style clarity. No hype, no trading features — just structured records, PLN valuation via NBP, and clear profit/loss.
 
 ## Table of contents

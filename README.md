@@ -1,6 +1,6 @@
-# ENTRY — the crypto journal
+[![Entry](public/logo.svg)](#)
 
-![Entry logo](public/logo.svg)
+# Entry
 
 A minimal, personal crypto transaction journal focused on correctness, transparency, and accounting-style clarity. No hype, no trading features — just structured records, PLN valuation via NBP, and clear profit/loss.
 
@@ -148,7 +148,7 @@ pnpm dev
 We do not accept public contributions to this project. It is a private repository meant for internal development only. Therefore, we kindly decline pull requests or other forms of contribution from the community.
 
 ## License
-#### Copyright © 2026, Piotr Wrobel <www.github.com/wrobit>. All rights reserved.
+Proprietary — all rights reserved. See `LICENSE`.
 
 ## Contact
 Contact me via e-mail: piotrwrobel.ajiiz@gmail.com

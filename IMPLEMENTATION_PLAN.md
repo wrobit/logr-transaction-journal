@@ -257,7 +257,7 @@ Live preview:
 
 ### Phase 1 — Foundation
 
-- [ ] Project setup
+- [x] Project setup
 - [ ] Drizzle + Neon
 - [ ] shadcn/ui
 

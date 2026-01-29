@@ -1,36 +1,153 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Entry — Crypto Journal
+A minimal, personal crypto transaction journal focused on correctness, transparency, and accounting-style clarity. No hype, no trading features — just structured records, PLN valuation via NBP, and clear profit/loss.
+
+## Table of contents
+- [Introduction](#introduction)
+- [Product Goals](#product-goals)
+- [Core Principles](#core-principles)
+- [Features](#features)
+- [Business Rules](#business-rules)
+- [Tech Stack](#tech-stack)
+- [Data Model](#data-model)
+- [NBP Integration](#nbp-integration)
+- [Project Structure](#project-structure)
+- [MVP Acceptance Criteria](#mvp-acceptance-criteria)
+- [Getting Started](#getting-started)
+
+## Introduction
+Entry is a personal crypto journal that treats each transaction as an immutable accounting entry. It emphasizes reproducible calculations, official PLN rates, and a clean UI designed for tracking and tax preparation.
+
+## Product Goals
+- Capture each transaction as a precise accounting entry
+- Provide accurate PLN valuation using official NBP rates
+- Offer a low-friction UI for personal tracking and tax prep
+- Keep calculations deterministic and reproducible
+
+## Core Principles
+- One entry equals one immutable transaction record
+- PLN value is always derived from NBP table A
+- All financial calculations are deterministic
+- Built for personal accounting, not trading analytics
+
+## Features
+### Entries (`/`)
+- Date range filter
+- Entries table with full financial breakdown
+- Primary action: **Add entry**
+
+### Summary (`/summary`)
+- Total buy value (PLN)
+- Total sell value (PLN)
+- Total PnL (PLN)
+- Holdings per asset (net quantity + PnL)
+
+### Profile (`/profile`)
+- Read-only user data
+- Delete account flow with confirmation
+
+### Dashboard (`/dashboard`)
+- Optional visual overview (PnL trends, buy vs sell, asset distribution)
+
+## Business Rules
+### PLN Valuation (NBP)
+- Rate source: **NBP Table A**
+- Rate date resolution:
+  - Weekday → previous calendar day
+  - Weekend → previous Friday
+  - If NBP has no data (404) → step backwards day-by-day
+- `valuePLN = fullPrice × nbpRate`
+- If quote currency is PLN → `nbpRate = 1`
+
+### Profit / Loss
+- Formula: `PnL = Σ(sell.valuePLN) − Σ(buy.valuePLN)`
+- Commission is stored explicitly and:
+  - included in buy cost / sell proceeds (default)
+  - optional separate display (future option)
+
+## Tech Stack
+- **Framework**: Next.js (App Router)
+- **Language**: TypeScript
+- **Database**: Neon (PostgreSQL)
+- **ORM**: Drizzle
+- **UI**: shadcn/ui + Tailwind CSS
+- **Auth**: NextAuth (Credentials provider)
+- **Validation**: zod
+- **Passwords**: bcrypt
+- **Charts (optional)**: Recharts or Chart.js
+
+## Data Model
+### `users`
+- `id`, `email`, `login`, `passwordHash`
+- `firstName`, `lastName`, `createdAt`, `updatedAt`
+
+### `entries`
+- `date`, `operation`, `baseAsset`, `quoteCurrency`
+- `quantity`, `pricePerUnit`, `fullPrice`, `commission`
+- `source`, `note`, `nbpRateDate`, `nbpRate`, `valuePLN`
+- `createdAt`, `updatedAt`
+
+### `fx_rates_cache`
+- `currency`, `rateDate`, `rate`
+- Unique constraint `(currency, rateDate)`
+
+## NBP Integration
+Module: `/lib/nbp`
+
+Responsibilities:
+- Resolve correct rate date
+- Fetch NBP rate
+- Handle weekends and missing days
+- Cache results
+
+Flow on entry creation:
+1. User submits entry form
+2. Server calculates `fullPrice`
+3. Rate date is resolved
+4. NBP rate fetched or loaded from cache
+5. `valuePLN` computed and persisted
+
+## Project Structure
+- `app/(auth)/login`
+- `app/(auth)/register`
+- `app/(protected)/page.tsx` (entries)
+- `app/(protected)/summary`
+- `app/(protected)/profile`
+- `app/(protected)/dashboard`
+- `components/entries/`
+- `components/summary/`
+- `components/profile/`
+- `components/dashboard/`
+- `lib/db/`
+- `lib/nbp/`
+- `lib/auth/`
+- `lib/format/`
+- `actions/entries.ts`
+- `actions/summary.ts`
+- `actions/profile.ts`
+
+## MVP Acceptance Criteria
+- User can register and log in
+- User can add a transaction entry
+- PLN value is calculated using correct NBP rate
+- Entries are listed and filterable by date
+- Summary correctly shows holdings and PnL
+- User can delete their account safely
 
 ## Getting Started
-
-First, run the development server:
+Install dependencies and run the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Contributing
+We do not accept public contributions to this project. It is a private repository meant for internal development only. Therefore, we kindly decline pull requests or other forms of contribution from the community.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## License
+#### Copyright © 2026, Piotr Wrobel <www.github.com/wrobit>. All rights reserved.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Contact
+Contact me via e-mail: piotrwrobel.ajiiz@gmail.com
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Initialized with 🖤

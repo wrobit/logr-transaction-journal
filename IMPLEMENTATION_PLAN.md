@@ -263,8 +263,8 @@ Live preview:
 
 ### Phase 2 — Auth
 
-- [ ] Register / login
-- [ ] Session protection
+- [x] Register / login
+- [x] Session protection
 
 Auth Pages Implementation Plan:
 - Define Cursor-style layout (ENTRY top-left, centered content, dark canvas)
@@ -273,7 +273,7 @@ Auth Pages Implementation Plan:
 - Build `/login` and `/register` pages with shadcn/ui, OAuth buttons first
 - Add zod validation + bcrypt hashing for credentials
 - Implement user creation flow and OAuth user provisioning
-- Add middleware protection for `(protected)` routes
+- Add `proxy.ts` protection for `(protected)` routes
 
 ### Phase 3 — Core Logic
 

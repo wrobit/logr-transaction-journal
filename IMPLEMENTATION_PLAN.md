@@ -266,6 +266,15 @@ Live preview:
 - [ ] Register / login
 - [ ] Session protection
 
+Auth Pages Implementation Plan:
+- Define Cursor-style layout (ENTRY top-left, centered content, dark canvas)
+- Set up NextAuth with Credentials + Google + GitHub providers
+- Configure env vars: `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, `GOOGLE_CLIENT_ID/SECRET`, `GITHUB_ID/SECRET`
+- Build `/login` and `/register` pages with shadcn/ui, OAuth buttons first
+- Add zod validation + bcrypt hashing for credentials
+- Implement user creation flow and OAuth user provisioning
+- Add middleware protection for `(protected)` routes
+
 ### Phase 3 — Core Logic
 
 - [ ] Entry creation

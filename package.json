@@ -7,7 +7,7 @@
     "pnpm": ">=9.0.0"
   },
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 2206",
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/bcrypt": "^6.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

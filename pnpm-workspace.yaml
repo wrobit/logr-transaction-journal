@@ -1,3 +1,6 @@
 ignoredBuiltDependencies:
+  - bcrypt
+  - esbuild
+  - msw
   - sharp
   - unrs-resolver

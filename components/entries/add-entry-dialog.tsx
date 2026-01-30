@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useMemo, useRef, useState } from "react";
+import { useActionState, useCallback, useMemo, useRef, useState } from "react";
 
 import {
   calculateFullPrice,
@@ -19,6 +19,27 @@ import { Label } from "@/components/ui/label";
 
 const DEFAULT_OPERATION = "BUY";
 const DEFAULT_CURRENCY = "PLN";
+const DEFAULT_ASSET = "BTC";
+
+const ASSET_OPTIONS = ["BTC", "ETH", "SOL"] as const;
+const QUOTE_CURRENCY_OPTIONS = ["PLN", "EUR", "USD"] as const;
+
+const normalizeNumericInput = (value: string, decimals = 12) => {
+  if (!value) {
+    return value;
+  }
+
+  const numericValue = Number(value);
+  if (Number.isNaN(numericValue)) {
+    return value;
+  }
+
+  if (value.includes("e") || value.includes("E")) {
+    return numericValue.toFixed(decimals);
+  }
+
+  return value;
+};
 
 type AddEntryDialogProps = {
   onCreated: (entry: EntryView) => void;
@@ -28,14 +49,37 @@ type AddEntryDialogProps = {
 export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
   const [open, setOpen] = useState(false);
   const [operation, setOperation] = useState(DEFAULT_OPERATION);
+  const [baseAsset, setBaseAsset] = useState(DEFAULT_ASSET);
   const [quoteCurrency, setQuoteCurrency] = useState(DEFAULT_CURRENCY);
   const [quantity, setQuantity] = useState("");
   const [pricePerUnit, setPricePerUnit] = useState("");
   const [commission, setCommission] = useState("");
 
   const formRef = useRef<HTMLFormElement>(null);
+
+  const actionHandler = useCallback(
+    async (prevState: CreateEntryState, formData: FormData) => {
+      const result = await (action ?? createEntry)(prevState, formData);
+
+      if (result.status === "success" && result.entry) {
+        onCreated(result.entry);
+        formRef.current?.reset();
+        setQuantity("");
+        setPricePerUnit("");
+        setCommission("");
+        setOperation(DEFAULT_OPERATION);
+        setBaseAsset(DEFAULT_ASSET);
+        setQuoteCurrency(DEFAULT_CURRENCY);
+        setOpen(false);
+      }
+
+      return result;
+    },
+    [action, onCreated],
+  );
+
   const [state, formAction, isPending] = useActionState<CreateEntryState, FormData>(
-    action ?? createEntry,
+    actionHandler,
     defaultCreateEntryState,
   );
 
@@ -64,16 +108,6 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
     };
   }, [commission, operation, pricePerUnit, quantity, quoteCurrency]);
 
-  useEffect(() => {
-    if (state.status === "success" && state.entry) {
-      onCreated(state.entry);
-      formRef.current?.reset();
-      setQuantity("");
-      setPricePerUnit("");
-      setCommission("");
-      setOpen(false);
-    }
-  }, [onCreated, state]);
 
   const errorMessage = state.message ?? null;
 
@@ -153,13 +187,20 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
                 <Label htmlFor="baseAsset" className="text-xs text-neutral-300">
                   Asset
                 </Label>
-                <Input
+                <select
                   id="baseAsset"
                   name="baseAsset"
+                  value={baseAsset}
+                  onChange={(event) => setBaseAsset(event.target.value)}
+                  className="h-9 w-full rounded-none border border-neutral-800 bg-neutral-950 px-3 text-sm text-white"
                   required
-                  className="border-neutral-800 bg-neutral-950 text-sm text-white"
-                  placeholder="SOL"
-                />
+                >
+                  {ASSET_OPTIONS.map((asset) => (
+                    <option key={asset} value={asset}>
+                      {asset}
+                    </option>
+                  ))}
+                </select>
                 {state.errors?.baseAsset ? (
                   <p className="text-xs text-red-400">
                     {state.errors.baseAsset}
@@ -174,15 +215,20 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
                 >
                   Quote currency
                 </Label>
-                <Input
+                <select
                   id="quoteCurrency"
                   name="quoteCurrency"
-                  required
                   value={quoteCurrency}
                   onChange={(event) => setQuoteCurrency(event.target.value)}
-                  className="border-neutral-800 bg-neutral-950 text-sm text-white"
-                  placeholder="PLN"
-                />
+                  className="h-9 w-full rounded-none border border-neutral-800 bg-neutral-950 px-3 text-sm text-white"
+                  required
+                >
+                  {QUOTE_CURRENCY_OPTIONS.map((currency) => (
+                    <option key={currency} value={currency}>
+                      {currency}
+                    </option>
+                  ))}
+                </select>
                 {state.errors?.quoteCurrency ? (
                   <p className="text-xs text-red-400">
                     {state.errors.quoteCurrency}
@@ -200,7 +246,9 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
                   type="number"
                   step="0.000000000001"
                   value={quantity}
-                  onChange={(event) => setQuantity(event.target.value)}
+                  onChange={(event) =>
+                    setQuantity(normalizeNumericInput(event.target.value))
+                  }
                   required
                   className="border-neutral-800 bg-neutral-950 text-sm text-white"
                 />
@@ -224,7 +272,9 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
                   type="number"
                   step="0.000000000001"
                   value={pricePerUnit}
-                  onChange={(event) => setPricePerUnit(event.target.value)}
+                  onChange={(event) =>
+                    setPricePerUnit(normalizeNumericInput(event.target.value))
+                  }
                   required
                   className="border-neutral-800 bg-neutral-950 text-sm text-white"
                 />
@@ -245,7 +295,9 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
                   type="number"
                   step="0.000000000001"
                   value={commission}
-                  onChange={(event) => setCommission(event.target.value)}
+                  onChange={(event) =>
+                    setCommission(normalizeNumericInput(event.target.value))
+                  }
                   className="border-neutral-800 bg-neutral-950 text-sm text-white"
                 />
                 {state.errors?.commission ? (
@@ -320,7 +372,7 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
                   type="button"
                   variant="outline"
                   onClick={() => setOpen(false)}
-                  className="border-neutral-800 text-neutral-200"
+                  className="border-neutral-700 bg-neutral-900/70 text-white hover:bg-neutral-800"
                 >
                   Cancel
                 </Button>

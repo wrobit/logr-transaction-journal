@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import type { EntryView } from "@/lib/entries/types";
 import { formatNumber } from "@/lib/format/numbers";
@@ -72,11 +72,17 @@ export function EntriesView({ entries, enableActions = true }: EntriesViewProps)
     setPage(1);
   }, [operationFilter, assetFilter, startDate, endDate]);
 
-  const handleCreated = (entry: EntryView) => {
-    setEntriesState((current) => [entry, ...current]);
+  const handleCreated = useCallback((entry: EntryView) => {
+    setEntriesState((current) => {
+      const existingIndex = current.findIndex((item) => item.id === entry.id);
+      if (existingIndex >= 0) {
+        return current.map((item) => (item.id === entry.id ? entry : item));
+      }
+      return [entry, ...current];
+    });
     setNotice("Entry added successfully.");
     window.setTimeout(() => setNotice(null), 4000);
-  };
+  }, []);
 
   return (
     <div className="space-y-6 text-white">

@@ -12,7 +12,7 @@ export default async function Page() {
     redirect("/login");
   }
 
-  const entries = await listEntries(session.user.id);
+  const entries = await listEntries(session.user);
 
   return (
     <div className="min-h-screen bg-black px-6 py-10">

@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 
 import { authOptions } from "@/lib/auth/options";
+import { ensureUserId } from "@/lib/auth/users";
 import { db } from "@/lib/db";
 import { entries } from "@/lib/db/schema";
 import {
@@ -19,7 +20,17 @@ import type { CreateEntryState } from "@/lib/entries/actions";
 import { entryInputSchema } from "@/lib/entries/validation";
 import { getNbpRate } from "@/lib/nbp";
 
-export async function listEntries(userId: string) {
+export async function listEntries(user: {
+  id?: string | null;
+  email?: string | null;
+  name?: string | null;
+}) {
+  const userId = await ensureUserId(user);
+
+  if (!userId) {
+    return [];
+  }
+
   const rows = await db
     .select()
     .from(entries)
@@ -39,6 +50,15 @@ export async function createEntry(
     return {
       status: "error",
       message: "You must be signed in to add entries.",
+    };
+  }
+
+  const userId = await ensureUserId(session.user);
+
+  if (!userId) {
+    return {
+      status: "error",
+      message: "User record missing. Please sign in again.",
     };
   }
 
@@ -85,7 +105,7 @@ export async function createEntry(
   const [created] = await db
     .insert(entries)
     .values({
-      userId: session.user.id,
+      userId,
       date: entryDate,
       operation: parsed.data.operation,
       baseAsset: parsed.data.baseAsset.trim().toUpperCase(),

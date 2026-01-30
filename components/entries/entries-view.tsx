@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
 import type { EntryView } from "@/lib/entries/types";
 import { formatNumber } from "@/lib/format/numbers";
@@ -21,7 +22,6 @@ export function EntriesView({ entries, enableActions = true }: EntriesViewProps)
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
   const [page, setPage] = useState(1);
-  const [notice, setNotice] = useState<string | null>(null);
 
   useEffect(() => {
     setEntriesState(entries);
@@ -80,8 +80,7 @@ export function EntriesView({ entries, enableActions = true }: EntriesViewProps)
       }
       return [entry, ...current];
     });
-    setNotice("Entry added successfully.");
-    window.setTimeout(() => setNotice(null), 4000);
+    toast.success("Entry added successfully.");
   }, []);
 
   return (
@@ -96,15 +95,6 @@ export function EntriesView({ entries, enableActions = true }: EntriesViewProps)
         {enableActions ? <AddEntryDialog onCreated={handleCreated} /> : null}
       </div>
 
-      {notice ? (
-        <div
-          role="status"
-          aria-live="polite"
-          className="rounded-sm border border-emerald-500/40 bg-emerald-500/10 px-3 py-2 text-xs text-emerald-200"
-        >
-          {notice}
-        </div>
-      ) : null}
 
       <div className="grid gap-3 rounded-sm border border-neutral-900 bg-neutral-950/40 p-4 text-xs text-neutral-300 md:grid-cols-4">
         <div className="space-y-2">

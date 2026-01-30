@@ -46,7 +46,14 @@ export function EntriesTable({ entries }: EntriesTableProps) {
             <tr key={entry.id} className="bg-neutral-950/30">
               <td className="px-3 py-3 text-neutral-400">{entry.date}</td>
               <td className="px-3 py-3">
-                <Badge variant="secondary" className="text-[10px]">
+                <Badge
+                  variant="secondary"
+                  className={
+                    entry.operation === "BUY"
+                      ? "bg-emerald-500/10 text-emerald-300"
+                      : "bg-red-500/10 text-red-300"
+                  }
+                >
                   {entry.operation}
                 </Badge>
               </td>

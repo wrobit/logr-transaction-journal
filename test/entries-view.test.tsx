@@ -53,8 +53,8 @@ describe("EntriesView", () => {
       target: { value: "SOL" },
     });
 
-    expect(screen.getByText(/SOL/i)).toBeInTheDocument();
-    expect(screen.queryByText(/BTC/i)).not.toBeInTheDocument();
+    expect(screen.getByRole("cell", { name: /sol/i })).toBeInTheDocument();
+    expect(screen.queryByRole("cell", { name: /btc/i })).not.toBeInTheDocument();
   });
 
   it("moves between pages", () => {

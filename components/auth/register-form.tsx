@@ -64,49 +64,49 @@ export function RegisterForm() {
     <div className="space-y-6">
       <div className="space-y-2 text-center">
         <h1 className="text-xl font-semibold">Create your Entry account</h1>
-        <p className="text-sm text-neutral-400">
+        <p className="text-sm text-muted-foreground">
           Start tracking transactions with clarity.
         </p>
       </div>
 
       <OauthButtons />
 
-      <div className="flex items-center gap-3 text-xs text-neutral-500">
-        <Separator className="flex-1 bg-neutral-800" />
+      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+        <Separator className="flex-1 bg-border" />
         <span>or sign up with email</span>
-        <Separator className="flex-1 bg-neutral-800" />
+        <Separator className="flex-1 bg-border" />
       </div>
 
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="firstName" className="text-xs text-neutral-300">
+            <Label htmlFor="firstName" className="text-xs text-muted-foreground">
               First name
             </Label>
             <Input
               id="firstName"
               name="firstName"
               required
-              className="border-neutral-800 bg-neutral-950 text-sm text-white placeholder:text-neutral-600"
+              className="border-border bg-background text-sm text-foreground placeholder:text-muted-foreground"
               placeholder="John"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="lastName" className="text-xs text-neutral-300">
+            <Label htmlFor="lastName" className="text-xs text-muted-foreground">
               Last name
             </Label>
             <Input
               id="lastName"
               name="lastName"
               required
-              className="border-neutral-800 bg-neutral-950 text-sm text-white placeholder:text-neutral-600"
+              className="border-border bg-background text-sm text-foreground placeholder:text-muted-foreground"
               placeholder="Doe"
             />
           </div>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="login" className="text-xs text-neutral-300">
+          <Label htmlFor="login" className="text-xs text-muted-foreground">
             Login
           </Label>
           <Input
@@ -114,13 +114,13 @@ export function RegisterForm() {
             name="login"
             autoComplete="username"
             required
-            className="border-neutral-800 bg-neutral-950 text-sm text-white placeholder:text-neutral-600"
+            className="border-border bg-background text-sm text-foreground placeholder:text-muted-foreground"
             placeholder="entry-user"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-xs text-neutral-300">
+          <Label htmlFor="email" className="text-xs text-muted-foreground">
             Email
           </Label>
           <Input
@@ -129,13 +129,13 @@ export function RegisterForm() {
             type="email"
             autoComplete="email"
             required
-            className="border-neutral-800 bg-neutral-950 text-sm text-white placeholder:text-neutral-600"
+            className="border-border bg-background text-sm text-foreground placeholder:text-muted-foreground"
             placeholder="you@example.com"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="password" className="text-xs text-neutral-300">
+          <Label htmlFor="password" className="text-xs text-muted-foreground">
             Password
           </Label>
           <Input
@@ -144,7 +144,7 @@ export function RegisterForm() {
             type="password"
             autoComplete="new-password"
             required
-            className="border-neutral-800 bg-neutral-950 text-sm text-white placeholder:text-neutral-600"
+            className="border-border bg-background text-sm text-foreground placeholder:text-muted-foreground"
             placeholder="••••••••"
           />
         </div>
@@ -153,16 +153,16 @@ export function RegisterForm() {
 
         <Button
           type="submit"
-          className="w-full bg-white text-black hover:bg-neutral-200"
+          className="w-full bg-foreground text-background hover:bg-foreground/90"
           disabled={isSubmitting}
         >
           {isSubmitting ? "Creating account..." : "Create account"}
         </Button>
       </form>
 
-      <p className="text-center text-xs text-neutral-500">
+      <p className="text-center text-xs text-muted-foreground">
         Already have an account?{" "}
-        <Link href="/login" className="text-neutral-200 hover:text-white">
+        <Link href="/login" className="text-foreground hover:text-foreground">
           Sign in
         </Link>
       </p>

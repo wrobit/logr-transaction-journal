@@ -13,7 +13,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ThemeToggle } from "@/components/layout/theme-toggle";
 
 export function Navbar() {
   return (
@@ -33,20 +32,18 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-3">
-          <ThemeToggle />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 type="button"
-                variant="outline"
+                variant="ghost"
                 size="icon-sm"
-                className="border-neutral-800 text-neutral-300 hover:bg-neutral-900/60"
               >
                 <UserIcon />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-44">
-              <DropdownMenuItem asChild>
+              <DropdownMenuItem variant="default" asChild>
                 <Link href="/profile">Profile</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />

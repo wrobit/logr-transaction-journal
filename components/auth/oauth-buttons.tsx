@@ -13,7 +13,7 @@ export function OauthButtons() {
       <Button
         type="button"
         variant="outline"
-        className="w-full cursor-pointer justify-center gap-2 border-neutral-800 bg-neutral-950 text-neutral-100 hover:border-neutral-700 hover:bg-neutral-900 hover:text-white"
+        className="w-full cursor-pointer justify-center gap-2 border-border bg-background text-foreground hover:bg-muted"
         onClick={() => signIn("google", { callbackUrl: CALLBACK_URL })}
       >
         <Chrome className="size-4" />
@@ -22,7 +22,7 @@ export function OauthButtons() {
       <Button
         type="button"
         variant="outline"
-        className="w-full cursor-pointer justify-center gap-2 border-neutral-800 bg-neutral-950 text-neutral-100 hover:border-neutral-700 hover:bg-neutral-900 hover:text-white"
+        className="w-full cursor-pointer justify-center gap-2 border-border bg-background text-foreground hover:bg-muted"
         onClick={() => signIn("github", { callbackUrl: CALLBACK_URL })}
       >
         <Github className="size-4" />

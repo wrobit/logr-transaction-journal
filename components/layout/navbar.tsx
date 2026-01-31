@@ -16,7 +16,7 @@ import {
 
 export function Navbar() {
   return (
-    <header className="border-b border-neutral-900 bg-neutral-950/90 px-6 py-4 text-white backdrop-blur">
+    <header className="border-b border-border bg-background/90 px-6 py-4 text-foreground backdrop-blur">
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center gap-2">
@@ -25,7 +25,7 @@ export function Navbar() {
               alt="Entry"
               width={120}
               height={32}
-              className="h-6 w-auto opacity-90 invert"
+              className="h-6 w-auto opacity-90 dark:invert"
               priority
             />
           </Link>
@@ -38,24 +38,21 @@ export function Navbar() {
                 type="button"
                 variant="outline"
                 size="icon-sm"
-                className="border-neutral-800 text-neutral-300 hover:bg-neutral-900/60"
+                className="border-border text-muted-foreground hover:bg-muted"
               >
                 <UserIcon />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
               align="end"
-              className="w-44 border border-neutral-800 bg-neutral-950 text-neutral-100 shadow-xl"
+              className="w-44 border border-border bg-popover text-popover-foreground shadow-xl"
             >
-              <DropdownMenuItem
-                className="text-neutral-200 focus:bg-neutral-900 focus:text-white"
-                asChild
-              >
+              <DropdownMenuItem className="text-muted-foreground" asChild>
                 <Link href="/profile">Profile</Link>
               </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-neutral-800" />
+              <DropdownMenuSeparator className="bg-border" />
               <DropdownMenuItem
-                className="text-red-300 focus:bg-red-500/10 focus:text-red-200"
+                className="text-destructive focus:bg-destructive/10"
                 variant="destructive"
                 onClick={() => signOut({ callbackUrl: "/login" })}
               >

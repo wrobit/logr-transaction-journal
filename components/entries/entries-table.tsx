@@ -23,16 +23,16 @@ type EntriesTableProps = {
 export function EntriesTable({ entries }: EntriesTableProps) {
   if (entries.length === 0) {
     return (
-      <div className="rounded-sm border border-neutral-900 bg-neutral-950/40 p-6 text-center text-sm text-neutral-400">
+      <div className="rounded-sm border border-border bg-muted/40 p-6 text-center text-sm text-muted-foreground">
         No entries yet. Add your first transaction to get started.
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-sm border border-neutral-900">
-      <table className="w-full border-collapse text-left text-xs text-neutral-200">
-        <thead className="bg-neutral-950 text-[11px] uppercase tracking-wide text-neutral-500">
+    <div className="overflow-hidden rounded-sm border border-border">
+      <table className="w-full border-collapse text-left text-xs text-foreground">
+        <thead className="bg-muted/50 text-[11px] uppercase tracking-wide text-muted-foreground">
           <tr>
             {columns.map((column) => (
               <th key={column} className="px-3 py-3 font-medium">
@@ -41,10 +41,10 @@ export function EntriesTable({ entries }: EntriesTableProps) {
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-neutral-900">
+        <tbody className="divide-y divide-border">
           {entries.map((entry) => (
-            <tr key={entry.id} className="bg-neutral-950/30">
-              <td className="px-3 py-3 text-neutral-400">{entry.date}</td>
+            <tr key={entry.id} className="bg-background">
+              <td className="px-3 py-3 text-muted-foreground">{entry.date}</td>
               <td className="px-3 py-3">
                 <Badge
                   variant="secondary"
@@ -69,21 +69,21 @@ export function EntriesTable({ entries }: EntriesTableProps) {
               <td className="px-3 py-3">
                 {formatNumber(Number(entry.fullPrice))}
               </td>
-              <td className="px-3 py-3 text-neutral-400">
+              <td className="px-3 py-3 text-muted-foreground">
                 {entry.commission
                   ? formatNumber(Number(entry.commission))
                   : "—"}
               </td>
-              <td className="px-3 py-3 text-neutral-400">
+              <td className="px-3 py-3 text-muted-foreground">
                 {entry.source ?? "—"}
               </td>
-              <td className="px-3 py-3 text-neutral-400">
+              <td className="px-3 py-3 text-muted-foreground">
                 {formatNumber(Number(entry.nbpRate))}
               </td>
               <td className="px-3 py-3">
                 {formatPln(Number(entry.valuePln))}
               </td>
-              <td className="px-3 py-3 text-neutral-400">
+              <td className="px-3 py-3 text-muted-foreground">
                 {entry.note ?? "—"}
               </td>
             </tr>

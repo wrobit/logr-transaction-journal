@@ -24,6 +24,12 @@ const DEFAULT_ASSET = "BTC";
 const ASSET_OPTIONS = ["BTC", "ETH", "SOL"] as const;
 const QUOTE_CURRENCY_OPTIONS = ["PLN", "EUR", "USD"] as const;
 
+const labelClassName = "text-xs text-muted-foreground";
+const inputClassName =
+  "border-border bg-background text-sm text-foreground placeholder:text-muted-foreground";
+const selectClassName =
+  "h-9 w-full rounded-none border border-border bg-background px-3 text-sm text-foreground";
+
 const normalizeNumericInput = (value: string, decimals = 12) => {
   if (!value) {
     return value;
@@ -115,7 +121,7 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
     <div>
       <Button
         type="button"
-        className="bg-white text-black hover:bg-neutral-200"
+        className="bg-foreground text-background hover:bg-foreground/90"
         onClick={() => setOpen(true)}
       >
         Add entry
@@ -123,18 +129,18 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
 
       {open ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4">
-          <div className="w-full max-w-2xl rounded-sm border border-neutral-800 bg-neutral-950 p-6 text-sm text-white shadow-xl">
+          <div className="w-full max-w-2xl rounded-sm border border-border bg-background p-6 text-sm text-foreground shadow-xl">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-lg font-semibold">New entry</h2>
-                <p className="text-xs text-neutral-400">
+                <p className="text-xs text-muted-foreground">
                   Fill in the transaction details to calculate PLN value.
                 </p>
               </div>
               <Button
                 type="button"
                 variant="ghost"
-                className="text-neutral-400"
+                className="text-muted-foreground"
                 onClick={() => setOpen(false)}
               >
                 Close
@@ -147,7 +153,7 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
               className="mt-6 grid gap-4 md:grid-cols-2"
             >
               <div className="space-y-2">
-                <Label htmlFor="date" className="text-xs text-neutral-300">
+                <Label htmlFor="date" className={labelClassName}>
                   Date
                 </Label>
                 <Input
@@ -155,7 +161,7 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
                   name="date"
                   type="date"
                   required
-                  className="border-neutral-800 bg-neutral-950 text-sm text-white"
+                  className={inputClassName}
                 />
                 {state.errors?.date ? (
                   <p className="text-xs text-red-400">{state.errors.date}</p>
@@ -163,7 +169,7 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="operation" className="text-xs text-neutral-300">
+                <Label htmlFor="operation" className={labelClassName}>
                   Operation
                 </Label>
                 <select
@@ -171,7 +177,7 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
                   name="operation"
                   value={operation}
                   onChange={(event) => setOperation(event.target.value)}
-                  className="h-9 w-full rounded-none border border-neutral-800 bg-neutral-950 px-3 text-sm text-white"
+                  className={selectClassName}
                 >
                   <option value="BUY">Buy</option>
                   <option value="SELL">Sell</option>
@@ -184,7 +190,7 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="baseAsset" className="text-xs text-neutral-300">
+                <Label htmlFor="baseAsset" className={labelClassName}>
                   Asset
                 </Label>
                 <select
@@ -192,7 +198,7 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
                   name="baseAsset"
                   value={baseAsset}
                   onChange={(event) => setBaseAsset(event.target.value)}
-                  className="h-9 w-full rounded-none border border-neutral-800 bg-neutral-950 px-3 text-sm text-white"
+                  className={selectClassName}
                   required
                 >
                   {ASSET_OPTIONS.map((asset) => (
@@ -209,10 +215,7 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
               </div>
 
               <div className="space-y-2">
-                <Label
-                  htmlFor="quoteCurrency"
-                  className="text-xs text-neutral-300"
-                >
+                <Label htmlFor="quoteCurrency" className={labelClassName}>
                   Quote currency
                 </Label>
                 <select
@@ -220,7 +223,7 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
                   name="quoteCurrency"
                   value={quoteCurrency}
                   onChange={(event) => setQuoteCurrency(event.target.value)}
-                  className="h-9 w-full rounded-none border border-neutral-800 bg-neutral-950 px-3 text-sm text-white"
+                  className={selectClassName}
                   required
                 >
                   {QUOTE_CURRENCY_OPTIONS.map((currency) => (
@@ -237,7 +240,7 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="quantity" className="text-xs text-neutral-300">
+                <Label htmlFor="quantity" className={labelClassName}>
                   Quantity
                 </Label>
                 <Input
@@ -250,7 +253,7 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
                     setQuantity(normalizeNumericInput(event.target.value))
                   }
                   required
-                  className="border-neutral-800 bg-neutral-950 text-sm text-white"
+                  className={inputClassName}
                 />
                 {state.errors?.quantity ? (
                   <p className="text-xs text-red-400">
@@ -260,10 +263,7 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
               </div>
 
               <div className="space-y-2">
-                <Label
-                  htmlFor="pricePerUnit"
-                  className="text-xs text-neutral-300"
-                >
+                <Label htmlFor="pricePerUnit" className={labelClassName}>
                   Price per unit
                 </Label>
                 <Input
@@ -276,7 +276,7 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
                     setPricePerUnit(normalizeNumericInput(event.target.value))
                   }
                   required
-                  className="border-neutral-800 bg-neutral-950 text-sm text-white"
+                  className={inputClassName}
                 />
                 {state.errors?.pricePerUnit ? (
                   <p className="text-xs text-red-400">
@@ -286,7 +286,7 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="commission" className="text-xs text-neutral-300">
+                <Label htmlFor="commission" className={labelClassName}>
                   Commission
                 </Label>
                 <Input
@@ -298,7 +298,7 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
                   onChange={(event) =>
                     setCommission(normalizeNumericInput(event.target.value))
                   }
-                  className="border-neutral-800 bg-neutral-950 text-sm text-white"
+                  className={inputClassName}
                 />
                 {state.errors?.commission ? (
                   <p className="text-xs text-red-400">
@@ -308,34 +308,30 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="source" className="text-xs text-neutral-300">
+                <Label htmlFor="source" className={labelClassName}>
                   Source
                 </Label>
-                <Input
-                  id="source"
-                  name="source"
-                  className="border-neutral-800 bg-neutral-950 text-sm text-white"
-                />
+                <Input id="source" name="source" className={inputClassName} />
               </div>
 
               <div className="space-y-2 md:col-span-2">
-                <Label htmlFor="note" className="text-xs text-neutral-300">
+                <Label htmlFor="note" className={labelClassName}>
                   Note
                 </Label>
                 <textarea
                   id="note"
                   name="note"
-                  className="min-h-[80px] w-full rounded-none border border-neutral-800 bg-neutral-950 px-3 py-2 text-sm text-white"
+                  className="min-h-[80px] w-full rounded-none border border-border bg-background px-3 py-2 text-sm text-foreground"
                 />
               </div>
 
-              <div className="rounded-sm border border-neutral-800 bg-neutral-950/60 p-4 text-xs text-neutral-300 md:col-span-2">
-                <p className="text-[11px] uppercase tracking-wide text-neutral-500">
+              <div className="rounded-sm border border-border bg-muted/40 p-4 text-xs text-muted-foreground md:col-span-2">
+                <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
                   Live preview
                 </p>
-                <div className="mt-3 grid gap-2 text-xs text-white md:grid-cols-3">
+                <div className="mt-3 grid gap-2 text-xs text-foreground md:grid-cols-3">
                   <div>
-                    <p className="text-neutral-500">Full price</p>
+                    <p className="text-muted-foreground">Full price</p>
                     <p>
                       {preview
                         ? formatNumber(preview.fullPrice)
@@ -343,7 +339,7 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
                     </p>
                   </div>
                   <div>
-                    <p className="text-neutral-500">NBP rate</p>
+                    <p className="text-muted-foreground">NBP rate</p>
                     <p>
                       {preview?.isPln
                         ? "1.00"
@@ -351,7 +347,7 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
                     </p>
                   </div>
                   <div>
-                    <p className="text-neutral-500">Value PLN</p>
+                    <p className="text-muted-foreground">Value PLN</p>
                     <p>
                       {preview?.valuePln !== null && preview?.valuePln !== undefined
                         ? formatPln(preview.valuePln)
@@ -372,13 +368,13 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
                   type="button"
                   variant="outline"
                   onClick={() => setOpen(false)}
-                  className="border-neutral-700 bg-neutral-900/70 text-white hover:bg-neutral-800"
+                  className="border-border text-foreground hover:bg-muted"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
-                  className="bg-white text-black hover:bg-neutral-200"
+                  className="bg-foreground text-background hover:bg-foreground/90"
                   disabled={isPending}
                 >
                   {isPending ? "Saving..." : "Save entry"}

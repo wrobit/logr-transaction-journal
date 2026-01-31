@@ -16,6 +16,10 @@ export function RegisterForm() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const labelClassName = "text-xs text-muted-foreground";
+  const inputClassName =
+    "border-border bg-background text-sm text-foreground placeholder:text-muted-foreground";
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
@@ -80,33 +84,33 @@ export function RegisterForm() {
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="firstName" className="text-xs text-muted-foreground">
+            <Label htmlFor="firstName" className={labelClassName}>
               First name
             </Label>
             <Input
               id="firstName"
               name="firstName"
               required
-              className="border-border bg-background text-sm text-foreground placeholder:text-muted-foreground"
+              className={inputClassName}
               placeholder="John"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="lastName" className="text-xs text-muted-foreground">
+            <Label htmlFor="lastName" className={labelClassName}>
               Last name
             </Label>
             <Input
               id="lastName"
               name="lastName"
               required
-              className="border-border bg-background text-sm text-foreground placeholder:text-muted-foreground"
+              className={inputClassName}
               placeholder="Doe"
             />
           </div>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="login" className="text-xs text-muted-foreground">
+          <Label htmlFor="login" className={labelClassName}>
             Login
           </Label>
           <Input
@@ -114,13 +118,13 @@ export function RegisterForm() {
             name="login"
             autoComplete="username"
             required
-            className="border-border bg-background text-sm text-foreground placeholder:text-muted-foreground"
+            className={inputClassName}
             placeholder="entry-user"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-xs text-muted-foreground">
+          <Label htmlFor="email" className={labelClassName}>
             Email
           </Label>
           <Input
@@ -129,13 +133,13 @@ export function RegisterForm() {
             type="email"
             autoComplete="email"
             required
-            className="border-border bg-background text-sm text-foreground placeholder:text-muted-foreground"
+            className={inputClassName}
             placeholder="you@example.com"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="password" className="text-xs text-muted-foreground">
+          <Label htmlFor="password" className={labelClassName}>
             Password
           </Label>
           <Input
@@ -144,7 +148,7 @@ export function RegisterForm() {
             type="password"
             autoComplete="new-password"
             required
-            className="border-border bg-background text-sm text-foreground placeholder:text-muted-foreground"
+            className={inputClassName}
             placeholder="••••••••"
           />
         </div>

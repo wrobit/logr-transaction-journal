@@ -16,6 +16,10 @@ export function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const labelClassName = "text-xs text-muted-foreground";
+  const inputClassName =
+    "border-border bg-background text-sm text-foreground placeholder:text-muted-foreground";
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
@@ -61,7 +65,7 @@ export function LoginForm() {
 
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-xs text-muted-foreground">
+          <Label htmlFor="email" className={labelClassName}>
             Email
           </Label>
           <Input
@@ -70,12 +74,12 @@ export function LoginForm() {
             type="email"
             autoComplete="email"
             required
-            className="border-border bg-background text-sm text-foreground placeholder:text-muted-foreground"
+            className={inputClassName}
             placeholder="you@example.com"
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="password" className="text-xs text-muted-foreground">
+          <Label htmlFor="password" className={labelClassName}>
             Password
           </Label>
           <Input
@@ -84,7 +88,7 @@ export function LoginForm() {
             type="password"
             autoComplete="current-password"
             required
-            className="border-border bg-background text-sm text-foreground placeholder:text-muted-foreground"
+            className={inputClassName}
             placeholder="••••••••"
           />
         </div>

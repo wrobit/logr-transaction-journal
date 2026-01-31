@@ -84,23 +84,22 @@ export function EntriesView({ entries, enableActions = true }: EntriesViewProps)
   }, []);
 
   return (
-    <div className="space-y-6 text-white">
+    <div className="space-y-6 text-foreground">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-lg font-semibold">Entries</h1>
-          <p className="text-sm text-neutral-400">
+          <p className="text-sm text-muted-foreground">
             Track every transaction with deterministic PLN valuation.
           </p>
         </div>
         {enableActions ? <AddEntryDialog onCreated={handleCreated} /> : null}
       </div>
 
-
-      <div className="grid gap-3 rounded-sm border border-neutral-900 bg-neutral-950/40 p-4 text-xs text-neutral-300 md:grid-cols-4">
+      <div className="grid gap-3 rounded-sm border border-border bg-muted/40 p-4 text-xs text-muted-foreground md:grid-cols-4">
         <div className="space-y-2">
           <label
             htmlFor="start-date"
-            className="text-[11px] uppercase tracking-wide text-neutral-500"
+            className="text-[11px] uppercase tracking-wide text-muted-foreground"
           >
             Start date
           </label>
@@ -109,13 +108,13 @@ export function EntriesView({ entries, enableActions = true }: EntriesViewProps)
             type="date"
             value={startDate}
             onChange={(event) => setStartDate(event.target.value)}
-            className="h-8 w-full rounded-none border border-neutral-800 bg-neutral-950 px-2 text-xs text-white"
+            className="h-8 w-full rounded-none border border-border bg-background px-2 text-xs text-foreground"
           />
         </div>
         <div className="space-y-2">
           <label
             htmlFor="end-date"
-            className="text-[11px] uppercase tracking-wide text-neutral-500"
+            className="text-[11px] uppercase tracking-wide text-muted-foreground"
           >
             End date
           </label>
@@ -124,13 +123,13 @@ export function EntriesView({ entries, enableActions = true }: EntriesViewProps)
             type="date"
             value={endDate}
             onChange={(event) => setEndDate(event.target.value)}
-            className="h-8 w-full rounded-none border border-neutral-800 bg-neutral-950 px-2 text-xs text-white"
+            className="h-8 w-full rounded-none border border-border bg-background px-2 text-xs text-foreground"
           />
         </div>
         <div className="space-y-2">
           <label
             htmlFor="asset-filter"
-            className="text-[11px] uppercase tracking-wide text-neutral-500"
+            className="text-[11px] uppercase tracking-wide text-muted-foreground"
           >
             Asset
           </label>
@@ -138,7 +137,7 @@ export function EntriesView({ entries, enableActions = true }: EntriesViewProps)
             id="asset-filter"
             value={assetFilter}
             onChange={(event) => setAssetFilter(event.target.value)}
-            className="h-8 w-full rounded-none border border-neutral-800 bg-neutral-950 px-2 text-xs text-white"
+            className="h-8 w-full rounded-none border border-border bg-background px-2 text-xs text-foreground"
           >
             <option value="all">All assets</option>
             {assets.map((asset) => (
@@ -151,7 +150,7 @@ export function EntriesView({ entries, enableActions = true }: EntriesViewProps)
         <div className="space-y-2">
           <label
             htmlFor="operation-filter"
-            className="text-[11px] uppercase tracking-wide text-neutral-500"
+            className="text-[11px] uppercase tracking-wide text-muted-foreground"
           >
             Operation
           </label>
@@ -159,7 +158,7 @@ export function EntriesView({ entries, enableActions = true }: EntriesViewProps)
             id="operation-filter"
             value={operationFilter}
             onChange={(event) => setOperationFilter(event.target.value)}
-            className="h-8 w-full rounded-none border border-neutral-800 bg-neutral-950 px-2 text-xs text-white"
+            className="h-8 w-full rounded-none border border-border bg-background px-2 text-xs text-foreground"
           >
             <option value="all">All operations</option>
             <option value="BUY">Buy</option>
@@ -168,7 +167,7 @@ export function EntriesView({ entries, enableActions = true }: EntriesViewProps)
         </div>
       </div>
 
-      <div className="flex items-center justify-between text-xs text-neutral-400">
+      <div className="flex items-center justify-between text-xs text-muted-foreground">
         <span>
           Showing {paginatedEntries.length} of {filteredEntries.length} entries
         </span>
@@ -177,24 +176,24 @@ export function EntriesView({ entries, enableActions = true }: EntriesViewProps)
 
       <EntriesTable entries={paginatedEntries} />
 
-      <div className="flex items-center justify-between gap-3 text-xs text-neutral-400">
+      <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
         <button
           type="button"
           onClick={() => setPage((current) => Math.max(1, current - 1))}
           disabled={page === 1}
-          className="rounded-none border border-neutral-800 px-3 py-2 text-xs text-white disabled:opacity-40"
+          className="rounded-none border border-border px-3 py-2 text-xs text-foreground disabled:opacity-40"
         >
           Previous
         </button>
         <div className="flex items-center gap-2">
-          <span className="text-neutral-500">Rows per page:</span>
+          <span className="text-muted-foreground">Rows per page:</span>
           <span>{formatNumber(PAGE_SIZE)}</span>
         </div>
         <button
           type="button"
           onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
           disabled={page >= totalPages}
-          className="rounded-none border border-neutral-800 px-3 py-2 text-xs text-white disabled:opacity-40"
+          className="rounded-none border border-border px-3 py-2 text-xs text-foreground disabled:opacity-40"
         >
           Next
         </button>

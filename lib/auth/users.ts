@@ -19,6 +19,45 @@ export async function getUserByEmail(email: string) {
   return user ?? null;
 }
 
+export async function getUserById(id: string) {
+  const [user] = await db
+    .select()
+    .from(users)
+    .where(eq(users.id, id))
+    .limit(1);
+
+  return user ?? null;
+}
+
+export async function ensureUserId({
+  id,
+  email,
+  name,
+}: {
+  id?: string | null;
+  email?: string | null;
+  name?: string | null;
+}) {
+  if (id) {
+    const existing = await getUserById(id);
+    if (existing) {
+      return existing.id;
+    }
+  }
+
+  if (!email) {
+    return null;
+  }
+
+  const existingByEmail = await getUserByEmail(email);
+  if (existingByEmail) {
+    return existingByEmail.id;
+  }
+
+  const created = await createOauthUser({ email, name });
+  return created.id;
+}
+
 export async function getUserByLogin(login: string) {
   const [user] = await db
     .select()

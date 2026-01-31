@@ -277,30 +277,30 @@ Auth Pages Implementation Plan:
 
 ### Phase 3 — Core Logic
 
-- [ ] Define entry creation server action with zod validation and type-safe payload
-- [ ] Compute derived fields (`fullPrice`, `valuePLN`, `nbpRateDate`) server-side
-- [ ] Implement NBP rate resolver with weekend/holiday fallback
-- [ ] Add fx_rates_cache lookup + insert on cache miss
-- [ ] Create DB insert for entries with Drizzle + return inserted row
-- [ ] Wire entry creation to UI submit (server action or API route)
-- [ ] Return validation errors to the UI with field mapping
-- [ ] Add tests for NBP resolver edge cases (weekends, 404 fallback)
-- [ ] Add tests for cache hit/miss behavior
-- [ ] Add tests for entry creation calculation correctness
-- [ ] Add tests for server action validation failures
+- [x] Define entry creation server action with zod validation and type-safe payload
+- [x] Compute derived fields (`fullPrice`, `valuePLN`, `nbpRateDate`) server-side
+- [x] Implement NBP rate resolver with weekend/holiday fallback
+- [x] Add fx_rates_cache lookup + insert on cache miss
+- [x] Create DB insert for entries with Drizzle + return inserted row
+- [x] Wire entry creation to UI submit (server action or API route)
+- [x] Return validation errors to the UI with field mapping
+- [x] Add tests for NBP resolver edge cases (weekends, 404 fallback)
+- [x] Add tests for cache hit/miss behavior
+- [x] Add tests for entry creation calculation correctness
+- [x] Add tests for server action validation failures
 
 ### Phase 4 — Entries UI
 
-- [ ] Build entries table component with formatting helpers
-- [ ] Add date range filter (client-side filter for now)
-- [ ] Add asset/operation filters (client-side, simple select)
-- [ ] Add pagination (client-side, slice results)
-- [ ] Build add entry dialog with form fields + live preview
-- [ ] Hook dialog submit to Phase 3 server action
-- [ ] Show loading, success, and error toasts
-- [ ] Ensure empty state and error state rendering
-- [ ] Add tests for table rendering, filters, and pagination
-- [ ] Add tests for entry form validation + submit flow
+- [x] Build entries table component with formatting helpers
+- [x] Add date range filter (client-side filter for now)
+- [x] Add asset/operation filters (client-side, simple select)
+- [x] Add pagination (client-side, slice results)
+- [x] Build add entry dialog with form fields + live preview
+- [x] Hook dialog submit to Phase 3 server action
+- [x] Show loading, success, and error toasts
+- [x] Ensure empty state and error state rendering
+- [x] Add tests for table rendering, filters, and pagination
+- [x] Add tests for entry form validation + submit flow
 
 ### Phase 4.1 — Entries Querying (Server-Backed)
 
@@ -308,20 +308,20 @@ Auth Pages Implementation Plan:
 - [ ] Add indexed queries for date range + asset + operation filters
 - [ ] Add loading states for server-side table refresh
 - [ ] Add tests for query param parsing and DB filtering
+- [ ] Add rows numbering
+- [ ] Add actions column with edit / preview / delete row (destructive)
 
-### Phase 5 — Summary
+### Phase 5 — Dashboard
 
+- [ ] Dashboard UI
 - [ ] Aggregations
 - [ ] Holdings calculation
+- [ ] Use shadcn charts library
 
 ### Phase 6 — Profile
 
 - [ ] Account data
 - [ ] Account deletion
-
-### Phase 7 — Dashboard (optional)
-
-- [ ] Dashboard UI
 
 ---
 

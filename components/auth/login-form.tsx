@@ -16,6 +16,10 @@ export function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const labelClassName = "text-xs text-muted-foreground";
+  const inputClassName =
+    "border-border bg-background text-sm text-foreground placeholder:text-muted-foreground";
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
@@ -46,22 +50,22 @@ export function LoginForm() {
     <div className="space-y-6">
       <div className="space-y-2 text-center">
         <h1 className="text-xl font-semibold">Welcome to Entry</h1>
-        <p className="text-sm text-neutral-400">
+        <p className="text-sm text-muted-foreground">
           Minimal crypto journaling for accurate tracking.
         </p>
       </div>
 
       <OauthButtons />
 
-      <div className="flex items-center gap-3 text-xs text-neutral-500">
-        <Separator className="flex-1 bg-neutral-800" />
+      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+        <Separator className="flex-1 bg-border" />
         <span>or continue with email</span>
-        <Separator className="flex-1 bg-neutral-800" />
+        <Separator className="flex-1 bg-border" />
       </div>
 
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-xs text-neutral-300">
+          <Label htmlFor="email" className={labelClassName}>
             Email
           </Label>
           <Input
@@ -70,12 +74,12 @@ export function LoginForm() {
             type="email"
             autoComplete="email"
             required
-            className="border-neutral-800 bg-neutral-950 text-sm text-white placeholder:text-neutral-600"
+            className={inputClassName}
             placeholder="you@example.com"
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="password" className="text-xs text-neutral-300">
+          <Label htmlFor="password" className={labelClassName}>
             Password
           </Label>
           <Input
@@ -84,7 +88,7 @@ export function LoginForm() {
             type="password"
             autoComplete="current-password"
             required
-            className="border-neutral-800 bg-neutral-950 text-sm text-white placeholder:text-neutral-600"
+            className={inputClassName}
             placeholder="••••••••"
           />
         </div>
@@ -93,16 +97,16 @@ export function LoginForm() {
 
         <Button
           type="submit"
-          className="w-full bg-white text-black hover:bg-neutral-200"
+          className="w-full bg-foreground text-background hover:bg-foreground/90"
           disabled={isSubmitting}
         >
           {isSubmitting ? "Signing in..." : "Continue"}
         </Button>
       </form>
 
-      <p className="text-center text-xs text-neutral-500">
+      <p className="text-center text-xs text-muted-foreground">
         Don&apos;t have an account?{" "}
-        <Link href="/register" className="text-neutral-200 hover:text-white">
+        <Link href="/register" className="text-foreground hover:text-foreground">
           Register
         </Link>
       </p>

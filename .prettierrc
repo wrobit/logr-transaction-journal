@@ -1,0 +1,14 @@
+{
+  "printWidth": 100,
+  "semi": true,
+  "singleQuote": false,
+  "tabWidth": 2,
+  "trailingComma": "es5",
+  "importOrder": [
+    "<THIRD_PARTY_MODULES>",
+    "^(app|assets|config|services|utils|controllers)/?",
+    "^[./]"
+  ],
+  "importOrderSeparation": true,
+  "importOrderSortSpecifiers": true
+}

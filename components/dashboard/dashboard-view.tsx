@@ -6,19 +6,24 @@ import {
   Bar,
   BarChart,
   CartesianGrid,
-  Cell,
   Line,
   LineChart,
   Pie,
   PieChart,
-  ResponsiveContainer,
-  Tooltip,
   XAxis,
   YAxis,
 } from "recharts";
 
 import type { DashboardData } from "@/actions/dashboard";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "@/components/ui/chart";
 import {
   Select,
   SelectContent,
@@ -34,24 +39,26 @@ import {
 import { formatNumber, formatPln } from "@/lib/format/numbers";
 import { cn } from "@/lib/utils";
 
-const CHART_COLORS = [
-  "#38BDF8",
-  "#A78BFA",
-  "#F472B6",
-  "#34D399",
-  "#FACC15",
-  "#FB7185",
+const HOLDINGS_MIX_COLORS = [
+  "var(--chart-1)",
+  "var(--chart-2)",
+  "var(--chart-3)",
+  "var(--chart-4)",
+  "var(--chart-5)",
 ];
+
+const pnlChartConfig = {
+  pnlValue: { label: "PnL", color: "var(--chart-1)" },
+} satisfies ChartConfig;
+
+const volumeChartConfig = {
+  buyValue: { label: "Buy", color: "var(--chart-2)" },
+  sellValue: { label: "Sell", color: "var(--chart-4)" },
+} satisfies ChartConfig;
 
 type DashboardViewProps = {
   data: DashboardData;
   query: DashboardQuery;
-};
-
-type TooltipPayload = {
-  name?: string;
-  value?: number;
-  payload?: Record<string, unknown>;
 };
 
 export function DashboardView({ data, query }: DashboardViewProps) {
@@ -68,14 +75,14 @@ export function DashboardView({ data, query }: DashboardViewProps) {
       const href = queryString ? `/dashboard?${queryString}` : "/dashboard";
       startTransition(() => router.push(href));
     },
-    [router, startTransition],
+    [router, startTransition]
   );
 
   const handleRangeChange = useCallback(
     (range: DashboardQuery["range"]) => {
       navigateWithQuery({ ...query, range });
     },
-    [navigateWithQuery, query],
+    [navigateWithQuery, query]
   );
 
   const handleAssetChange = useCallback(
@@ -85,16 +92,34 @@ export function DashboardView({ data, query }: DashboardViewProps) {
         asset: asset === "all" ? undefined : asset,
       });
     },
-    [navigateWithQuery, query],
+    [navigateWithQuery, query]
   );
 
   const totals = data.totals;
   const hasSeries = data.series.length > 0;
   const hasHoldings = data.holdings.length > 0;
   const hasHoldingsMix = data.holdingsMix.length > 0;
-  const axisFormatter = (value: number) =>
-    formatNumber(value, { maximumFractionDigits: 0 });
+  const axisFormatter = (value: number) => formatNumber(value, { maximumFractionDigits: 0 });
   const dateTickFormatter = (value: string | number) => String(value).slice(5);
+  const holdingsMixConfig = useMemo(
+    () =>
+      data.holdingsMix.reduce<ChartConfig>((config, entry, index) => {
+        config[entry.asset] = {
+          label: entry.asset,
+          color: HOLDINGS_MIX_COLORS[index % HOLDINGS_MIX_COLORS.length],
+        };
+        return config;
+      }, {}),
+    [data.holdingsMix]
+  );
+  const holdingsMixChartData = useMemo(
+    () =>
+      data.holdingsMix.map((entry) => ({
+        ...entry,
+        fill: `var(--color-${entry.asset})`,
+      })),
+    [data.holdingsMix]
+  );
 
   return (
     <div className="space-y-6 text-foreground">
@@ -106,9 +131,7 @@ export function DashboardView({ data, query }: DashboardViewProps) {
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {isPending ? (
-            <span className="text-xs text-muted-foreground">Refreshing…</span>
-          ) : null}
+          {isPending ? <span className="text-xs text-muted-foreground">Refreshing…</span> : null}
           <Select value={query.range} onValueChange={handleRangeChange}>
             <SelectTrigger size="sm" className="min-w-[120px]">
               <SelectValue placeholder="Range" />
@@ -138,11 +161,7 @@ export function DashboardView({ data, query }: DashboardViewProps) {
       </div>
 
       <div className="grid gap-3 md:grid-cols-3">
-        <KpiCard
-          label="Total buys"
-          value={formatPln(totals.buyValue)}
-          subtitle="Realized cost"
-        />
+        <KpiCard label="Total buys" value={formatPln(totals.buyValue)} subtitle="Realized cost" />
         <KpiCard
           label="Total sells"
           value={formatPln(totals.sellValue)}
@@ -157,7 +176,7 @@ export function DashboardView({ data, query }: DashboardViewProps) {
       </div>
 
       <div className="grid gap-3 md:grid-cols-12">
-        <Card className={cn("md:col-span-8", isPending && "opacity-60")}> 
+        <Card className={cn("md:col-span-8", isPending && "opacity-60")}>
           <CardHeader className="border-b border-border/60">
             <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
               PnL over time
@@ -165,33 +184,40 @@ export function DashboardView({ data, query }: DashboardViewProps) {
           </CardHeader>
           <CardContent className="h-[260px]">
             {hasSeries ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={data.series} margin={{ left: 8, right: 12 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
+              <ChartContainer config={pnlChartConfig} className="h-full w-full min-h-[200px]">
+                <LineChart data={data.series} margin={{ left: 8, right: 12 }} accessibilityLayer>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
                   <XAxis
                     dataKey="date"
                     tickMargin={8}
                     tickFormatter={dateTickFormatter}
+                    axisLine={false}
+                    tickLine={false}
                   />
-                  <YAxis width={60} tickFormatter={axisFormatter} />
-                  <Tooltip content={<ChartTooltip />} />
+                  <YAxis
+                    width={60}
+                    tickFormatter={axisFormatter}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <ChartTooltip content={<ChartTooltipContent valueFormatter={formatPln} />} />
                   <Line
                     type="monotone"
                     dataKey="pnlValue"
                     name="PnL"
-                    stroke="#38BDF8"
+                    stroke="var(--color-pnlValue)"
                     strokeWidth={2}
                     dot={false}
                   />
                 </LineChart>
-              </ResponsiveContainer>
+              </ChartContainer>
             ) : (
               <EmptyPanel message="No PnL data for this range." />
             )}
           </CardContent>
         </Card>
 
-        <Card className={cn("md:col-span-4", isPending && "opacity-60")}> 
+        <Card className={cn("md:col-span-4", isPending && "opacity-60")}>
           <CardHeader className="border-b border-border/60">
             <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
               Holdings mix
@@ -199,26 +225,24 @@ export function DashboardView({ data, query }: DashboardViewProps) {
           </CardHeader>
           <CardContent className="h-[260px]">
             {hasHoldingsMix ? (
-              <ResponsiveContainer width="100%" height="100%">
+              <ChartContainer config={holdingsMixConfig} className="h-full w-full min-h-[200px]">
                 <PieChart>
                   <Pie
-                    data={data.holdingsMix}
+                    data={holdingsMixChartData}
                     dataKey="value"
                     nameKey="asset"
                     innerRadius={48}
                     outerRadius={80}
                     paddingAngle={2}
-                  >
-                    {data.holdingsMix.map((entry, index) => (
-                      <Cell
-                        key={entry.asset}
-                        fill={CHART_COLORS[index % CHART_COLORS.length]}
-                      />
-                    ))}
-                  </Pie>
-                  <Tooltip content={<ChartTooltip />} />
+                  />
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent nameKey="asset" hideLabel valueFormatter={formatPln} />
+                    }
+                  />
+                  <ChartLegend content={<ChartLegendContent nameKey="asset" />} />
                 </PieChart>
-              </ResponsiveContainer>
+              </ChartContainer>
             ) : (
               <EmptyPanel message="No holdings mix available." />
             )}
@@ -227,7 +251,7 @@ export function DashboardView({ data, query }: DashboardViewProps) {
       </div>
 
       <div className="grid gap-3 md:grid-cols-12">
-        <Card className={cn("md:col-span-7", isPending && "opacity-60")}> 
+        <Card className={cn("md:col-span-7", isPending && "opacity-60")}>
           <CardHeader className="border-b border-border/60">
             <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
               Buy vs sell volume
@@ -235,39 +259,47 @@ export function DashboardView({ data, query }: DashboardViewProps) {
           </CardHeader>
           <CardContent className="h-[240px]">
             {hasSeries ? (
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data.series} margin={{ left: 8, right: 12 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#1F2937" />
+              <ChartContainer config={volumeChartConfig} className="h-full w-full min-h-[180px]">
+                <BarChart data={data.series} margin={{ left: 8, right: 12 }} accessibilityLayer>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
                   <XAxis
                     dataKey="date"
                     tickMargin={8}
                     tickFormatter={dateTickFormatter}
+                    axisLine={false}
+                    tickLine={false}
                   />
-                  <YAxis width={60} tickFormatter={axisFormatter} />
-                  <Tooltip content={<ChartTooltip />} />
+                  <YAxis
+                    width={60}
+                    tickFormatter={axisFormatter}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <ChartTooltip content={<ChartTooltipContent valueFormatter={formatPln} />} />
+                  <ChartLegend content={<ChartLegendContent />} />
                   <Bar
                     dataKey="buyValue"
                     name="Buy"
                     stackId="a"
-                    fill="#34D399"
+                    fill="var(--color-buyValue)"
                     radius={[2, 2, 0, 0]}
                   />
                   <Bar
                     dataKey="sellValue"
                     name="Sell"
                     stackId="a"
-                    fill="#F472B6"
+                    fill="var(--color-sellValue)"
                     radius={[2, 2, 0, 0]}
                   />
                 </BarChart>
-              </ResponsiveContainer>
+              </ChartContainer>
             ) : (
               <EmptyPanel message="No volume data for this range." />
             )}
           </CardContent>
         </Card>
 
-        <Card className={cn("md:col-span-5", isPending && "opacity-60")}> 
+        <Card className={cn("md:col-span-5", isPending && "opacity-60")}>
           <CardHeader className="border-b border-border/60">
             <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
               Holdings by asset
@@ -288,23 +320,17 @@ export function DashboardView({ data, query }: DashboardViewProps) {
                   <tbody className="divide-y divide-border">
                     {data.holdings.map((holding) => (
                       <tr key={holding.asset}>
-                        <td className="py-2 pr-2 text-muted-foreground">
-                          {holding.asset}
-                        </td>
+                        <td className="py-2 pr-2 text-muted-foreground">{holding.asset}</td>
                         <td className="py-2 pr-2">
                           {formatNumber(holding.netQuantity, {
                             maximumFractionDigits: 6,
                           })}
                         </td>
-                        <td className="py-2 pr-2">
-                          {formatPln(holding.buyValue)}
-                        </td>
+                        <td className="py-2 pr-2">{formatPln(holding.buyValue)}</td>
                         <td
                           className={cn(
                             "py-2",
-                            holding.pnlValue >= 0
-                              ? "text-emerald-300"
-                              : "text-red-300",
+                            holding.pnlValue >= 0 ? "text-emerald-300" : "text-red-300"
                           )}
                         >
                           {formatPln(holding.pnlValue)}
@@ -338,16 +364,14 @@ function KpiCard({
   return (
     <Card className="bg-muted/20">
       <CardHeader className="border-b border-border/60">
-        <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
-          {label}
-        </div>
+        <div className="text-[11px] uppercase tracking-wide text-muted-foreground">{label}</div>
       </CardHeader>
       <CardContent className="flex flex-col gap-1">
         <div
           className={cn(
             "text-lg font-semibold",
             highlight === "positive" && "text-emerald-300",
-            highlight === "negative" && "text-red-300",
+            highlight === "negative" && "text-red-300"
           )}
         >
           {value}
@@ -362,48 +386,6 @@ function EmptyPanel({ message }: { message: string }) {
   return (
     <div className="flex h-full items-center justify-center text-xs text-muted-foreground">
       {message}
-    </div>
-  );
-}
-
-function ChartTooltip({
-  active,
-  payload,
-  label,
-}: {
-  active?: boolean;
-  payload?: TooltipPayload[];
-  label?: string | number;
-}) {
-  if (!active || !payload?.length) {
-    return null;
-  }
-
-  const payloadLabel = payload[0]?.payload?.asset;
-  const title =
-    typeof payloadLabel === "string"
-      ? payloadLabel
-      : label
-        ? String(label)
-        : "";
-
-  return (
-    <div className="rounded-sm border border-border bg-popover px-3 py-2 text-xs text-popover-foreground shadow-lg">
-      {title ? (
-        <div className="text-[11px] uppercase text-muted-foreground">
-          {title}
-        </div>
-      ) : null}
-      <div className="mt-1 space-y-1">
-        {payload.map((item) => (
-          <div key={item.name} className="flex items-center justify-between gap-4">
-            <span className="text-muted-foreground">{item.name}</span>
-            <span className="font-medium">
-              {formatPln(Number(item.value ?? 0))}
-            </span>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }

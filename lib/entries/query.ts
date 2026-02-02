@@ -63,9 +63,7 @@ const DEFAULT_SORT_DIR: EntrySortDirection = "asc";
 const getFirstValue = (value: string | string[] | undefined) =>
   Array.isArray(value) ? value[0] : value;
 
-export function parseEntryQuery(
-  params: Record<string, string | string[] | undefined>,
-): EntryQuery {
+export function parseEntryQuery(params: Record<string, string | string[] | undefined>): EntryQuery {
   const pageResult = pageSchema.safeParse(getFirstValue(params.page));
   const startDateResult = dateSchema.safeParse(getFirstValue(params.startDate));
   const endDateResult = dateSchema.safeParse(getFirstValue(params.endDate));
@@ -110,10 +108,7 @@ export function buildEntryQueryParams(query: EntryQuery) {
     params.set("operation", query.filters.operation);
   }
 
-  if (
-    query.sortBy !== DEFAULT_SORT_BY ||
-    query.sortDir !== DEFAULT_SORT_DIR
-  ) {
+  if (query.sortBy !== DEFAULT_SORT_BY || query.sortDir !== DEFAULT_SORT_DIR) {
     params.set("sortBy", query.sortBy);
     params.set("sortDir", query.sortDir);
   }

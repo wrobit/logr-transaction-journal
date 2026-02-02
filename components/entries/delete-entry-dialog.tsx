@@ -10,7 +10,6 @@ import {
 import type { EntryView } from "@/lib/entries/types";
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -18,6 +17,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 
 const DEFAULT_STATE = defaultDeleteEntryState;
 
@@ -79,13 +79,13 @@ export function DeleteEntryDialog({
 
           <AlertDialogFooter>
             <AlertDialogCancel type="button">Cancel</AlertDialogCancel>
-            <AlertDialogAction
+            <Button
               type="submit"
               variant="destructive"
               disabled={isPending}
             >
               {isPending ? "Deleting..." : "Delete entry"}
-            </AlertDialogAction>
+            </Button>
           </AlertDialogFooter>
         </form>
       </AlertDialogContent>

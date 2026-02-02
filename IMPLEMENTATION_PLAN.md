@@ -313,10 +313,15 @@ Auth Pages Implementation Plan:
 
 ### Phase 5 — Dashboard
 
-- [ ] Dashboard UI
-- [ ] Aggregations
-- [ ] Holdings calculation
-- [ ] Use shadcn charts library
+- [ ] Define dashboard grid layout + HUD-style panels
+- [ ] Add filter bar (time range dropdown + asset dropdown)
+- [ ] Default time range: All time (7D/30D/90D/YTD/All)
+- [ ] Realized PnL only (default)
+- [ ] Build server aggregations (PnL series, buy vs sell, holdings mix)
+- [ ] Add KPI cards (total buys, total sells, realized PnL)
+- [ ] Add charts with shadcn (line PnL, stacked buy/sell, donut holdings)
+- [ ] Hook filters to server refresh + loading/empty states
+- [ ] Add tests for aggregations and dashboard render
 
 ### Phase 6 — Profile
 

@@ -346,6 +346,52 @@ export function DashboardView({ data, query }: DashboardViewProps) {
           </CardContent>
         </Card>
       </div>
+
+      <div className="grid gap-3 md:grid-cols-12">
+        <Card className={cn("md:col-span-12", isPending && "opacity-60")}>
+          <CardHeader className="border-b border-border/60">
+            <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
+              Buy vs sell by asset
+            </div>
+          </CardHeader>
+          <CardContent className="h-[260px]">
+            {hasHoldings ? (
+              <ChartContainer config={volumeChartConfig} className="h-full w-full min-h-[200px]">
+                <BarChart
+                  data={data.holdings}
+                  margin={{ left: 8, right: 12 }}
+                  accessibilityLayer
+                >
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                  <XAxis dataKey="asset" tickMargin={8} axisLine={false} tickLine={false} />
+                  <YAxis
+                    width={60}
+                    tickFormatter={axisFormatter}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <ChartTooltip content={<ChartTooltipContent valueFormatter={formatPln} />} />
+                  <ChartLegend content={<ChartLegendContent />} />
+                  <Bar
+                    dataKey="buyValue"
+                    name="Buy"
+                    fill="var(--color-buyValue)"
+                    radius={[2, 2, 0, 0]}
+                  />
+                  <Bar
+                    dataKey="sellValue"
+                    name="Sell"
+                    fill="var(--color-sellValue)"
+                    radius={[2, 2, 0, 0]}
+                  />
+                </BarChart>
+              </ChartContainer>
+            ) : (
+              <EmptyPanel message="No asset volume data yet." />
+            )}
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

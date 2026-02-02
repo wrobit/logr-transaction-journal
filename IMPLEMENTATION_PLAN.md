@@ -123,7 +123,9 @@ Visual overview of data.
 
 - PnL over time
 - Buy vs Sell volume
+- Buy vs Sell by asset
 - Asset distribution
+- Realized PnL % KPI
 
 ---
 
@@ -321,14 +323,14 @@ Auth Pages Implementation Plan:
 
 ### Phase 5 — Dashboard
 
-- [ ] Define dashboard grid layout + HUD-style panels
-- [ ] Add filter bar (time range dropdown + asset dropdown)
-- [ ] Default time range: All time (7D/30D/90D/YTD/All)
-- [ ] Realized PnL only (default)
-- [ ] Build server aggregations (PnL series, buy vs sell, holdings mix)
-- [ ] Add KPI cards (total buys, total sells, realized PnL)
-- [ ] Add charts with shadcn (line PnL, stacked buy/sell, donut holdings)
-- [ ] Hook filters to server refresh + loading/empty states
+- [x] Define dashboard grid layout + HUD-style panels
+- [x] Add filter bar (time range dropdown + asset dropdown)
+- [x] Default time range: All time (7D/30D/90D/YTD/All)
+- [x] Realized PnL only (default)
+- [x] Build server aggregations (PnL series, buy vs sell, holdings mix)
+- [x] Add KPI cards (total buys, total sells, realized PnL)
+- [x] Add charts with shadcn (line PnL, stacked buy/sell, donut holdings)
+- [x] Hook filters to server refresh + loading/empty states
 - [ ] Add tests for aggregations and dashboard render
 
 ### Phase 6 — Profile

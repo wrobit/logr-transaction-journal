@@ -1,10 +1,12 @@
 "use client";
 
-import { useCallback, useTransition } from "react";
+import { useCallback, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
 import { AddEntryDialog } from "@/components/entries/add-entry-dialog";
+import { DeleteEntryDialog } from "@/components/entries/delete-entry-dialog";
+import { EditEntryDialog } from "@/components/entries/edit-entry-dialog";
 import { EntriesTable } from "@/components/entries/entries-table";
 import { buildEntryQueryParams, type EntryQuery } from "@/lib/entries/query";
 import type { EntryView } from "@/lib/entries/types";
@@ -55,6 +57,9 @@ export function EntriesView({
     [navigateWithQuery, query],
   );
 
+  const [editingEntry, setEditingEntry] = useState<EntryView | null>(null);
+  const [deletingEntry, setDeletingEntry] = useState<EntryView | null>(null);
+
   const handleCreated = useCallback(
     (_entry: EntryView) => {
       toast.success("Entry added successfully.");
@@ -63,16 +68,25 @@ export function EntriesView({
     [router, startTransition],
   );
 
-  const handlePreview = useCallback((_entry: EntryView) => {
-    toast.message("Preview is coming soon.");
+  const handleUpdated = useCallback(
+    (_entry: EntryView) => {
+      toast.success("Entry updated successfully.");
+      startTransition(() => router.refresh());
+    },
+    [router, startTransition],
+  );
+
+  const handleDeleted = useCallback(() => {
+    toast.success("Entry deleted successfully.");
+    startTransition(() => router.refresh());
+  }, [router, startTransition]);
+
+  const handleEdit = useCallback((entry: EntryView) => {
+    setEditingEntry(entry);
   }, []);
 
-  const handleEdit = useCallback((_entry: EntryView) => {
-    toast.message("Edit is coming soon.");
-  }, []);
-
-  const handleDelete = useCallback((_entry: EntryView) => {
-    toast.message("Delete is coming soon.");
+  const handleDelete = useCallback((entry: EntryView) => {
+    setDeletingEntry(entry);
   }, []);
 
   const startDate = query.filters.startDate ?? "";
@@ -210,7 +224,6 @@ export function EntriesView({
           entries={entries}
           rowOffset={rowOffset}
           showActions={enableActions}
-          onPreview={handlePreview}
           onEdit={handleEdit}
           onDelete={handleDelete}
         />
@@ -238,6 +251,28 @@ export function EntriesView({
           Next
         </button>
       </div>
+
+      <EditEntryDialog
+        entry={editingEntry}
+        open={Boolean(editingEntry)}
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) {
+            setEditingEntry(null);
+          }
+        }}
+        onUpdated={handleUpdated}
+      />
+
+      <DeleteEntryDialog
+        entry={deletingEntry}
+        open={Boolean(deletingEntry)}
+        onOpenChange={(nextOpen) => {
+          if (!nextOpen) {
+            setDeletingEntry(null);
+          }
+        }}
+        onDeleted={handleDeleted}
+      />
     </div>
   );
 }

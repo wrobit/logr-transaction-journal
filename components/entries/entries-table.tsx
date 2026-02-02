@@ -1,4 +1,4 @@
-import { MoreHorizontal } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -30,7 +30,6 @@ type EntriesTableProps = {
   entries: EntryView[];
   rowOffset?: number;
   showActions?: boolean;
-  onPreview?: (entry: EntryView) => void;
   onEdit?: (entry: EntryView) => void;
   onDelete?: (entry: EntryView) => void;
 };
@@ -39,7 +38,6 @@ export function EntriesTable({
   entries,
   rowOffset = 0,
   showActions = false,
-  onPreview,
   onEdit,
   onDelete,
 }: EntriesTableProps) {
@@ -127,17 +125,16 @@ export function EntriesTable({
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                      <DropdownMenuItem onSelect={() => onPreview?.(entry)}>
-                        Preview
-                      </DropdownMenuItem>
                       <DropdownMenuItem onSelect={() => onEdit?.(entry)}>
-                        Edit
+                        <Pencil />
+                        Edit entry
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         variant="destructive"
                         onSelect={() => onDelete?.(entry)}
                       >
-                        Delete
+                        <Trash2 />
+                        Delete entry
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

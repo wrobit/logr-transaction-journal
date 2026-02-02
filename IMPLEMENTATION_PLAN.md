@@ -304,12 +304,12 @@ Auth Pages Implementation Plan:
 
 ### Phase 4.1 — Entries Querying (Server-Backed)
 
-- [ ] Add server-backed filters and pagination via query params
-- [ ] Add indexed queries for date range + asset + operation filters
-- [ ] Add loading states for server-side table refresh
-- [ ] Add tests for query param parsing and DB filtering
-- [ ] Add rows numbering
-- [ ] Add actions column with edit / preview / delete row (destructive)
+- [x] Add server-backed filters and pagination via query params
+- [x] Add indexed queries for date range + asset + operation filters
+- [x] Add loading states for server-side table refresh
+- [x] Add tests for query param parsing and DB filtering
+- [x] Add rows numbering
+- [x] Add actions column with edit / preview / delete row (destructive)
 
 ### Phase 5 — Dashboard
 

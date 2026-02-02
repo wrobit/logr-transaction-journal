@@ -1,8 +1,16 @@
 import { render, screen, fireEvent } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EntriesView } from "@/components/entries/entries-view";
+import type { EntryQuery } from "@/lib/entries/query";
 import type { EntryView } from "@/lib/entries/types";
+
+const push = vi.fn();
+const refresh = vi.fn();
+
+vi.mock("next/navigation", () => ({
+  useRouter: () => ({ push, refresh }),
+}));
 
 const entries: EntryView[] = [
   {
@@ -45,31 +53,58 @@ const entries: EntryView[] = [
   },
 ];
 
+const baseQuery: EntryQuery = {
+  page: 1,
+  filters: {},
+  sortBy: "updatedAt",
+  sortDir: "asc",
+};
+
 describe("EntriesView", () => {
-  it("filters by asset", () => {
-    render(<EntriesView entries={entries} enableActions={false} />);
+  beforeEach(() => {
+    push.mockClear();
+    refresh.mockClear();
+  });
+
+  it("updates query params on asset filter", () => {
+    render(
+      <EntriesView
+        entries={entries}
+        assets={["SOL", "BTC"]}
+        totalCount={entries.length}
+        pageSize={10}
+        query={baseQuery}
+        enableActions={false}
+      />,
+    );
 
     fireEvent.change(screen.getByLabelText(/asset/i), {
       target: { value: "SOL" },
     });
 
-    expect(screen.getByRole("cell", { name: /sol/i })).toBeInTheDocument();
-    expect(screen.queryByRole("cell", { name: /btc/i })).not.toBeInTheDocument();
+    expect(push).toHaveBeenCalledWith("/?asset=SOL");
   });
 
-  it("moves between pages", () => {
-    const manyEntries = Array.from({ length: 12 }, (_, index) => ({
+  it("updates query params on page change", () => {
+    const manyEntries = Array.from({ length: 10 }, (_, index) => ({
       ...entries[0],
       id: String(index + 1),
       baseAsset: `ASSET-${index + 1}`,
     }));
 
-    render(<EntriesView entries={manyEntries} enableActions={false} />);
-
-    expect(screen.getByText(/Page 1 of 2/i)).toBeInTheDocument();
+    render(
+      <EntriesView
+        entries={manyEntries}
+        assets={["SOL", "BTC"]}
+        totalCount={12}
+        pageSize={10}
+        query={baseQuery}
+        enableActions={false}
+      />,
+    );
 
     fireEvent.click(screen.getByText(/Next/i));
 
-    expect(screen.getByText(/Page 2 of 2/i)).toBeInTheDocument();
+    expect(push).toHaveBeenCalledWith("/?page=2");
   });
 });

@@ -1,5 +1,6 @@
 import {
   date,
+  index,
   numeric,
   pgEnum,
   pgTable,
@@ -26,31 +27,45 @@ export const users = pgTable("users", {
     .notNull(),
 });
 
-export const entries = pgTable("entries", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  userId: uuid("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  date: date("date", { mode: "date" }).notNull(),
-  operation: entryOperationEnum("operation").notNull(),
-  baseAsset: text("base_asset").notNull(),
-  quoteCurrency: text("quote_currency").notNull(),
-  quantity: numeric("quantity", { precision: 30, scale: 12 }).notNull(),
-  pricePerUnit: numeric("price_per_unit", { precision: 30, scale: 12 }).notNull(),
-  fullPrice: numeric("full_price", { precision: 30, scale: 12 }).notNull(),
-  commission: numeric("commission", { precision: 30, scale: 12 }),
-  source: text("source"),
-  note: text("note"),
-  nbpRateDate: date("nbp_rate_date", { mode: "date" }).notNull(),
-  nbpRate: numeric("nbp_rate", { precision: 18, scale: 6 }).notNull(),
-  valuePln: numeric("value_pln", { precision: 30, scale: 2 }).notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
-    .defaultNow()
-    .notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
-    .defaultNow()
-    .notNull(),
-});
+export const entries = pgTable(
+  "entries",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    date: date("date", { mode: "date" }).notNull(),
+    operation: entryOperationEnum("operation").notNull(),
+    baseAsset: text("base_asset").notNull(),
+    quoteCurrency: text("quote_currency").notNull(),
+    quantity: numeric("quantity", { precision: 30, scale: 12 }).notNull(),
+    pricePerUnit: numeric("price_per_unit", { precision: 30, scale: 12 }).notNull(),
+    fullPrice: numeric("full_price", { precision: 30, scale: 12 }).notNull(),
+    commission: numeric("commission", { precision: 30, scale: 12 }),
+    source: text("source"),
+    note: text("note"),
+    nbpRateDate: date("nbp_rate_date", { mode: "date" }).notNull(),
+    nbpRate: numeric("nbp_rate", { precision: 18, scale: 6 }).notNull(),
+    valuePln: numeric("value_pln", { precision: 30, scale: 2 }).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => ({
+    userDateIndex: index("entries_user_date_idx").on(table.userId, table.date),
+    userAssetIndex: index("entries_user_asset_idx").on(
+      table.userId,
+      table.baseAsset,
+    ),
+    userOperationIndex: index("entries_user_operation_idx").on(
+      table.userId,
+      table.operation,
+    ),
+  }),
+);
 
 export const fxRatesCache = pgTable(
   "fx_rates_cache",

@@ -1,6 +1,6 @@
 "use server";
 
-import { desc, eq } from "drizzle-orm";
+import { asc, desc, eq, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 
@@ -8,6 +8,12 @@ import { authOptions } from "@/lib/auth/options";
 import { ensureUserId } from "@/lib/auth/users";
 import { db } from "@/lib/db";
 import { entries } from "@/lib/db/schema";
+import type { EntryView } from "@/lib/entries/types";
+import {
+  buildEntryWhere,
+  ENTRY_PAGE_SIZE,
+  type EntryQuery,
+} from "@/lib/entries/query";
 import {
   calculateFullPrice,
   calculateValuePln,
@@ -20,24 +26,63 @@ import type { CreateEntryState } from "@/lib/entries/actions";
 import { entryInputSchema } from "@/lib/entries/validation";
 import { getNbpRate } from "@/lib/nbp";
 
-export async function listEntries(user: {
-  id?: string | null;
-  email?: string | null;
-  name?: string | null;
-}) {
+export type EntryListResult = {
+  entries: EntryView[];
+  totalCount: number;
+  assets: string[];
+  page: number;
+  pageSize: number;
+};
+
+export async function listEntries(
+  user: {
+    id?: string | null;
+    email?: string | null;
+    name?: string | null;
+  },
+  query: EntryQuery,
+): Promise<EntryListResult> {
   const userId = await ensureUserId(user);
 
   if (!userId) {
-    return [];
+    return {
+      entries: [],
+      totalCount: 0,
+      assets: [],
+      page: query.page,
+      pageSize: ENTRY_PAGE_SIZE,
+    };
   }
+
+  const whereClause = buildEntryWhere(userId, query.filters);
+  const offset = (query.page - 1) * ENTRY_PAGE_SIZE;
+
+  const [countResult] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(entries)
+    .where(whereClause);
 
   const rows = await db
     .select()
     .from(entries)
-    .where(eq(entries.userId, userId))
-    .orderBy(desc(entries.date));
+    .where(whereClause)
+    .orderBy(desc(entries.date))
+    .limit(ENTRY_PAGE_SIZE)
+    .offset(offset);
 
-  return rows.map(serializeEntry);
+  const assetRows = await db
+    .selectDistinct({ baseAsset: entries.baseAsset })
+    .from(entries)
+    .where(eq(entries.userId, userId))
+    .orderBy(asc(entries.baseAsset));
+
+  return {
+    entries: rows.map(serializeEntry),
+    totalCount: Number(countResult?.count ?? 0),
+    assets: assetRows.map((row) => row.baseAsset),
+    page: query.page,
+    pageSize: ENTRY_PAGE_SIZE,
+  };
 }
 
 export async function createEntry(

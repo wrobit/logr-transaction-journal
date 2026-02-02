@@ -1,87 +1,84 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-import type { EntryView } from "@/lib/entries/types";
-import { formatNumber } from "@/lib/format/numbers";
 import { AddEntryDialog } from "@/components/entries/add-entry-dialog";
 import { EntriesTable } from "@/components/entries/entries-table";
+import { buildEntryQueryParams, type EntryQuery } from "@/lib/entries/query";
+import type { EntryView } from "@/lib/entries/types";
+import { formatNumber } from "@/lib/format/numbers";
 
-const PAGE_SIZE = 10;
-
-type EntriesViewProps = {
+export type EntriesViewProps = {
   entries: EntryView[];
+  assets: string[];
+  totalCount: number;
+  pageSize: number;
+  query: EntryQuery;
   enableActions?: boolean;
 };
 
-export function EntriesView({ entries, enableActions = true }: EntriesViewProps) {
-  const [entriesState, setEntriesState] = useState(entries);
-  const [operationFilter, setOperationFilter] = useState("all");
-  const [assetFilter, setAssetFilter] = useState("all");
-  const [startDate, setStartDate] = useState("");
-  const [endDate, setEndDate] = useState("");
-  const [page, setPage] = useState(1);
+export function EntriesView({
+  entries,
+  assets,
+  totalCount,
+  pageSize,
+  query,
+  enableActions = true,
+}: EntriesViewProps) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+  const currentPage = Math.min(query.page, totalPages);
+  const rowOffset = (currentPage - 1) * pageSize;
 
-  useEffect(() => {
-    setEntriesState(entries);
-  }, [entries]);
+  const navigateWithQuery = useCallback(
+    (nextQuery: EntryQuery) => {
+      const params = buildEntryQueryParams(nextQuery);
+      const queryString = params.toString();
+      const href = queryString ? `/?${queryString}` : "/";
+      startTransition(() => router.push(href));
+    },
+    [router, startTransition],
+  );
 
-  const assets = useMemo(() => {
-    const uniqueAssets = Array.from(
-      new Set(entriesState.map((entry) => entry.baseAsset)),
-    );
+  const updateQuery = useCallback(
+    (updates: { page?: number; filters?: Partial<EntryQuery["filters"]> }) => {
+      const nextQuery: EntryQuery = {
+        page: updates.page ?? query.page,
+        filters: { ...query.filters, ...updates.filters },
+      };
 
-    return uniqueAssets.sort();
-  }, [entriesState]);
+      navigateWithQuery(nextQuery);
+    },
+    [navigateWithQuery, query],
+  );
 
-  const filteredEntries = useMemo(() => {
-    const start = startDate ? new Date(`${startDate}T00:00:00Z`) : null;
-    const end = endDate ? new Date(`${endDate}T23:59:59Z`) : null;
+  const handleCreated = useCallback(
+    (_entry: EntryView) => {
+      toast.success("Entry added successfully.");
+      startTransition(() => router.refresh());
+    },
+    [router, startTransition],
+  );
 
-    return entriesState.filter((entry) => {
-      if (operationFilter !== "all" && entry.operation !== operationFilter) {
-        return false;
-      }
-
-      if (assetFilter !== "all" && entry.baseAsset !== assetFilter) {
-        return false;
-      }
-
-      if (start || end) {
-        const entryDate = new Date(`${entry.date}T00:00:00Z`);
-        if (start && entryDate < start) {
-          return false;
-        }
-        if (end && entryDate > end) {
-          return false;
-        }
-      }
-
-      return true;
-    });
-  }, [assetFilter, endDate, entriesState, operationFilter, startDate]);
-
-  const totalPages = Math.max(1, Math.ceil(filteredEntries.length / PAGE_SIZE));
-  const paginatedEntries = useMemo(() => {
-    const startIndex = (page - 1) * PAGE_SIZE;
-    return filteredEntries.slice(startIndex, startIndex + PAGE_SIZE);
-  }, [filteredEntries, page]);
-
-  useEffect(() => {
-    setPage(1);
-  }, [operationFilter, assetFilter, startDate, endDate]);
-
-  const handleCreated = useCallback((entry: EntryView) => {
-    setEntriesState((current) => {
-      const existingIndex = current.findIndex((item) => item.id === entry.id);
-      if (existingIndex >= 0) {
-        return current.map((item) => (item.id === entry.id ? entry : item));
-      }
-      return [entry, ...current];
-    });
-    toast.success("Entry added successfully.");
+  const handlePreview = useCallback((_entry: EntryView) => {
+    toast.message("Preview is coming soon.");
   }, []);
+
+  const handleEdit = useCallback((_entry: EntryView) => {
+    toast.message("Edit is coming soon.");
+  }, []);
+
+  const handleDelete = useCallback((_entry: EntryView) => {
+    toast.message("Delete is coming soon.");
+  }, []);
+
+  const startDate = query.filters.startDate ?? "";
+  const endDate = query.filters.endDate ?? "";
+  const assetFilter = query.filters.asset ?? "all";
+  const operationFilter = query.filters.operation ?? "all";
 
   return (
     <div className="space-y-6 text-foreground">
@@ -92,7 +89,12 @@ export function EntriesView({ entries, enableActions = true }: EntriesViewProps)
             Track every transaction with deterministic PLN valuation.
           </p>
         </div>
-        {enableActions ? <AddEntryDialog onCreated={handleCreated} /> : null}
+        <div className="flex items-center gap-3">
+          {isPending ? (
+            <span className="text-xs text-muted-foreground">Refreshing…</span>
+          ) : null}
+          {enableActions ? <AddEntryDialog onCreated={handleCreated} /> : null}
+        </div>
       </div>
 
       <div className="grid gap-3 rounded-sm border border-border bg-muted/40 p-4 text-xs text-muted-foreground md:grid-cols-4">
@@ -107,7 +109,12 @@ export function EntriesView({ entries, enableActions = true }: EntriesViewProps)
             id="start-date"
             type="date"
             value={startDate}
-            onChange={(event) => setStartDate(event.target.value)}
+            onChange={(event) =>
+              updateQuery({
+                page: 1,
+                filters: { startDate: event.target.value || undefined },
+              })
+            }
             className="h-8 w-full rounded-none border border-border bg-background px-2 text-xs text-foreground"
           />
         </div>
@@ -122,7 +129,12 @@ export function EntriesView({ entries, enableActions = true }: EntriesViewProps)
             id="end-date"
             type="date"
             value={endDate}
-            onChange={(event) => setEndDate(event.target.value)}
+            onChange={(event) =>
+              updateQuery({
+                page: 1,
+                filters: { endDate: event.target.value || undefined },
+              })
+            }
             className="h-8 w-full rounded-none border border-border bg-background px-2 text-xs text-foreground"
           />
         </div>
@@ -136,7 +148,14 @@ export function EntriesView({ entries, enableActions = true }: EntriesViewProps)
           <select
             id="asset-filter"
             value={assetFilter}
-            onChange={(event) => setAssetFilter(event.target.value)}
+            onChange={(event) =>
+              updateQuery({
+                page: 1,
+                filters: {
+                  asset: event.target.value === "all" ? undefined : event.target.value,
+                },
+              })
+            }
             className="h-8 w-full rounded-none border border-border bg-background px-2 text-xs text-foreground"
           >
             <option value="all">All assets</option>
@@ -157,7 +176,17 @@ export function EntriesView({ entries, enableActions = true }: EntriesViewProps)
           <select
             id="operation-filter"
             value={operationFilter}
-            onChange={(event) => setOperationFilter(event.target.value)}
+            onChange={(event) =>
+              updateQuery({
+                page: 1,
+                filters: {
+                  operation:
+                    event.target.value === "all"
+                      ? undefined
+                      : (event.target.value as EntryQuery["filters"]["operation"]),
+                },
+              })
+            }
             className="h-8 w-full rounded-none border border-border bg-background px-2 text-xs text-foreground"
           >
             <option value="all">All operations</option>
@@ -169,30 +198,41 @@ export function EntriesView({ entries, enableActions = true }: EntriesViewProps)
 
       <div className="flex items-center justify-between text-xs text-muted-foreground">
         <span>
-          Showing {paginatedEntries.length} of {filteredEntries.length} entries
+          Showing {entries.length} of {totalCount} entries
         </span>
-        <span>Page {page} of {totalPages}</span>
+        <span>
+          Page {currentPage} of {totalPages}
+        </span>
       </div>
 
-      <EntriesTable entries={paginatedEntries} />
+      <div aria-busy={isPending} aria-live="polite">
+        <EntriesTable
+          entries={entries}
+          rowOffset={rowOffset}
+          showActions={enableActions}
+          onPreview={handlePreview}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
+      </div>
 
       <div className="flex items-center justify-between gap-3 text-xs text-muted-foreground">
         <button
           type="button"
-          onClick={() => setPage((current) => Math.max(1, current - 1))}
-          disabled={page === 1}
+          onClick={() => updateQuery({ page: Math.max(1, currentPage - 1) })}
+          disabled={isPending || currentPage === 1}
           className="rounded-none border border-border px-3 py-2 text-xs text-foreground disabled:opacity-40"
         >
           Previous
         </button>
         <div className="flex items-center gap-2">
           <span className="text-muted-foreground">Rows per page:</span>
-          <span>{formatNumber(PAGE_SIZE)}</span>
+          <span>{formatNumber(pageSize)}</span>
         </div>
         <button
           type="button"
-          onClick={() => setPage((current) => Math.min(totalPages, current + 1))}
-          disabled={page >= totalPages}
+          onClick={() => updateQuery({ page: Math.min(totalPages, currentPage + 1) })}
+          disabled={isPending || currentPage >= totalPages}
           className="rounded-none border border-border px-3 py-2 text-xs text-foreground disabled:opacity-40"
         >
           Next

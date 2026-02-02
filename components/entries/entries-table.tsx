@@ -1,8 +1,18 @@
-import { Badge } from "@/components/ui/badge";
-import { formatNumber, formatPln } from "@/lib/format/numbers";
-import type { EntryView } from "@/lib/entries/types";
+import { MoreHorizontal } from "lucide-react";
 
-const columns = [
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import type { EntryView } from "@/lib/entries/types";
+import { formatNumber, formatPln } from "@/lib/format/numbers";
+
+const baseColumns = [
+  "#",
   "Date",
   "Operation",
   "Asset",
@@ -18,9 +28,21 @@ const columns = [
 
 type EntriesTableProps = {
   entries: EntryView[];
+  rowOffset?: number;
+  showActions?: boolean;
+  onPreview?: (entry: EntryView) => void;
+  onEdit?: (entry: EntryView) => void;
+  onDelete?: (entry: EntryView) => void;
 };
 
-export function EntriesTable({ entries }: EntriesTableProps) {
+export function EntriesTable({
+  entries,
+  rowOffset = 0,
+  showActions = false,
+  onPreview,
+  onEdit,
+  onDelete,
+}: EntriesTableProps) {
   if (entries.length === 0) {
     return (
       <div className="rounded-sm border border-border bg-muted/40 p-6 text-center text-sm text-muted-foreground">
@@ -28,6 +50,8 @@ export function EntriesTable({ entries }: EntriesTableProps) {
       </div>
     );
   }
+
+  const columns = showActions ? [...baseColumns, "Actions"] : baseColumns;
 
   return (
     <div className="overflow-hidden rounded-sm border border-border">
@@ -42,8 +66,11 @@ export function EntriesTable({ entries }: EntriesTableProps) {
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
-          {entries.map((entry) => (
+          {entries.map((entry, index) => (
             <tr key={entry.id} className="bg-background">
+              <td className="px-3 py-3 text-muted-foreground">
+                {rowOffset + index + 1}
+              </td>
               <td className="px-3 py-3 text-muted-foreground">{entry.date}</td>
               <td className="px-3 py-3">
                 <Badge
@@ -86,6 +113,36 @@ export function EntriesTable({ entries }: EntriesTableProps) {
               <td className="px-3 py-3 text-muted-foreground">
                 {entry.note ?? "—"}
               </td>
+              {showActions ? (
+                <td className="px-3 py-3 text-right">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        aria-label="Open entry actions"
+                      >
+                        <MoreHorizontal />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem onSelect={() => onPreview?.(entry)}>
+                        Preview
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => onEdit?.(entry)}>
+                        Edit
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        variant="destructive"
+                        onSelect={() => onDelete?.(entry)}
+                      >
+                        Delete
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </td>
+              ) : null}
             </tr>
           ))}
         </tbody>

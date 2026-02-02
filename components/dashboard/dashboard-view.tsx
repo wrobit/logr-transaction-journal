@@ -101,6 +101,12 @@ export function DashboardView({ data, query }: DashboardViewProps) {
   const hasHoldingsMix = data.holdingsMix.length > 0;
   const axisFormatter = (value: number) => formatNumber(value, { maximumFractionDigits: 0 });
   const dateTickFormatter = (value: string | number) => String(value).slice(5);
+  const pnlPercent = totals.buyValue ? (totals.pnlValue / totals.buyValue) * 100 : null;
+  const pnlPercentLabel = pnlPercent === null
+    ? "—"
+    : `${pnlPercent > 0 ? "+" : ""}${formatNumber(pnlPercent, {
+        maximumFractionDigits: 1,
+      })}%`;
   const holdingsMixConfig = useMemo(
     () =>
       data.holdingsMix.reduce<ChartConfig>((config, entry, index) => {
@@ -170,6 +176,7 @@ export function DashboardView({ data, query }: DashboardViewProps) {
         <KpiCard
           label="Realized PnL"
           value={formatPln(totals.pnlValue)}
+          secondaryValue={pnlPercentLabel}
           subtitle="Buy vs sell difference"
           highlight={totals.pnlValue >= 0 ? "positive" : "negative"}
         />
@@ -399,14 +406,23 @@ export function DashboardView({ data, query }: DashboardViewProps) {
 function KpiCard({
   label,
   value,
+  secondaryValue,
   subtitle,
   highlight,
 }: {
   label: string;
   value: string;
+  secondaryValue?: string;
   subtitle: string;
   highlight?: "positive" | "negative";
 }) {
+  const highlightClassName =
+    highlight === "positive"
+      ? "text-emerald-300"
+      : highlight === "negative"
+        ? "text-red-300"
+        : undefined;
+
   return (
     <Card className="bg-muted/20">
       <CardHeader className="border-b border-border/60">
@@ -415,12 +431,14 @@ function KpiCard({
       <CardContent className="flex flex-col gap-1">
         <div
           className={cn(
-            "text-lg font-semibold",
-            highlight === "positive" && "text-emerald-300",
-            highlight === "negative" && "text-red-300"
+            "text-lg font-semibold flex items-baseline gap-2",
+            highlightClassName
           )}
         >
-          {value}
+          <span>{value}</span>
+          {secondaryValue ? (
+            <span className="text-xs font-medium opacity-80">{secondaryValue}</span>
+          ) : null}
         </div>
         <div className="text-xs text-muted-foreground">{subtitle}</div>
       </CardContent>

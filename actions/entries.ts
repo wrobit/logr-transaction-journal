@@ -62,6 +62,23 @@ export async function listEntries(
   const whereClause = buildEntryWhere(userId, query.filters);
   const offset = (query.page - 1) * ENTRY_PAGE_SIZE;
 
+  const orderColumn = {
+    createdAt: entries.createdAt,
+    updatedAt: entries.updatedAt,
+    operation: entries.operation,
+    baseAsset: entries.baseAsset,
+    quantity: entries.quantity,
+    pricePerUnit: entries.pricePerUnit,
+    fullPrice: entries.fullPrice,
+    commission: entries.commission,
+    source: entries.source,
+    nbpRate: entries.nbpRate,
+    valuePln: entries.valuePln,
+  }[query.sortBy];
+
+  const orderByClause =
+    query.sortDir === "desc" ? desc(orderColumn) : asc(orderColumn);
+
   const [countResult] = await db
     .select({ count: sql<number>`count(*)` })
     .from(entries)
@@ -71,7 +88,7 @@ export async function listEntries(
     .select()
     .from(entries)
     .where(whereClause)
-    .orderBy(desc(entries.date))
+    .orderBy(orderByClause)
     .limit(ENTRY_PAGE_SIZE)
     .offset(offset);
 

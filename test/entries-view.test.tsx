@@ -56,6 +56,8 @@ const entries: EntryView[] = [
 const baseQuery: EntryQuery = {
   page: 1,
   filters: {},
+  sortBy: "updatedAt",
+  sortDir: "asc",
 };
 
 describe("EntriesView", () => {

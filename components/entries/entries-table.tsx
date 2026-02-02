@@ -1,4 +1,4 @@
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { ArrowDown, ArrowUp, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -8,28 +8,31 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import type { EntrySortDirection, EntrySortKey } from "@/lib/entries/query";
 import type { EntryView } from "@/lib/entries/types";
 import { formatNumber, formatPln } from "@/lib/format/numbers";
 
-const baseColumns = [
-  "#",
-  "Date",
-  "Operation",
-  "Asset",
-  "Quantity",
-  "Price",
-  "Full",
-  "Commission",
-  "Source",
-  "NBP",
-  "Value PLN",
-  "Note",
+const sortableColumns: Array<{ label: string; key: EntrySortKey }> = [
+  { label: "Created", key: "createdAt" },
+  { label: "Updated", key: "updatedAt" },
+  { label: "Operation", key: "operation" },
+  { label: "Asset", key: "baseAsset" },
+  { label: "Quantity", key: "quantity" },
+  { label: "Price", key: "pricePerUnit" },
+  { label: "Full", key: "fullPrice" },
+  { label: "Commission", key: "commission" },
+  { label: "Source", key: "source" },
+  { label: "NBP", key: "nbpRate" },
+  { label: "Value PLN", key: "valuePln" },
 ];
 
 type EntriesTableProps = {
   entries: EntryView[];
   rowOffset?: number;
   showActions?: boolean;
+  sortBy: EntrySortKey;
+  sortDir: EntrySortDirection;
+  onSort: (column: EntrySortKey) => void;
   onEdit?: (entry: EntryView) => void;
   onDelete?: (entry: EntryView) => void;
 };
@@ -38,6 +41,9 @@ export function EntriesTable({
   entries,
   rowOffset = 0,
   showActions = false,
+  sortBy,
+  sortDir,
+  onSort,
   onEdit,
   onDelete,
 }: EntriesTableProps) {
@@ -49,18 +55,37 @@ export function EntriesTable({
     );
   }
 
-  const columns = showActions ? [...baseColumns, "Actions"] : baseColumns;
+  const formatDate = (value: string) => value.slice(0, 10);
 
   return (
     <div className="overflow-hidden rounded-sm border border-border">
       <table className="w-full border-collapse text-left text-xs text-foreground">
         <thead className="bg-muted/50 text-[11px] uppercase tracking-wide text-muted-foreground">
           <tr>
-            {columns.map((column) => (
-              <th key={column} className="px-3 py-3 font-medium">
-                {column}
-              </th>
-            ))}
+            <th className="px-3 py-3 font-medium">#</th>
+            {sortableColumns.map((column) => {
+              const isActive = sortBy === column.key;
+              return (
+                <th key={column.key} className="px-3 py-3 font-medium">
+                  <button
+                    type="button"
+                    onClick={() => onSort(column.key)}
+                    className="inline-flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground transition hover:text-foreground"
+                  >
+                    {column.label}
+                    {isActive ? (
+                      sortDir === "asc" ? (
+                        <ArrowUp className="size-3" />
+                      ) : (
+                        <ArrowDown className="size-3" />
+                      )
+                    ) : null}
+                  </button>
+                </th>
+              );
+            })}
+            <th className="px-3 py-3 font-medium">Note</th>
+            {showActions ? <th className="px-3 py-3 font-medium">Actions</th> : null}
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
@@ -69,7 +94,12 @@ export function EntriesTable({
               <td className="px-3 py-3 text-muted-foreground">
                 {rowOffset + index + 1}
               </td>
-              <td className="px-3 py-3 text-muted-foreground">{entry.date}</td>
+              <td className="px-3 py-3 text-muted-foreground">
+                {formatDate(entry.createdAt)}
+              </td>
+              <td className="px-3 py-3 text-muted-foreground">
+                {formatDate(entry.updatedAt)}
+              </td>
               <td className="px-3 py-3">
                 <Badge
                   variant="secondary"

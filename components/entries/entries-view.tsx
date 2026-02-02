@@ -46,10 +46,17 @@ export function EntriesView({
   );
 
   const updateQuery = useCallback(
-    (updates: { page?: number; filters?: Partial<EntryQuery["filters"]> }) => {
+    (updates: {
+      page?: number;
+      filters?: Partial<EntryQuery["filters"]>;
+      sortBy?: EntryQuery["sortBy"];
+      sortDir?: EntryQuery["sortDir"];
+    }) => {
       const nextQuery: EntryQuery = {
         page: updates.page ?? query.page,
         filters: { ...query.filters, ...updates.filters },
+        sortBy: updates.sortBy ?? query.sortBy,
+        sortDir: updates.sortDir ?? query.sortDir,
       };
 
       navigateWithQuery(nextQuery);
@@ -88,6 +95,21 @@ export function EntriesView({
   const handleDelete = useCallback((entry: EntryView) => {
     setDeletingEntry(entry);
   }, []);
+
+  const handleSort = useCallback(
+    (column: EntryQuery["sortBy"]) => {
+      if (column === query.sortBy) {
+        updateQuery({
+          page: 1,
+          sortDir: query.sortDir === "asc" ? "desc" : "asc",
+        });
+        return;
+      }
+
+      updateQuery({ page: 1, sortBy: column, sortDir: "asc" });
+    },
+    [query.sortBy, query.sortDir, updateQuery],
+  );
 
   const startDate = query.filters.startDate ?? "";
   const endDate = query.filters.endDate ?? "";
@@ -224,6 +246,9 @@ export function EntriesView({
           entries={entries}
           rowOffset={rowOffset}
           showActions={enableActions}
+          sortBy={query.sortBy}
+          sortDir={query.sortDir}
+          onSort={handleSort}
           onEdit={handleEdit}
           onDelete={handleDelete}
         />

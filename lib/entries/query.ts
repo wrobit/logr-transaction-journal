@@ -13,9 +13,26 @@ export type EntryFilters = {
   operation?: EntryOperation;
 };
 
+export type EntrySortKey =
+  | "createdAt"
+  | "updatedAt"
+  | "operation"
+  | "baseAsset"
+  | "quantity"
+  | "pricePerUnit"
+  | "fullPrice"
+  | "commission"
+  | "source"
+  | "nbpRate"
+  | "valuePln";
+
+export type EntrySortDirection = "asc" | "desc";
+
 export type EntryQuery = {
   page: number;
   filters: EntryFilters;
+  sortBy: EntrySortKey;
+  sortDir: EntrySortDirection;
 };
 
 const pageSchema = z.coerce.number().int().min(1);
@@ -25,6 +42,23 @@ const dateSchema = z
   .optional();
 const assetSchema = z.string().trim().min(1);
 const operationSchema = z.enum(["BUY", "SELL"]);
+const sortBySchema = z.enum([
+  "createdAt",
+  "updatedAt",
+  "operation",
+  "baseAsset",
+  "quantity",
+  "pricePerUnit",
+  "fullPrice",
+  "commission",
+  "source",
+  "nbpRate",
+  "valuePln",
+]);
+const sortDirSchema = z.enum(["asc", "desc"]);
+
+const DEFAULT_SORT_BY: EntrySortKey = "updatedAt";
+const DEFAULT_SORT_DIR: EntrySortDirection = "asc";
 
 const getFirstValue = (value: string | string[] | undefined) =>
   Array.isArray(value) ? value[0] : value;
@@ -37,6 +71,8 @@ export function parseEntryQuery(
   const endDateResult = dateSchema.safeParse(getFirstValue(params.endDate));
   const assetResult = assetSchema.safeParse(getFirstValue(params.asset));
   const operationResult = operationSchema.safeParse(getFirstValue(params.operation));
+  const sortByResult = sortBySchema.safeParse(getFirstValue(params.sortBy));
+  const sortDirResult = sortDirSchema.safeParse(getFirstValue(params.sortDir));
 
   return {
     page: pageResult.success ? pageResult.data : 1,
@@ -46,6 +82,8 @@ export function parseEntryQuery(
       asset: assetResult.success ? assetResult.data.toUpperCase() : undefined,
       operation: operationResult.success ? operationResult.data : undefined,
     },
+    sortBy: sortByResult.success ? sortByResult.data : DEFAULT_SORT_BY,
+    sortDir: sortDirResult.success ? sortDirResult.data : DEFAULT_SORT_DIR,
   };
 }
 
@@ -70,6 +108,14 @@ export function buildEntryQueryParams(query: EntryQuery) {
 
   if (query.filters.operation) {
     params.set("operation", query.filters.operation);
+  }
+
+  if (
+    query.sortBy !== DEFAULT_SORT_BY ||
+    query.sortDir !== DEFAULT_SORT_DIR
+  ) {
+    params.set("sortBy", query.sortBy);
+    params.set("sortDir", query.sortDir);
   }
 
   return params;

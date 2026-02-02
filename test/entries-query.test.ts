@@ -24,6 +24,8 @@ describe("entry query parsing", () => {
         startDate: "2025-01-10",
         endDate: "2025-02-01",
       },
+      sortBy: "updatedAt",
+      sortDir: "asc",
     });
   });
 
@@ -35,18 +37,27 @@ describe("entry query parsing", () => {
       startDate: "bad",
     });
 
-    expect(query).toEqual({ page: 1, filters: {} });
+    expect(query).toEqual({
+      page: 1,
+      filters: {},
+      sortBy: "updatedAt",
+      sortDir: "asc",
+    });
   });
 
   it("builds query params from filters", () => {
     const params = buildEntryQueryParams({
       page: 3,
       filters: { asset: "ETH", operation: "BUY" },
+      sortBy: "quantity",
+      sortDir: "desc",
     });
 
     expect(params.get("page")).toBe("3");
     expect(params.get("asset")).toBe("ETH");
     expect(params.get("operation")).toBe("BUY");
+    expect(params.get("sortBy")).toBe("quantity");
+    expect(params.get("sortDir")).toBe("desc");
   });
 });
 

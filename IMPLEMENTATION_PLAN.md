@@ -371,6 +371,58 @@ Auth Pages Implementation Plan:
 
 ### Phase 9 — Import & Export with various providers
 
+### Phase 10 — Administration Panel
+
+- [ ] Create admin role and permissions system
+- [ ] Add admin flag to users table
+- [ ] Build admin authentication middleware
+- [ ] Create admin dashboard layout
+- [ ] Add user management interface:
+  - [ ] View all users (active/deleted)
+  - [ ] Search and filter users
+  - [ ] View user details and activity
+  - [ ] Soft delete/restore user accounts
+  - [ ] View user entries (read-only)
+- [ ] Add system monitoring:
+  - [ ] User registration metrics
+  - [ ] Active users statistics
+  - [ ] Entry creation trends
+  - [ ] Database health metrics
+- [ ] Add feedback review panel:
+  - [ ] View all account deletion feedback
+  - [ ] Filter by reason and date
+  - [ ] Export feedback for analysis
+- [ ] Add admin activity audit log
+- [ ] Add tests for admin authorization and actions
+
+### Phase 11 — Data Encryption for Entries
+
+- [ ] Design encryption strategy:
+  - [ ] Determine encryption scope (all entry fields vs sensitive only)
+  - [ ] Choose encryption method (field-level vs row-level)
+  - [ ] Define key management strategy (per-user keys)
+- [ ] Implement encryption layer:
+  - [ ] Add encryption utilities (encrypt/decrypt functions)
+  - [ ] Generate and store user encryption keys securely
+  - [ ] Add key derivation from user credentials or separate key storage
+- [ ] Update entry CRUD operations:
+  - [ ] Encrypt entries on creation/update
+  - [ ] Decrypt entries on read
+  - [ ] Handle migration of existing unencrypted entries
+- [ ] Update query and aggregation logic:
+  - [ ] Adjust filters to work with encrypted data
+  - [ ] Update summary calculations
+  - [ ] Optimize performance for encrypted queries
+- [ ] Add key rotation mechanism:
+  - [ ] Build re-encryption flow for key changes
+  - [ ] Handle key recovery scenarios
+- [ ] Update backup and export features:
+  - [ ] Ensure encrypted data in backups
+  - [ ] Provide decrypted exports for user download
+- [ ] Add tests for encryption/decryption correctness
+- [ ] Add tests for key management and rotation
+- [ ] Document encryption approach and recovery procedures
+
 ---
 
 ## 11) MVP Acceptance Criteria

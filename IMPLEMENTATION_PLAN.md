@@ -331,12 +331,18 @@ Auth Pages Implementation Plan:
 - [x] Add KPI cards (total buys, total sells, realized PnL)
 - [x] Add charts with shadcn (line PnL, stacked buy/sell, donut holdings)
 - [x] Hook filters to server refresh + loading/empty states
-- [ ] Add tests for aggregations and dashboard render
+- [x] Add tests for aggregations and dashboard render
 
 ### Phase 6 — Profile
 
 - [ ] Account data
 - [ ] Account deletion
+
+### Phase 7 — Website Metadata & SEO
+
+### Phase 8 — Subscriptions and payments with polarr
+
+### Phase 9 — Import & Export with various providers
 
 ---
 

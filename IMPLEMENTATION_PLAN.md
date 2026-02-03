@@ -335,38 +335,31 @@ Auth Pages Implementation Plan:
 
 ### Phase 6 — Profile + Navigation
 
-#### Phase 6.1 — Sidebar Navigation
-
-- [ ] Build persistent sidebar for protected routes (icons + labels)
-- [ ] Keep top navigation/actions as-is (profile dropdown)
-- [ ] Mobile layout: sidebar stacks on top, content below
-- [ ] Ensure active route styling + accessible focus states
-
-#### Phase 6.2 — Profile Data + Actions
+#### Phase 6.1 — Profile Data + Actions
 
 - [ ] Add profile fetch action (current user)
 - [ ] Add profile update action (first/last/login/email)
 - [ ] Add delete account action (cascade delete entries)
 
-#### Phase 6.3 — Profile UI (Editable)
+#### Phase 6.2 — Profile UI (Editable)
 
 - [ ] Read-only summary section
 - [ ] Minimal edit controls for profile fields
 - [ ] Validation + inline errors
 
-#### Phase 6.4 — Account Deletion Flow
+#### Phase 6.3 — Account Deletion Flow
 
 - [ ] Lethal warning copy + consequences
 - [ ] Require typing “DELETE” to confirm
 - [ ] AlertDialog confirmation
 
-#### Phase 6.5 — Goodbye Screen
+#### Phase 6.4 — Goodbye Screen
 
 - [ ] Post-delete confirmation screen
 - [ ] “Why are you leaving?” options + freeform
 - [ ] “I’ve changed my mind” CTA
 
-#### Phase 6.6 — Tests
+#### Phase 6.5 — Tests
 
 - [ ] Profile render + edit validation
 - [ ] Delete confirmation requirement

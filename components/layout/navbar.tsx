@@ -29,6 +29,14 @@ export function Navbar() {
               priority
             />
           </Link>
+          <nav className="flex items-center gap-4 text-xs text-muted-foreground">
+            <Link href="/" className="transition hover:text-foreground">
+              Entries
+            </Link>
+            <Link href="/dashboard" className="transition hover:text-foreground">
+              Dashboard
+            </Link>
+          </nav>
         </div>
 
         <div className="flex items-center gap-3">

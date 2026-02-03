@@ -1,24 +1,25 @@
 // @vitest-environment node
 import { describe, expect, it, vi } from "vitest";
 
+import { dayjs } from "@/lib/dayjs";
 import { getNbpRate, resolveRateDate } from "@/lib/nbp";
 
 describe("NBP resolver", () => {
   it("uses previous day for weekdays", () => {
-    const date = new Date("2025-10-22T00:00:00Z");
-    expect(resolveRateDate(date).toISOString().slice(0, 10)).toBe("2025-10-21");
+    const date = dayjs.utc("2025-10-22").toDate();
+    expect(dayjs.utc(resolveRateDate(date)).format("YYYY-MM-DD")).toBe("2025-10-21");
   });
 
   it("uses Friday for Sundays", () => {
-    const date = new Date("2025-10-19T00:00:00Z");
-    expect(resolveRateDate(date).toISOString().slice(0, 10)).toBe("2025-10-17");
+    const date = dayjs.utc("2025-10-19").toDate();
+    expect(dayjs.utc(resolveRateDate(date)).format("YYYY-MM-DD")).toBe("2025-10-17");
   });
 
   it("returns cached rate when available", async () => {
     const getCachedRate = vi.fn().mockResolvedValue(4.2);
     const fetchRate = vi.fn();
 
-    const result = await getNbpRate("EUR", new Date("2025-10-22T00:00:00Z"), {
+    const result = await getNbpRate("EUR", dayjs.utc("2025-10-22").toDate(), {
       getCachedRate,
       setCachedRate: vi.fn(),
       fetchRate,
@@ -36,7 +37,7 @@ describe("NBP resolver", () => {
       .mockResolvedValueOnce(4.3);
     const setCachedRate = vi.fn();
 
-    const result = await getNbpRate("EUR", new Date("2025-10-22T00:00:00Z"), {
+    const result = await getNbpRate("EUR", dayjs.utc("2025-10-22").toDate(), {
       getCachedRate,
       fetchRate,
       setCachedRate,

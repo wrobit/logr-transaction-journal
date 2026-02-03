@@ -13,12 +13,13 @@ import {
   defaultCreateEntryState,
   type CreateEntryState,
 } from "@/lib/entries/actions";
+import { dayjs } from "@/lib/dayjs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 const DEFAULT_OPERATION = "BUY";
-const DEFAULT_CURRENCY = "PLN";
+const DEFAULT_CURRENCY = "USD";
 const DEFAULT_ASSET = "BTC";
 
 const ASSET_OPTIONS = ["BTC", "ETH", "SOL"] as const;
@@ -62,6 +63,7 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
   const [commission, setCommission] = useState("");
 
   const formRef = useRef<HTMLFormElement>(null);
+  const maxDate = dayjs().format("YYYY-MM-DD");
 
   const actionHandler = useCallback(
     async (prevState: CreateEntryState, formData: FormData) => {
@@ -161,6 +163,7 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
                   name="date"
                   type="date"
                   required
+                  max={maxDate}
                   className={inputClassName}
                 />
                 {state.errors?.date ? (

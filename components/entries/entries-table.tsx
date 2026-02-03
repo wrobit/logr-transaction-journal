@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { EntrySortDirection, EntrySortKey } from "@/lib/entries/query";
 import type { EntryView } from "@/lib/entries/types";
+import { dayjs } from "@/lib/dayjs";
 import { formatNumber, formatPln } from "@/lib/format/numbers";
 
 const sortableColumns: Array<{ label: string; key: EntrySortKey }> = [
@@ -55,7 +56,7 @@ export function EntriesTable({
     );
   }
 
-  const formatDate = (value: string) => value.slice(0, 10);
+  const formatDate = (value: string) => dayjs(value).format("YYYY-MM-DD");
 
   return (
     <div className="overflow-hidden rounded-sm border border-border">

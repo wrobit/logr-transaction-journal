@@ -25,7 +25,7 @@ describe("entry query parsing", () => {
         endDate: "2025-02-01",
       },
       sortBy: "updatedAt",
-      sortDir: "asc",
+      sortDir: "desc",
     });
   });
 
@@ -41,7 +41,7 @@ describe("entry query parsing", () => {
       page: 1,
       filters: {},
       sortBy: "updatedAt",
-      sortDir: "asc",
+      sortDir: "desc",
     });
   });
 
@@ -70,6 +70,6 @@ describe("entry filter conditions", () => {
       endDate: "2025-01-31",
     });
 
-    expect(conditions).toHaveLength(5);
+    expect(conditions).toHaveLength(6);
   });
 });

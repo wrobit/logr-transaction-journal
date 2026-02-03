@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 const DEFAULT_OPERATION = "BUY";
-const DEFAULT_CURRENCY = "PLN";
+const DEFAULT_CURRENCY = "USD";
 const DEFAULT_ASSET = "BTC";
 
 const BASE_ASSET_OPTIONS = ["BTC", "ETH", "SOL"] as const;

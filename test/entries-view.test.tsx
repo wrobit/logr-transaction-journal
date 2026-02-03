@@ -57,7 +57,7 @@ const baseQuery: EntryQuery = {
   page: 1,
   filters: {},
   sortBy: "updatedAt",
-  sortDir: "asc",
+  sortDir: "desc",
 };
 
 describe("EntriesView", () => {

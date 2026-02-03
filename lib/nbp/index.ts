@@ -2,6 +2,7 @@ import { and, desc, eq } from "drizzle-orm";
 
 import { db } from "@/lib/db";
 import { fxRatesCache } from "@/lib/db/schema";
+import { dayjs } from "@/lib/dayjs";
 
 export type NbpRateResult = {
   rate: number;
@@ -22,24 +23,18 @@ export type NbpRateOptions = {
 const DEFAULT_LOOKBACK_DAYS = 10;
 
 export function resolveRateDate(entryDate: Date) {
-  const baseDate = new Date(
-    Date.UTC(
-      entryDate.getUTCFullYear(),
-      entryDate.getUTCMonth(),
-      entryDate.getUTCDate(),
-    ),
-  );
-  const dayOfWeek = baseDate.getUTCDay();
+  const baseDate = dayjs.utc(entryDate).startOf("day");
+  const dayOfWeek = baseDate.day();
 
   if (dayOfWeek === 0) {
-    return addDays(baseDate, -2);
+    return baseDate.subtract(2, "day").toDate();
   }
 
   if (dayOfWeek === 6) {
-    return addDays(baseDate, -1);
+    return baseDate.subtract(1, "day").toDate();
   }
 
-  return addDays(baseDate, -1);
+  return baseDate.subtract(1, "day").toDate();
 }
 
 export async function getNbpRate(
@@ -131,11 +126,9 @@ export async function cacheNbpRate(
 }
 
 export function formatDate(date: Date) {
-  return date.toISOString().slice(0, 10);
+  return dayjs.utc(date).format("YYYY-MM-DD");
 }
 
 function addDays(date: Date, amount: number) {
-  const copy = new Date(date.getTime());
-  copy.setUTCDate(copy.getUTCDate() + amount);
-  return copy;
+  return dayjs.utc(date).add(amount, "day").toDate();
 }

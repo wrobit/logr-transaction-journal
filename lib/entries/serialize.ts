@@ -1,8 +1,9 @@
 import type { Entry } from "@/lib/db/schema";
 import type { EntryView } from "@/lib/entries/types";
+import { dayjs } from "@/lib/dayjs";
 
-const toDateString = (value: Date) => value.toISOString().slice(0, 10);
-const toDateTimeString = (value: Date) => value.toISOString();
+const toDateString = (value: Date) => dayjs.utc(value).format("YYYY-MM-DD");
+const toDateTimeString = (value: Date) => dayjs.utc(value).toISOString();
 
 export function serializeEntry(entry: Entry): EntryView {
   return {

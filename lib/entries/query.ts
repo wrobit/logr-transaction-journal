@@ -1,6 +1,7 @@
-import { and, eq, gte, lte } from "drizzle-orm";
+import { and, eq, gte, isNull, lte } from "drizzle-orm";
 import { z } from "zod";
 
+import { dayjs } from "@/lib/dayjs";
 import { entries } from "@/lib/db/schema";
 import type { EntryOperation } from "@/lib/entries/types";
 
@@ -58,14 +59,12 @@ const sortBySchema = z.enum([
 const sortDirSchema = z.enum(["asc", "desc"]);
 
 const DEFAULT_SORT_BY: EntrySortKey = "updatedAt";
-const DEFAULT_SORT_DIR: EntrySortDirection = "asc";
+const DEFAULT_SORT_DIR: EntrySortDirection = "desc";
 
 const getFirstValue = (value: string | string[] | undefined) =>
   Array.isArray(value) ? value[0] : value;
 
-export function parseEntryQuery(
-  params: Record<string, string | string[] | undefined>,
-): EntryQuery {
+export function parseEntryQuery(params: Record<string, string | string[] | undefined>): EntryQuery {
   const pageResult = pageSchema.safeParse(getFirstValue(params.page));
   const startDateResult = dateSchema.safeParse(getFirstValue(params.startDate));
   const endDateResult = dateSchema.safeParse(getFirstValue(params.endDate));
@@ -110,10 +109,7 @@ export function buildEntryQueryParams(query: EntryQuery) {
     params.set("operation", query.filters.operation);
   }
 
-  if (
-    query.sortBy !== DEFAULT_SORT_BY ||
-    query.sortDir !== DEFAULT_SORT_DIR
-  ) {
+  if (query.sortBy !== DEFAULT_SORT_BY || query.sortDir !== DEFAULT_SORT_DIR) {
     params.set("sortBy", query.sortBy);
     params.set("sortDir", query.sortDir);
   }
@@ -121,11 +117,13 @@ export function buildEntryQueryParams(query: EntryQuery) {
   return params;
 }
 
-const toUtcDate = (date: string, endOfDay = false) =>
-  new Date(`${date}T${endOfDay ? "23:59:59" : "00:00:00"}Z`);
+const toUtcDate = (date: string, endOfDay = false) => {
+  const parsed = dayjs.utc(date, "YYYY-MM-DD", true);
+  return (endOfDay ? parsed.endOf("day") : parsed.startOf("day")).toDate();
+};
 
 export function buildEntryConditions(userId: string, filters: EntryFilters) {
-  const conditions = [eq(entries.userId, userId)];
+  const conditions = [eq(entries.userId, userId), isNull(entries.deletedAt)];
 
   if (filters.startDate) {
     conditions.push(gte(entries.date, toUtcDate(filters.startDate)));

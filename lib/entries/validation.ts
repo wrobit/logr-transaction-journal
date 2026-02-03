@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { dayjs } from "@/lib/dayjs";
+
 const numericField = (label: string) =>
   z.preprocess(
     (value) => (value === "" || value === null ? undefined : value),
@@ -21,8 +23,21 @@ const optionalTextField = (label: string, min = 0) =>
     z.string().min(min, `${label} is required.`).optional(),
   );
 
+const isNotFutureDate = (value: string) => {
+  const parsed = dayjs.utc(value, "YYYY-MM-DD", true);
+  if (!parsed.isValid()) {
+    return false;
+  }
+
+  const today = dayjs.utc().startOf("day");
+  return !parsed.isAfter(today);
+};
+
 export const entryInputSchema = z.object({
-  date: z.string().min(1, "Date is required."),
+  date: z
+    .string()
+    .min(1, "Date is required.")
+    .refine(isNotFutureDate, "Date cannot be in the future."),
   operation: z.enum(["BUY", "SELL"]),
   baseAsset: z.string().min(1, "Asset is required."),
   quoteCurrency: z.string().min(1, "Quote currency is required."),

@@ -1,4 +1,5 @@
 # Entry — Crypto Journal
+
 Implementation Plan (Next.js App Router + TypeScript + Drizzle + Neon + shadcn/ui)
 
 **Entry** is a minimal, personal crypto transaction journal focused on correctness, transparency, and accounting-style clarity. No hype, no trading features — just structured records, PLN valuation via NBP, and clear profit/loss.
@@ -72,12 +73,14 @@ Implementation Plan (Next.js App Router + TypeScript + Drizzle + Neon + shadcn/u
 Primary workspace for transaction history and data entry.
 
 Features:
+
 - Date range filter
 - Asset/operation filters (future)
 - Entries table
 - Primary action: **Add entry**
 
 Table columns:
+
 - Date
 - Operation (Buy / Sell)
 - Asset / Currency (e.g. SOL / USD)
@@ -120,7 +123,9 @@ Visual overview of data.
 
 - PnL over time
 - Buy vs Sell volume
+- Buy vs Sell by asset
 - Asset distribution
+- Realized PnL % KPI
 
 ---
 
@@ -172,12 +177,14 @@ Visual overview of data.
 Module: `/lib/nbp`
 
 Responsibilities:
+
 - Resolve correct rate date
 - Fetch NBP rate
 - Handle weekends and missing days
 - Cache results
 
 Flow on entry creation:
+
 1. User submits entry form
 2. Server calculates `fullPrice`
 3. Rate date is resolved
@@ -198,6 +205,7 @@ Flow on entry creation:
 ### Add Entry Dialog
 
 Fields:
+
 - Date
 - Operation
 - Asset
@@ -209,6 +217,7 @@ Fields:
 - Note
 
 Live preview:
+
 - Full price
 - NBP rate + date
 - Value in PLN
@@ -267,6 +276,7 @@ Live preview:
 - [x] Session protection
 
 Auth Pages Implementation Plan:
+
 - Define Cursor-style layout (ENTRY top-left, centered content, dark canvas)
 - Set up NextAuth with Credentials + Google + GitHub providers
 - Configure env vars: `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, `GOOGLE_CLIENT_ID/SECRET`, `GITHUB_ID/SECRET`
@@ -313,15 +323,26 @@ Auth Pages Implementation Plan:
 
 ### Phase 5 — Dashboard
 
-- [ ] Dashboard UI
-- [ ] Aggregations
-- [ ] Holdings calculation
-- [ ] Use shadcn charts library
+- [x] Define dashboard grid layout + HUD-style panels
+- [x] Add filter bar (time range dropdown + asset dropdown)
+- [x] Default time range: All time (7D/30D/90D/YTD/All)
+- [x] Realized PnL only (default)
+- [x] Build server aggregations (PnL series, buy vs sell, holdings mix)
+- [x] Add KPI cards (total buys, total sells, realized PnL)
+- [x] Add charts with shadcn (line PnL, stacked buy/sell, donut holdings)
+- [x] Hook filters to server refresh + loading/empty states
+- [x] Add tests for aggregations and dashboard render
 
 ### Phase 6 — Profile
 
 - [ ] Account data
 - [ ] Account deletion
+
+### Phase 7 — Website Metadata & SEO
+
+### Phase 8 — Subscriptions and payments with polarr
+
+### Phase 9 — Import & Export with various providers
 
 ---
 
@@ -338,9 +359,9 @@ Auth Pages Implementation Plan:
 
 ## 12) Example Entry
 
-| Date       | Operation | Asset / Currency | Quantity | Price | Full | Commission | Source   | NBP   | Value (PLN) |
-|------------|----------|------------------|----------|-------|------|------------|----------|-------|-------------|
-| 2025-10-28 | BUY      | SOL / EUR        | 2 SOL    | 180   | 360  | 5          | PKO–SEPA | 4.2586 | 1533.10 |
+| Date       | Operation | Asset / Currency | Quantity | Price | Full | Commission | Source   | NBP    | Value (PLN) |
+| ---------- | --------- | ---------------- | -------- | ----- | ---- | ---------- | -------- | ------ | ----------- |
+| 2025-10-28 | BUY       | SOL / EUR        | 2 SOL    | 180   | 360  | 5          | PKO–SEPA | 4.2586 | 1533.10     |
 
 ---
 

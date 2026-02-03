@@ -1,6 +1,6 @@
 "use server";
 
-import { and, asc, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
@@ -29,6 +29,7 @@ import type {
   UpdateEntryState,
 } from "@/lib/entries/actions";
 import { entryInputSchema } from "@/lib/entries/validation";
+import { dayjs } from "@/lib/dayjs";
 import { getNbpRate } from "@/lib/nbp";
 
 export type EntryListResult = {
@@ -95,7 +96,7 @@ export async function listEntries(
   const assetRows = await db
     .selectDistinct({ baseAsset: entries.baseAsset })
     .from(entries)
-    .where(eq(entries.userId, userId))
+    .where(and(eq(entries.userId, userId), isNull(entries.deletedAt)))
     .orderBy(asc(entries.baseAsset));
 
   return {
@@ -143,7 +144,7 @@ const resolveEntryFields = async (parsed: {
     note?: string | undefined;
   };
 }) => {
-  const entryDate = new Date(`${parsed.data.date}T00:00:00Z`);
+  const entryDate = dayjs.utc(parsed.data.date, "YYYY-MM-DD", true).toDate();
   const quantity = parsed.data.quantity;
   const pricePerUnit = parsed.data.pricePerUnit;
   const commission = parsed.data.commission ?? null;
@@ -239,6 +240,8 @@ export async function createEntry(
   }
 
   revalidatePath("/");
+  revalidatePath("/summary");
+  revalidatePath("/dashboard");
 
   return {
     status: "success",
@@ -313,9 +316,15 @@ export async function updateEntry(
         toFixedNumber(valuePln, NUMERIC_SCALES.valuePln),
         NUMERIC_SCALES.valuePln,
       ),
-      updatedAt: new Date(),
+      updatedAt: dayjs.utc().toDate(),
     })
-    .where(and(eq(entries.id, entryId), eq(entries.userId, userId)))
+    .where(
+      and(
+        eq(entries.id, entryId),
+        eq(entries.userId, userId),
+        isNull(entries.deletedAt),
+      ),
+    )
     .returning();
 
   if (!updated) {
@@ -323,6 +332,8 @@ export async function updateEntry(
   }
 
   revalidatePath("/");
+  revalidatePath("/summary");
+  revalidatePath("/dashboard");
 
   return {
     status: "success",
@@ -358,8 +369,15 @@ export async function deleteEntry(
   }
 
   const [deleted] = await db
-    .delete(entries)
-    .where(and(eq(entries.id, entryId), eq(entries.userId, userId)))
+    .update(entries)
+    .set({ deletedAt: dayjs.utc().toDate(), updatedAt: dayjs.utc().toDate() })
+    .where(
+      and(
+        eq(entries.id, entryId),
+        eq(entries.userId, userId),
+        isNull(entries.deletedAt),
+      ),
+    )
     .returning({ id: entries.id });
 
   if (!deleted) {
@@ -367,6 +385,8 @@ export async function deleteEntry(
   }
 
   revalidatePath("/");
+  revalidatePath("/summary");
+  revalidatePath("/dashboard");
 
   return { status: "success" };
 }

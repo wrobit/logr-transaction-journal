@@ -70,7 +70,7 @@ const sampleData: DashboardData = {
   totals: { buyValue: 300, sellValue: 560, pnlValue: 260 },
   series: [
     { date: "2025-01-01", buyValue: 100, sellValue: 60, pnlValue: -40 },
-    { date: "2025-01-02", buyValue: 200, sellValue: 500, pnlValue: 300 },
+    { date: "2025-01-02", buyValue: 200, sellValue: 500, pnlValue: 260 },
   ],
   holdings: [
     {

@@ -53,6 +53,7 @@ export const entries = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
       .defaultNow()
       .notNull(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "date" }),
   },
   (table) => ({
     userDateIndex: index("entries_user_date_idx").on(table.userId, table.date),

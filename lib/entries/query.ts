@@ -1,4 +1,4 @@
-import { and, eq, gte, lte } from "drizzle-orm";
+import { and, eq, gte, isNull, lte } from "drizzle-orm";
 import { z } from "zod";
 
 import { entries } from "@/lib/db/schema";
@@ -58,7 +58,7 @@ const sortBySchema = z.enum([
 const sortDirSchema = z.enum(["asc", "desc"]);
 
 const DEFAULT_SORT_BY: EntrySortKey = "updatedAt";
-const DEFAULT_SORT_DIR: EntrySortDirection = "asc";
+const DEFAULT_SORT_DIR: EntrySortDirection = "desc";
 
 const getFirstValue = (value: string | string[] | undefined) =>
   Array.isArray(value) ? value[0] : value;
@@ -120,7 +120,7 @@ const toUtcDate = (date: string, endOfDay = false) =>
   new Date(`${date}T${endOfDay ? "23:59:59" : "00:00:00"}Z`);
 
 export function buildEntryConditions(userId: string, filters: EntryFilters) {
-  const conditions = [eq(entries.userId, userId)];
+  const conditions = [eq(entries.userId, userId), isNull(entries.deletedAt)];
 
   if (filters.startDate) {
     conditions.push(gte(entries.date, toUtcDate(filters.startDate)));

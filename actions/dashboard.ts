@@ -1,6 +1,6 @@
 "use server";
 
-import { and, asc, eq, gte, lte } from "drizzle-orm";
+import { and, asc, eq, gte, isNull, lte } from "drizzle-orm";
 
 import { ensureUserId } from "@/lib/auth/users";
 import { db } from "@/lib/db";
@@ -57,7 +57,7 @@ export async function getDashboardData(
   }
 
   const range = resolveDashboardRange(query.range);
-  const conditions = [eq(entries.userId, userId)];
+  const conditions = [eq(entries.userId, userId), isNull(entries.deletedAt)];
 
   if (range.startDate) {
     conditions.push(gte(entries.date, range.startDate));
@@ -122,14 +122,19 @@ export async function getDashboardData(
 
   totals.pnlValue = totals.sellValue - totals.buyValue;
 
+  let runningPnl = 0;
   const series = Array.from(seriesMap.entries())
     .sort(([left], [right]) => left.localeCompare(right))
-    .map(([date, values]) => ({
-      date,
-      buyValue: values.buyValue,
-      sellValue: values.sellValue,
-      pnlValue: values.sellValue - values.buyValue,
-    }));
+    .map(([date, values]) => {
+      const pnlDelta = values.sellValue - values.buyValue;
+      runningPnl += pnlDelta;
+      return {
+        date,
+        buyValue: values.buyValue,
+        sellValue: values.sellValue,
+        pnlValue: runningPnl,
+      };
+    });
 
   const holdings = Array.from(holdingsMap.entries())
     .map(([asset, values]) => {
@@ -156,7 +161,7 @@ export async function getDashboardData(
   const assetRows = await db
     .selectDistinct({ baseAsset: entries.baseAsset })
     .from(entries)
-    .where(eq(entries.userId, userId))
+    .where(and(eq(entries.userId, userId), isNull(entries.deletedAt)))
     .orderBy(asc(entries.baseAsset));
 
   return {

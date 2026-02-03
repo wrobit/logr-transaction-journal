@@ -1,6 +1,6 @@
 "use server";
 
-import { and, asc, desc, eq, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
@@ -95,7 +95,7 @@ export async function listEntries(
   const assetRows = await db
     .selectDistinct({ baseAsset: entries.baseAsset })
     .from(entries)
-    .where(eq(entries.userId, userId))
+    .where(and(eq(entries.userId, userId), isNull(entries.deletedAt)))
     .orderBy(asc(entries.baseAsset));
 
   return {
@@ -239,6 +239,8 @@ export async function createEntry(
   }
 
   revalidatePath("/");
+  revalidatePath("/summary");
+  revalidatePath("/dashboard");
 
   return {
     status: "success",
@@ -315,7 +317,13 @@ export async function updateEntry(
       ),
       updatedAt: new Date(),
     })
-    .where(and(eq(entries.id, entryId), eq(entries.userId, userId)))
+    .where(
+      and(
+        eq(entries.id, entryId),
+        eq(entries.userId, userId),
+        isNull(entries.deletedAt),
+      ),
+    )
     .returning();
 
   if (!updated) {
@@ -323,6 +331,8 @@ export async function updateEntry(
   }
 
   revalidatePath("/");
+  revalidatePath("/summary");
+  revalidatePath("/dashboard");
 
   return {
     status: "success",
@@ -358,8 +368,15 @@ export async function deleteEntry(
   }
 
   const [deleted] = await db
-    .delete(entries)
-    .where(and(eq(entries.id, entryId), eq(entries.userId, userId)))
+    .update(entries)
+    .set({ deletedAt: new Date(), updatedAt: new Date() })
+    .where(
+      and(
+        eq(entries.id, entryId),
+        eq(entries.userId, userId),
+        isNull(entries.deletedAt),
+      ),
+    )
     .returning({ id: entries.id });
 
   if (!deleted) {
@@ -367,6 +384,8 @@ export async function deleteEntry(
   }
 
   revalidatePath("/");
+  revalidatePath("/summary");
+  revalidatePath("/dashboard");
 
   return { status: "success" };
 }

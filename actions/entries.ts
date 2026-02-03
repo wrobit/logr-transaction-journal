@@ -29,6 +29,7 @@ import type {
   UpdateEntryState,
 } from "@/lib/entries/actions";
 import { entryInputSchema } from "@/lib/entries/validation";
+import { dayjs } from "@/lib/dayjs";
 import { getNbpRate } from "@/lib/nbp";
 
 export type EntryListResult = {
@@ -143,7 +144,7 @@ const resolveEntryFields = async (parsed: {
     note?: string | undefined;
   };
 }) => {
-  const entryDate = new Date(`${parsed.data.date}T00:00:00Z`);
+  const entryDate = dayjs.utc(parsed.data.date, "YYYY-MM-DD", true).toDate();
   const quantity = parsed.data.quantity;
   const pricePerUnit = parsed.data.pricePerUnit;
   const commission = parsed.data.commission ?? null;
@@ -315,7 +316,7 @@ export async function updateEntry(
         toFixedNumber(valuePln, NUMERIC_SCALES.valuePln),
         NUMERIC_SCALES.valuePln,
       ),
-      updatedAt: new Date(),
+      updatedAt: dayjs.utc().toDate(),
     })
     .where(
       and(
@@ -369,7 +370,7 @@ export async function deleteEntry(
 
   const [deleted] = await db
     .update(entries)
-    .set({ deletedAt: new Date(), updatedAt: new Date() })
+    .set({ deletedAt: dayjs.utc().toDate(), updatedAt: dayjs.utc().toDate() })
     .where(
       and(
         eq(entries.id, entryId),

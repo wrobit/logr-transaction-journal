@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { getDashboardData } from "@/actions/dashboard";
 import type { DashboardQuery } from "@/lib/dashboard/query";
+import { dayjs } from "@/lib/dayjs";
 
 const selectMock = vi.hoisted(() => vi.fn());
 const selectDistinctMock = vi.hoisted(() => vi.fn());
@@ -55,28 +56,28 @@ describe("dashboard aggregations", () => {
 
     const entryRows = [
       {
-        date: new Date("2025-01-01T00:00:00Z"),
+        date: dayjs.utc("2025-01-01").toDate(),
         operation: "BUY",
         baseAsset: "SOL",
         quantity: "2",
         valuePln: "100",
       },
       {
-        date: new Date("2025-01-01T00:00:00Z"),
+        date: dayjs.utc("2025-01-01").toDate(),
         operation: "SELL",
         baseAsset: "SOL",
         quantity: "1",
         valuePln: "60",
       },
       {
-        date: new Date("2025-01-02T00:00:00Z"),
+        date: dayjs.utc("2025-01-02").toDate(),
         operation: "BUY",
         baseAsset: "BTC",
         quantity: "0.5",
         valuePln: "200",
       },
       {
-        date: new Date("2025-01-02T00:00:00Z"),
+        date: dayjs.utc("2025-01-02").toDate(),
         operation: "SELL",
         baseAsset: "BTC",
         quantity: "0.5",

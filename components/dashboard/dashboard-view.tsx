@@ -36,6 +36,7 @@ import {
   DASHBOARD_RANGE_OPTIONS,
   type DashboardQuery,
 } from "@/lib/dashboard/query";
+import { dayjs } from "@/lib/dayjs";
 import { formatNumber, formatPln } from "@/lib/format/numbers";
 import { cn } from "@/lib/utils";
 
@@ -100,7 +101,8 @@ export function DashboardView({ data, query }: DashboardViewProps) {
   const hasHoldings = data.holdings.length > 0;
   const hasHoldingsMix = data.holdingsMix.length > 0;
   const axisFormatter = (value: number) => formatNumber(value, { maximumFractionDigits: 0 });
-  const dateTickFormatter = (value: string | number) => String(value).slice(5);
+  const dateTickFormatter = (value: string | number) =>
+    dayjs(value).format("MM-DD");
   const pnlPercent = totals.buyValue ? (totals.pnlValue / totals.buyValue) * 100 : null;
   const pnlPercentLabel = pnlPercent === null
     ? "—"

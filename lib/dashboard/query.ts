@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { dayjs } from "@/lib/dayjs";
+
 export type DashboardRange = "7d" | "30d" | "90d" | "ytd" | "all";
 
 export type DashboardQuery = {
@@ -54,22 +56,11 @@ export function buildDashboardQueryParams(query: DashboardQuery) {
   return params;
 }
 
-const startOfUtcDay = (date: Date) =>
-  new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()));
+const startOfUtcDay = (date: Date) => dayjs.utc(date).startOf("day").toDate();
 
-const endOfUtcDay = (date: Date) =>
-  new Date(
-    Date.UTC(
-      date.getUTCFullYear(),
-      date.getUTCMonth(),
-      date.getUTCDate(),
-      23,
-      59,
-      59,
-    ),
-  );
+const endOfUtcDay = (date: Date) => dayjs.utc(date).endOf("day").toDate();
 
-export function resolveDashboardRange(range: DashboardRange, now = new Date()) {
+export function resolveDashboardRange(range: DashboardRange, now = dayjs().toDate()) {
   if (range === "all") {
     return {
       label: "All time",
@@ -79,7 +70,7 @@ export function resolveDashboardRange(range: DashboardRange, now = new Date()) {
   }
 
   if (range === "ytd") {
-    const start = new Date(Date.UTC(now.getUTCFullYear(), 0, 1));
+    const start = dayjs.utc(now).startOf("year").toDate();
     return {
       label: "Year to date",
       startDate: startOfUtcDay(start),
@@ -88,8 +79,7 @@ export function resolveDashboardRange(range: DashboardRange, now = new Date()) {
   }
 
   const days = range === "7d" ? 7 : range === "30d" ? 30 : 90;
-  const start = new Date(now);
-  start.setUTCDate(start.getUTCDate() - (days - 1));
+  const start = dayjs.utc(now).subtract(days - 1, "day").toDate();
 
   return {
     label: `${days} days`,

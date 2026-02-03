@@ -5,10 +5,8 @@ import { and, asc, eq, gte, isNull, lte } from "drizzle-orm";
 import { ensureUserId } from "@/lib/auth/users";
 import { db } from "@/lib/db";
 import { entries } from "@/lib/db/schema";
-import {
-  resolveDashboardRange,
-  type DashboardQuery,
-} from "@/lib/dashboard/query";
+import { resolveDashboardRange, type DashboardQuery } from "@/lib/dashboard/query";
+import { dayjs } from "@/lib/dayjs";
 
 export type DashboardSeriesPoint = {
   date: string;
@@ -95,7 +93,7 @@ export async function getDashboardData(
   for (const row of rows) {
     const value = toNumber(row.valuePln);
     const quantity = toNumber(row.quantity);
-    const dateKey = row.date.toISOString().slice(0, 10);
+    const dateKey = dayjs.utc(row.date).format("YYYY-MM-DD");
     const seriesEntry =
       seriesMap.get(dateKey) ?? { buyValue: 0, sellValue: 0 };
     const holdingsEntry = holdingsMap.get(row.baseAsset) ?? {

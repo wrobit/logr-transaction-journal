@@ -13,6 +13,7 @@ import {
   defaultCreateEntryState,
   type CreateEntryState,
 } from "@/lib/entries/actions";
+import { dayjs } from "@/lib/dayjs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -29,12 +30,6 @@ const inputClassName =
   "border-border bg-background text-sm text-foreground placeholder:text-muted-foreground";
 const selectClassName =
   "h-9 w-full rounded-none border border-border bg-background px-3 text-sm text-foreground";
-
-const todayDate = () => {
-  const now = new Date();
-  const offset = now.getTimezoneOffset() * 60000;
-  return new Date(now.getTime() - offset).toISOString().split("T")[0];
-};
 
 const normalizeNumericInput = (value: string, decimals = 12) => {
   if (!value) {
@@ -68,7 +63,7 @@ export function AddEntryDialog({ onCreated, action }: AddEntryDialogProps) {
   const [commission, setCommission] = useState("");
 
   const formRef = useRef<HTMLFormElement>(null);
-  const maxDate = useMemo(() => todayDate(), []);
+  const maxDate = dayjs().format("YYYY-MM-DD");
 
   const actionHandler = useCallback(
     async (prevState: CreateEntryState, formData: FormData) => {

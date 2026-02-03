@@ -1,6 +1,7 @@
 import { and, eq, gte, isNull, lte } from "drizzle-orm";
 import { z } from "zod";
 
+import { dayjs } from "@/lib/dayjs";
 import { entries } from "@/lib/db/schema";
 import type { EntryOperation } from "@/lib/entries/types";
 
@@ -116,8 +117,10 @@ export function buildEntryQueryParams(query: EntryQuery) {
   return params;
 }
 
-const toUtcDate = (date: string, endOfDay = false) =>
-  new Date(`${date}T${endOfDay ? "23:59:59" : "00:00:00"}Z`);
+const toUtcDate = (date: string, endOfDay = false) => {
+  const parsed = dayjs.utc(date, "YYYY-MM-DD", true);
+  return (endOfDay ? parsed.endOf("day") : parsed.startOf("day")).toDate();
+};
 
 export function buildEntryConditions(userId: string, filters: EntryFilters) {
   const conditions = [eq(entries.userId, userId), isNull(entries.deletedAt)];

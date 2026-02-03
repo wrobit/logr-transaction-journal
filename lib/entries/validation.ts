@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { dayjs } from "@/lib/dayjs";
+
 const numericField = (label: string) =>
   z.preprocess(
     (value) => (value === "" || value === null ? undefined : value),
@@ -22,14 +24,13 @@ const optionalTextField = (label: string, min = 0) =>
   );
 
 const isNotFutureDate = (value: string) => {
-  const parsed = new Date(`${value}T00:00:00Z`);
-  if (Number.isNaN(parsed.getTime())) {
+  const parsed = dayjs.utc(value, "YYYY-MM-DD", true);
+  if (!parsed.isValid()) {
     return false;
   }
 
-  const today = new Date();
-  today.setUTCHours(0, 0, 0, 0);
-  return parsed <= today;
+  const today = dayjs.utc().startOf("day");
+  return !parsed.isAfter(today);
 };
 
 export const entryInputSchema = z.object({

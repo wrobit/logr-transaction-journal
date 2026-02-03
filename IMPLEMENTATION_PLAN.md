@@ -337,33 +337,33 @@ Auth Pages Implementation Plan:
 
 #### Phase 6.1 — Profile Data + Actions
 
-- [ ] Add profile fetch action (current user)
-- [ ] Add profile update action (first/last/login/email)
-- [ ] Add delete account action (cascade delete entries)
+- [x] Add profile fetch action (current user)
+- [x] Add profile update action (first/last/login/email)
+- [x] Add delete account action (cascade delete entries)
 
 #### Phase 6.2 — Profile UI (Editable)
 
-- [ ] Read-only summary section
-- [ ] Minimal edit controls for profile fields
-- [ ] Validation + inline errors
+- [x] Read-only summary section
+- [x] Minimal edit controls for profile fields
+- [x] Validation + inline errors
 
 #### Phase 6.3 — Account Deletion Flow
 
-- [ ] Lethal warning copy + consequences
-- [ ] Require typing “DELETE” to confirm
-- [ ] AlertDialog confirmation
+- [x] Lethal warning copy + consequences
+- [x] Require typing “DELETE” to confirm
+- [x] AlertDialog confirmation
 
 #### Phase 6.4 — Goodbye Screen
 
-- [ ] Post-delete confirmation screen
-- [ ] “Why are you leaving?” options + freeform
-- [ ] “I’ve changed my mind” CTA
+- [x] Post-delete confirmation screen
+- [x] “Why are you leaving?” options + freeform
+- [x] “I’ve changed my mind” CTA
 
 #### Phase 6.5 — Tests
 
-- [ ] Profile render + edit validation
-- [ ] Delete confirmation requirement
-- [ ] Goodbye screen rendering
+- [x] Profile render + edit validation
+- [x] Delete confirmation requirement
+- [x] Goodbye screen rendering
 
 ### Phase 7 — Website Metadata & SEO
 

@@ -189,7 +189,10 @@ export async function deleteAccount(
   }
 
   const [deleted] = await db
-    .delete(users)
+    .update(users)
+    .set({
+      deletedAt: dayjs.utc().toDate(),
+    })
     .where(eq(users.id, userId))
     .returning({ id: users.id });
 

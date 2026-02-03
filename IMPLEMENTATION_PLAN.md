@@ -333,16 +333,95 @@ Auth Pages Implementation Plan:
 - [x] Hook filters to server refresh + loading/empty states
 - [x] Add tests for aggregations and dashboard render
 
-### Phase 6 — Profile
+### Phase 6 — Profile + Navigation
 
-- [ ] Account data
-- [ ] Account deletion
+#### Phase 6.1 — Profile Data + Actions
+
+- [x] Add profile fetch action (current user)
+- [x] Add profile update action (first/last/login/email)
+- [x] Add delete account action (cascade delete entries)
+
+#### Phase 6.2 — Profile UI (Editable)
+
+- [x] Read-only summary section
+- [x] Minimal edit controls for profile fields
+- [x] Validation + inline errors
+
+#### Phase 6.3 — Account Deletion Flow
+
+- [x] Lethal warning copy + consequences
+- [x] Require typing “DELETE” to confirm
+- [x] AlertDialog confirmation
+
+#### Phase 6.4 — Goodbye Screen
+
+- [x] Post-delete confirmation screen
+- [x] “Why are you leaving?” options + freeform
+- [x] “I’ve changed my mind” CTA
+
+#### Phase 6.5 — Tests
+
+- [x] Profile render + edit validation
+- [x] Delete confirmation requirement
+- [x] Goodbye screen rendering
 
 ### Phase 7 — Website Metadata & SEO
 
 ### Phase 8 — Subscriptions and payments with polarr
 
 ### Phase 9 — Import & Export with various providers
+
+### Phase 10 — Administration Panel
+
+- [ ] Create admin role and permissions system
+- [ ] Add admin flag to users table
+- [ ] Build admin authentication middleware
+- [ ] Create admin dashboard layout
+- [ ] Add user management interface:
+  - [ ] View all users (active/deleted)
+  - [ ] Search and filter users
+  - [ ] View user details and activity
+  - [ ] Soft delete/restore user accounts
+  - [ ] View user entries (read-only)
+- [ ] Add system monitoring:
+  - [ ] User registration metrics
+  - [ ] Active users statistics
+  - [ ] Entry creation trends
+  - [ ] Database health metrics
+- [ ] Add feedback review panel:
+  - [ ] View all account deletion feedback
+  - [ ] Filter by reason and date
+  - [ ] Export feedback for analysis
+- [ ] Add admin activity audit log
+- [ ] Add tests for admin authorization and actions
+
+### Phase 11 — Data Encryption for Entries
+
+- [ ] Design encryption strategy:
+  - [ ] Determine encryption scope (all entry fields vs sensitive only)
+  - [ ] Choose encryption method (field-level vs row-level)
+  - [ ] Define key management strategy (per-user keys)
+- [ ] Implement encryption layer:
+  - [ ] Add encryption utilities (encrypt/decrypt functions)
+  - [ ] Generate and store user encryption keys securely
+  - [ ] Add key derivation from user credentials or separate key storage
+- [ ] Update entry CRUD operations:
+  - [ ] Encrypt entries on creation/update
+  - [ ] Decrypt entries on read
+  - [ ] Handle migration of existing unencrypted entries
+- [ ] Update query and aggregation logic:
+  - [ ] Adjust filters to work with encrypted data
+  - [ ] Update summary calculations
+  - [ ] Optimize performance for encrypted queries
+- [ ] Add key rotation mechanism:
+  - [ ] Build re-encryption flow for key changes
+  - [ ] Handle key recovery scenarios
+- [ ] Update backup and export features:
+  - [ ] Ensure encrypted data in backups
+  - [ ] Provide decrypted exports for user download
+- [ ] Add tests for encryption/decryption correctness
+- [ ] Add tests for key management and rotation
+- [ ] Document encryption approach and recovery procedures
 
 ---
 

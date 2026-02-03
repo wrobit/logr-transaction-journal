@@ -11,6 +11,14 @@ import {
 } from "drizzle-orm/pg-core";
 
 export const entryOperationEnum = pgEnum("entry_operation", ["BUY", "SELL"]);
+export const feedbackReasonEnum = pgEnum("feedback_reason", [
+  "tracking_elsewhere",
+  "no_longer_needed",
+  "missing_features",
+  "too_complex",
+  "privacy",
+  "other",
+]);
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -83,6 +91,16 @@ export const fxRatesCache = pgTable(
   }),
 );
 
+export const feedbacks = pgTable("feedbacks", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
+  reason: feedbackReasonEnum("reason"),
+  notes: text("notes"),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+    .defaultNow()
+    .notNull(),
+});
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 
@@ -91,3 +109,6 @@ export type NewEntry = typeof entries.$inferInsert;
 
 export type FxRateCache = typeof fxRatesCache.$inferSelect;
 export type NewFxRateCache = typeof fxRatesCache.$inferInsert;
+
+export type Feedback = typeof feedbacks.$inferSelect;
+export type NewFeedback = typeof feedbacks.$inferInsert;

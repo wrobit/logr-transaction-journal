@@ -8,6 +8,7 @@ import {
   defaultDeleteAccountState,
   type DeleteAccountState,
 } from "@/lib/profile/actions";
+import { feedbackOptions } from "@/lib/profile/feedback";
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -25,15 +26,6 @@ import { Textarea } from "@/components/ui/textarea";
 const labelClassName = "text-xs text-muted-foreground";
 const inputClassName =
   "border-border bg-background text-sm text-foreground placeholder:text-muted-foreground";
-
-const feedbackOptions = [
-  { value: "tracking_elsewhere", label: "Tracking elsewhere" },
-  { value: "no_longer_needed", label: "No longer needed" },
-  { value: "missing_features", label: "Missing features" },
-  { value: "too_complex", label: "Too complex" },
-  { value: "privacy", label: "Privacy concerns" },
-  { value: "other", label: "Other" },
-];
 
 type DeleteStep = "warning" | "feedback";
 

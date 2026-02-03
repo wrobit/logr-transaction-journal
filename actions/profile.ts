@@ -13,7 +13,7 @@ import {
   getUserByLogin,
 } from "@/lib/auth/users";
 import { db } from "@/lib/db";
-import { users } from "@/lib/db/schema";
+import { feedbacks, users } from "@/lib/db/schema";
 import { dayjs } from "@/lib/dayjs";
 import type { DeleteAccountState, UpdateProfileState } from "@/lib/profile/actions";
 import { serializeProfile } from "@/lib/profile/serialize";
@@ -167,6 +167,8 @@ export async function deleteAccount(
 
   const parsed = deleteAccountSchema.safeParse({
     confirmation: formData.get("confirmation"),
+    reason: formData.get("reason"),
+    notes: formData.get("notes"),
   });
 
   if (!parsed.success) {
@@ -174,6 +176,16 @@ export async function deleteAccount(
       status: "error",
       message: "Type DELETE to confirm account deletion.",
     };
+  }
+
+  const shouldStoreFeedback = Boolean(parsed.data.reason || parsed.data.notes);
+
+  if (shouldStoreFeedback) {
+    await db.insert(feedbacks).values({
+      userId,
+      reason: parsed.data.reason ?? null,
+      notes: parsed.data.notes ?? null,
+    });
   }
 
   const [deleted] = await db

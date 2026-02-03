@@ -25,4 +25,14 @@ describe("profile validation", () => {
       deleteAccountSchema.safeParse({ confirmation: "DELETE" }).success,
     ).toBe(true);
   });
+
+  it("accepts optional feedback fields", () => {
+    expect(
+      deleteAccountSchema.safeParse({
+        confirmation: "DELETE",
+        reason: "privacy",
+        notes: "Missing audit exports",
+      }).success,
+    ).toBe(true);
+  });
 });

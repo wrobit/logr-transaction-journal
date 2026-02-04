@@ -1,6 +1,13 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
 import { ArrowDownRight, ArrowUpRight, Minus } from "lucide-react";
 
-import { getTopAssets, type TickerItem } from "@/lib/market-data/coincap";
+import {
+  COINPAPRIKA_URL,
+  normalizeCoinPaprikaTickers,
+  type TickerItem,
+} from "@/lib/market-data/coincap";
 
 const usdFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -48,14 +55,67 @@ const TickerItemRow = ({ asset }: { asset: TickerItem }) => {
   );
 };
 
-export const FooterTicker = async () => {
-  const assets = await getTopAssets();
+const fetchAssets = async (): Promise<TickerItem[] | null> => {
+  try {
+    const response = await fetch("/api/market-data", { cache: "no-store" });
+
+    if (response.ok) {
+      const payload = (await response.json()) as { assets?: TickerItem[] };
+      const assets = payload.assets ?? [];
+
+      if (assets.length > 0) {
+        return assets;
+      }
+    }
+  } catch {
+    // Ignore and fall back to direct CoinPaprika fetch.
+  }
+
+  try {
+    const response = await fetch(COINPAPRIKA_URL, {
+      cache: "no-store",
+      headers: { Accept: "application/json" },
+    });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    const payload = (await response.json()) as unknown;
+
+    return normalizeCoinPaprikaTickers(payload);
+  } catch {
+    return null;
+  }
+};
+
+export const FooterTicker = () => {
+  const [assets, setAssets] = useState<TickerItem[] | null>(null);
+  const items = useMemo(() => (assets ? [...assets, ...assets] : []), [assets]);
+
+  useEffect(() => {
+    let isActive = true;
+
+    const loadAssets = async () => {
+      const nextAssets = await fetchAssets();
+
+      if (isActive) {
+        setAssets(nextAssets);
+      }
+    };
+
+    loadAssets();
+    const interval = window.setInterval(loadAssets, 60_000);
+
+    return () => {
+      isActive = false;
+      window.clearInterval(interval);
+    };
+  }, []);
 
   if (!assets || assets.length === 0) {
     return null;
   }
-
-  const items = [...assets, ...assets];
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-black/80 text-xs backdrop-blur">

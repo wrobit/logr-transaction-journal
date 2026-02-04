@@ -385,7 +385,7 @@ Auth Pages Implementation Plan:
 
 ### Phase 8 — Footer Crypto Ticker
 
-- [ ] Fetch top 10 assets from CoinCap (`/v2/assets?limit=10`) with `revalidate: 60`
+- [ ] Fetch top 10 assets from CoinPaprika (`/v1/tickers?limit=10`) with `revalidate: 60`
 - [ ] Normalize response into `TickerItem` (symbol, name, priceUsd, changePct, trend)
 - [ ] Render ticker only for authenticated users (hide on auth routes)
 - [ ] Build sticky bottom bar with muted, minimal styling

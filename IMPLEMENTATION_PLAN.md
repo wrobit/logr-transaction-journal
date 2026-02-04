@@ -423,7 +423,7 @@ Auth Pages Implementation Plan:
   - [x] Filter by reason and date
   - [x] Export feedback for analysis
 - [x] Add admin activity audit log
-- [ ] Add tests for admin authorization and actions
+- [x] Add tests for admin authorization and actions
 
 ### Phase 12 — Data Encryption for Entries
 

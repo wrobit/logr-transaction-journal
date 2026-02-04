@@ -400,21 +400,24 @@ Auth Pages Implementation Plan:
 
 ### Phase 11 — Administration Panel
 
-- [ ] Create admin role and permissions system
-- [ ] Add admin flag to users table
-- [ ] Build admin authentication middleware
-- [ ] Create admin dashboard layout
+- [ ] Add `users.role` enum (`user | admin`) with default `user`
+- [ ] Add `ADMIN_EMAIL_ALLOWLIST` env (comma-separated) for admin bootstrap
+- [ ] Promote allowlisted users to admin on login/session provisioning
+- [ ] Add `users.lastLoginAt` and update on successful login
+- [ ] Build admin-only middleware/guard for `(admin)` routes
+- [ ] Create admin dashboard layout and navigation shell
 - [ ] Add user management interface:
   - [ ] View all users (active/deleted)
   - [ ] Search and filter users
   - [ ] View user details and activity
   - [ ] Soft delete/restore user accounts
+  - [ ] Purge entries for a user without deleting the account
   - [ ] View user entries (read-only)
-- [ ] Add system monitoring:
+- [ ] Add system monitoring (reuse dashboard chart stack):
   - [ ] User registration metrics
-  - [ ] Active users statistics
+  - [ ] Active users statistics (based on `lastLoginAt`)
   - [ ] Entry creation trends
-  - [ ] Database health metrics
+  - [ ] Deletion feedback trends by reason/date
 - [ ] Add feedback review panel:
   - [ ] View all account deletion feedback
   - [ ] Filter by reason and date

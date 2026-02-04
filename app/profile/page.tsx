@@ -1,9 +1,15 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
 import { getProfile } from "@/actions/profile";
 import { ProfileView } from "@/components/profile/profile-view";
 import { authOptions } from "@/lib/auth/options";
+
+export const metadata: Metadata = {
+  title: "Profile",
+  description: "Manage your Entry account details and settings.",
+};
 
 export default async function ProfilePage() {
   const session = await getServerSession(authOptions);

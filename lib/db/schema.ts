@@ -1,6 +1,7 @@
 import {
   date,
   index,
+  jsonb,
   numeric,
   pgEnum,
   pgTable,
@@ -19,22 +20,32 @@ export const feedbackReasonEnum = pgEnum("feedback_reason", [
   "privacy",
   "other",
 ]);
+export const userRoleEnum = pgEnum("user_role", ["user", "admin"]);
 
-export const users = pgTable("users", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  email: text("email").notNull().unique(),
-  login: text("login").notNull().unique(),
-  passwordHash: text("password_hash").notNull(),
-  firstName: text("first_name").notNull(),
-  lastName: text("last_name").notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
-    .defaultNow()
-    .notNull(),
-  updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
-    .defaultNow()
-    .notNull(),
-  deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "date" }),
-});
+export const users = pgTable(
+  "users",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    email: text("email").notNull().unique(),
+    login: text("login").notNull().unique(),
+    passwordHash: text("password_hash").notNull(),
+    firstName: text("first_name").notNull(),
+    lastName: text("last_name").notNull(),
+    role: userRoleEnum("role").notNull().default("user"),
+    lastLoginAt: timestamp("last_login_at", { withTimezone: true, mode: "date" }),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+      .defaultNow()
+      .notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
+      .defaultNow()
+      .notNull(),
+    deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "date" }),
+  },
+  (table) => ({
+    roleIndex: index("users_role_idx").on(table.role),
+    lastLoginAtIndex: index("users_last_login_at_idx").on(table.lastLoginAt),
+  }),
+);
 
 export const entries = pgTable(
   "entries",
@@ -102,6 +113,30 @@ export const feedbacks = pgTable("feedbacks", {
     .notNull(),
 });
 
+export const adminAuditLogs = pgTable(
+  "admin_audit_logs",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    actorUserId: uuid("actor_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    targetUserId: uuid("target_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    action: text("action").notNull(),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => ({
+    actorIndex: index("admin_audit_actor_idx").on(table.actorUserId),
+    targetIndex: index("admin_audit_target_idx").on(table.targetUserId),
+    createdAtIndex: index("admin_audit_created_at_idx").on(table.createdAt),
+    actionIndex: index("admin_audit_action_idx").on(table.action),
+  }),
+);
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 
@@ -113,3 +148,6 @@ export type NewFxRateCache = typeof fxRatesCache.$inferInsert;
 
 export type Feedback = typeof feedbacks.$inferSelect;
 export type NewFeedback = typeof feedbacks.$inferInsert;
+
+export type AdminAuditLog = typeof adminAuditLogs.$inferSelect;
+export type NewAdminAuditLog = typeof adminAuditLogs.$inferInsert;

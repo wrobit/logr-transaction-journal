@@ -4,7 +4,12 @@ import GitHubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 
 import { verifyPassword } from "@/lib/auth/password";
-import { createOauthUser, getUserByEmail } from "@/lib/auth/users";
+import {
+  createOauthUser,
+  getUserByEmail,
+  getUserById,
+  updateUserLoginMetadata,
+} from "@/lib/auth/users";
 import { credentialsSchema } from "@/lib/auth/validation";
 
 export const authOptions: NextAuthOptions = {
@@ -53,23 +58,28 @@ export const authOptions: NextAuthOptions = {
           id: user.id,
           email: user.email,
           name: `${user.firstName} ${user.lastName}`,
+          role: user.role,
         };
       },
     }),
   ],
   callbacks: {
     async signIn({ user, account }) {
-      if (!account || account.provider === "credentials") {
-        return true;
-      }
-
-      if (!user.email) {
+      if (!user?.email) {
         return false;
       }
 
-      const existingUser = await getUserByEmail(user.email);
-      if (!existingUser) {
-        await createOauthUser({ email: user.email, name: user.name });
+      let dbUser = await getUserByEmail(user.email);
+
+      if (!dbUser && account?.provider !== "credentials") {
+        dbUser = await createOauthUser({ email: user.email, name: user.name });
+      }
+
+      if (dbUser) {
+        await updateUserLoginMetadata({
+          userId: dbUser.id,
+          email: dbUser.email,
+        });
       }
 
       return true;
@@ -78,6 +88,7 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         if (account?.provider === "credentials") {
           token.userId = user.id;
+          token.role = "role" in user ? (user.role as "user" | "admin" | undefined) : undefined;
           return token;
         }
 
@@ -85,6 +96,7 @@ export const authOptions: NextAuthOptions = {
           const dbUser = await getUserByEmail(user.email);
           if (dbUser) {
             token.userId = dbUser.id;
+            token.role = dbUser.role;
           }
         }
       }
@@ -93,6 +105,14 @@ export const authOptions: NextAuthOptions = {
         const dbUser = await getUserByEmail(token.email);
         if (dbUser) {
           token.userId = dbUser.id;
+          token.role = dbUser.role;
+        }
+      }
+
+      if (token.userId && !token.role) {
+        const dbUser = await getUserById(token.userId as string);
+        if (dbUser) {
+          token.role = dbUser.role;
         }
       }
 
@@ -101,6 +121,10 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user && token.userId) {
         session.user.id = token.userId as string;
+      }
+
+      if (session.user && token.role) {
+        session.user.role = token.role as "user" | "admin";
       }
 
       return session;

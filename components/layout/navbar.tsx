@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { UserIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,9 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 export function Navbar() {
+  const { data: session } = useSession();
+  const isAdmin = session?.user?.role === "admin";
+
   return (
     <header className="border-b border-border bg-background/90 px-6 py-4 text-foreground backdrop-blur">
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between">
@@ -36,6 +39,11 @@ export function Navbar() {
             <Link href="/dashboard" className="transition hover:text-foreground">
               Dashboard
             </Link>
+            {isAdmin ? (
+              <Link href="/admin" className="transition hover:text-foreground">
+                Admin
+              </Link>
+            ) : null}
           </nav>
         </div>
 

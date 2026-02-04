@@ -400,27 +400,30 @@ Auth Pages Implementation Plan:
 
 ### Phase 11 — Administration Panel
 
-- [ ] Create admin role and permissions system
-- [ ] Add admin flag to users table
-- [ ] Build admin authentication middleware
-- [ ] Create admin dashboard layout
-- [ ] Add user management interface:
-  - [ ] View all users (active/deleted)
-  - [ ] Search and filter users
-  - [ ] View user details and activity
-  - [ ] Soft delete/restore user accounts
-  - [ ] View user entries (read-only)
-- [ ] Add system monitoring:
-  - [ ] User registration metrics
-  - [ ] Active users statistics
-  - [ ] Entry creation trends
-  - [ ] Database health metrics
-- [ ] Add feedback review panel:
-  - [ ] View all account deletion feedback
-  - [ ] Filter by reason and date
-  - [ ] Export feedback for analysis
-- [ ] Add admin activity audit log
-- [ ] Add tests for admin authorization and actions
+- [x] Add `users.role` enum (`user | admin`) with default `user`
+- [x] Add `ADMIN_EMAIL_ALLOWLIST` env (comma-separated) for admin bootstrap
+- [x] Promote allowlisted users to admin on login/session provisioning
+- [x] Add `users.lastLoginAt` and update on successful login
+- [x] Build admin-only middleware/guard for `(admin)` routes
+- [x] Create admin dashboard layout and navigation shell
+- [x] Add user management interface:
+  - [x] View all users (active/deleted)
+  - [x] Search and filter users
+  - [x] View user details and activity
+  - [x] Soft delete/restore user accounts
+  - [x] Purge entries for a user without deleting the account
+  - [x] View user entries (read-only)
+- [x] Add system monitoring (reuse dashboard chart stack):
+  - [x] User registration metrics
+  - [x] Active users statistics (based on `lastLoginAt`)
+  - [x] Entry creation trends
+  - [x] Deletion feedback trends by reason/date
+- [x] Add feedback review panel:
+  - [x] View all account deletion feedback
+  - [x] Filter by reason and date
+  - [x] Export feedback for analysis
+- [x] Add admin activity audit log
+- [x] Add tests for admin authorization and actions
 
 ### Phase 12 — Data Encryption for Entries
 

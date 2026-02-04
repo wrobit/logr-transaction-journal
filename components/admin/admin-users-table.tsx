@@ -1,8 +1,8 @@
 import Link from "next/link";
 
 import { softDeleteUser, restoreUser, purgeUserEntries } from "@/actions/admin-users";
+import { AdminUserActionDialog } from "@/components/admin/admin-user-action-dialog";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import type { AdminUserRow } from "@/actions/admin-users";
 import { dayjs } from "@/lib/dayjs";
 
@@ -81,31 +81,43 @@ export function AdminUsersTable({ users, currentUserId }: AdminUsersTableProps) 
                   <div className="flex flex-col items-end gap-2">
                     <div className="flex flex-wrap justify-end gap-2">
                       {isDeleted ? (
-                        <form action={restoreUser}>
-                          <input type="hidden" name="userId" value={user.id} />
-                          <Button type="submit" size="sm" disabled={isSelf}>
-                            Restore
-                          </Button>
-                        </form>
+                        <AdminUserActionDialog
+                          userId={user.id}
+                          title="Restore account"
+                          description="This restores user access and reactivates the account."
+                          triggerLabel="Restore"
+                          confirmLabel="Restore"
+                          successMessage="User restored."
+                          action={restoreUser}
+                          triggerVariant="outline"
+                          confirmVariant="default"
+                          disabled={isSelf}
+                        />
                       ) : (
-                        <form action={softDeleteUser}>
-                          <input type="hidden" name="userId" value={user.id} />
-                          <Button
-                            type="submit"
-                            size="sm"
-                            variant="destructive"
-                            disabled={isSelf}
-                          >
-                            Deactivate
-                          </Button>
-                        </form>
+                        <AdminUserActionDialog
+                          userId={user.id}
+                          title="Deactivate account"
+                          description="This disables access for the user until restored."
+                          triggerLabel="Deactivate"
+                          confirmLabel="Deactivate"
+                          successMessage="User deactivated."
+                          action={softDeleteUser}
+                          triggerVariant="destructive"
+                          confirmVariant="destructive"
+                          disabled={isSelf}
+                        />
                       )}
-                      <form action={purgeUserEntries}>
-                        <input type="hidden" name="userId" value={user.id} />
-                        <Button type="submit" size="sm" variant="outline">
-                          Purge entries
-                        </Button>
-                      </form>
+                      <AdminUserActionDialog
+                        userId={user.id}
+                        title="Purge entries"
+                        description="This permanently removes all entries for this user."
+                        triggerLabel="Purge entries"
+                        confirmLabel="Purge entries"
+                        successMessage="Entries purged."
+                        action={purgeUserEntries}
+                        triggerVariant="outline"
+                        confirmVariant="destructive"
+                      />
                     </div>
                     {isSelf ? (
                       <span className="text-[11px] text-muted-foreground">

@@ -48,6 +48,11 @@ export type AdminUsersResult = {
   pageSize: number;
 };
 
+export type AdminActionResult = {
+  status: "success" | "error";
+  message?: string;
+};
+
 
 const DEFAULT_QUERY: Required<Pick<AdminUsersQuery, "page" | "status">> = {
   page: 1,
@@ -57,7 +62,7 @@ const DEFAULT_QUERY: Required<Pick<AdminUsersQuery, "page" | "status">> = {
 const normalizeQuery = (query?: AdminUsersQuery) => ({
   search: query?.search?.trim() || "",
   status: query?.status ?? DEFAULT_QUERY.status,
-  page: query?.page ?? DEFAULT_QUERY.page,
+  page: Math.max(1, Math.floor(query?.page ?? DEFAULT_QUERY.page)),
 });
 
 const buildWhereClause = (query: ReturnType<typeof normalizeQuery>) => {
@@ -185,17 +190,19 @@ export async function getAdminUserEntries(userId: string) {
     .limit(50);
 }
 
-export async function softDeleteUser(formData: FormData): Promise<void> {
+export async function softDeleteUser(userId: string): Promise<AdminActionResult> {
   const session = await getAdminSession();
 
   if (!session) {
-    return;
+    return { status: "error", message: "Admin access required." };
   }
 
-  const userId = String(formData.get("userId") ?? "");
+  if (!userId) {
+    return { status: "error", message: "User ID is required." };
+  }
 
-  if (!userId || userId === session.user.id) {
-    return;
+  if (userId === session.user.id) {
+    return { status: "error", message: "You cannot deactivate your own account." };
   }
 
   await db
@@ -207,19 +214,19 @@ export async function softDeleteUser(formData: FormData): Promise<void> {
 
   revalidatePath("/admin/users");
   revalidatePath(`/admin/users/${userId}`);
+
+  return { status: "success" };
 }
 
-export async function restoreUser(formData: FormData): Promise<void> {
+export async function restoreUser(userId: string): Promise<AdminActionResult> {
   const session = await getAdminSession();
 
   if (!session) {
-    return;
+    return { status: "error", message: "Admin access required." };
   }
 
-  const userId = String(formData.get("userId") ?? "");
-
   if (!userId) {
-    return;
+    return { status: "error", message: "User ID is required." };
   }
 
   await db
@@ -231,23 +238,25 @@ export async function restoreUser(formData: FormData): Promise<void> {
 
   revalidatePath("/admin/users");
   revalidatePath(`/admin/users/${userId}`);
+
+  return { status: "success" };
 }
 
-export async function purgeUserEntries(formData: FormData): Promise<void> {
+export async function purgeUserEntries(userId: string): Promise<AdminActionResult> {
   const session = await getAdminSession();
 
   if (!session) {
-    return;
+    return { status: "error", message: "Admin access required." };
   }
 
-  const userId = String(formData.get("userId") ?? "");
-
   if (!userId) {
-    return;
+    return { status: "error", message: "User ID is required." };
   }
 
   await db.delete(entries).where(eq(entries.userId, userId));
 
   revalidatePath("/admin/users");
   revalidatePath(`/admin/users/${userId}`);
+
+  return { status: "success" };
 }

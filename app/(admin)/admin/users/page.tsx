@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { getAdminUsers } from "@/actions/admin-users";
 import { AdminUsersFilters } from "@/components/admin/admin-users-filters";
+import { AdminUsersPagination } from "@/components/admin/admin-users-pagination";
 import { AdminUsersTable } from "@/components/admin/admin-users-table";
 import { requireAdminSession } from "@/lib/auth/admin";
 
@@ -19,6 +20,14 @@ type PageProps = {
 const parseSearchParam = (value?: string | string[]) =>
   typeof value === "string" ? value : Array.isArray(value) ? value[0] : undefined;
 
+const parsePage = (value?: string) => {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    return 1;
+  }
+  return Math.max(1, Math.floor(parsed));
+};
+
 export default async function AdminUsersPage({ searchParams }: PageProps) {
   const session = await requireAdminSession();
   const resolvedParams = await searchParams;
@@ -29,11 +38,15 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
     | "active"
     | "deleted"
     | undefined;
+  const page = parsePage(parseSearchParam(resolvedParams?.page));
 
   const data = await getAdminUsers({
     search,
     status,
+    page,
   });
+
+  const totalPages = Math.max(1, Math.ceil(data.totalCount / data.pageSize));
 
   return (
     <div className="space-y-6">
@@ -48,6 +61,7 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
         {data.totalCount} users · showing page {data.page}
       </div>
       <AdminUsersTable users={data.users} currentUserId={session.user.id} />
+      <AdminUsersPagination page={data.page} totalPages={totalPages} />
     </div>
   );
 }

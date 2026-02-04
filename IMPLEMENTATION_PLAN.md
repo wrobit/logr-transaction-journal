@@ -385,12 +385,14 @@ Auth Pages Implementation Plan:
 
 ### Phase 8 — Footer Crypto Ticker
 
-- [ ] Define data source (static seed or API placeholder)
-- [ ] Build minimal bottom bar layout (sticky, subtle height)
-- [ ] Implement infinite horizontal carousel animation
-- [ ] Render each item with symbol, price, % change, trend arrow
-- [ ] Add muted styling that reads as preview
-- [ ] Handle loading/empty state gracefully
+- [ ] Fetch top 10 assets from CoinCap (`/v2/assets?limit=10`) with `revalidate: 60`
+- [ ] Normalize response into `TickerItem` (symbol, name, priceUsd, changePct, trend)
+- [ ] Render ticker only for authenticated users (hide on auth routes)
+- [ ] Build sticky bottom bar with muted, minimal styling
+- [ ] Implement infinite horizontal carousel animation with duplicated items
+- [ ] Show symbol, USD price, % change, and up/down arrow per asset
+- [ ] Respect `prefers-reduced-motion` and pause on hover
+- [ ] Hide ticker on empty or failed API response
 
 ### Phase 9 — Subscriptions and payments with polarr
 

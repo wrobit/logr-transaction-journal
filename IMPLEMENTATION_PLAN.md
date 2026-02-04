@@ -367,6 +367,22 @@ Auth Pages Implementation Plan:
 
 ### Phase 7 — Website Metadata & SEO
 
+- [x] Define default metadata baseline (title template, description, keywords, app name)
+- [x] Add global `metadata` in `app/layout.tsx` (App Router):
+  - [x] Title template + default title
+  - [x] `description`, `applicationName`, `authors`
+  - [x] `robots` set to `noindex, nofollow` in non-prod (if env supports)
+- [x] Add Open Graph + Twitter defaults with placeholder images:
+  - [x] `openGraph` title/description/siteName/type/images
+  - [x] `twitter` card `summary_large_image` + images
+- [x] Add per-route metadata for auth and protected pages:
+  - [x] `/login`, `/register`
+  - [x] `/`, `/dashboard`, `/profile`, `/goodbye`
+  - [x] Use “Entry — {Page}” titles + concise descriptions
+- [x] Add app icons + manifest placeholders:
+  - [x] `favicon.ico`, `icon.svg`, `apple-touch-icon.svg`
+  - [x] `site.webmanifest` with name, theme colors, icons
+
 ### Phase 8 — Subscriptions and payments with polarr
 
 ### Phase 9 — Import & Export with various providers
@@ -422,6 +438,19 @@ Auth Pages Implementation Plan:
 - [ ] Add tests for encryption/decryption correctness
 - [ ] Add tests for key management and rotation
 - [ ] Document encryption approach and recovery procedures
+
+## Phase 12 - Internationalization
+
+### Post-domain metadata (later)
+
+- [ ] Set `metadataBase` to production URL
+- [ ] Set `openGraph.url` and canonical URLs
+- [ ] Replace placeholder social images with branded assets
+- [ ] Revisit robots policy for production
+- [ ] Swap placeholder icons (`icon.svg`, `apple-touch-icon.svg`, `og-placeholder.svg`) for branded assets
+- [ ] Review sitemap outputs once public routes finalize (may need adjustments)
+- [ ] Verify rendered metadata for key routes
+- [ ] Validate Open Graph/Twitter tags
 
 ---
 

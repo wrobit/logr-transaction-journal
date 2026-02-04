@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
@@ -5,6 +6,11 @@ import { getDashboardData } from "@/actions/dashboard";
 import { DashboardView } from "@/components/dashboard/dashboard-view";
 import { authOptions } from "@/lib/auth/options";
 import { parseDashboardQuery } from "@/lib/dashboard/query";
+
+export const metadata: Metadata = {
+  title: "Dashboard",
+  description: "Track performance and PnL across your crypto entries.",
+};
 
 type PageProps = {
   searchParams?:

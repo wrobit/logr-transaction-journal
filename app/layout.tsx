@@ -80,7 +80,7 @@ export default async function RootLayout({
   return (
     <html lang="en" className={`${figtree.variable} dark`}>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Providers>
+        <Providers session={session}>
           <AppShell showTicker={showTicker}>{children}</AppShell>
         </Providers>
         {showTicker ? <FooterTicker /> : null}

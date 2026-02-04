@@ -8,6 +8,20 @@ import { hashPassword } from "@/lib/auth/password";
 import type { RegisterInput } from "@/lib/auth/validation";
 
 const DEFAULT_LAST_NAME = "User";
+const adminAllowlist = new Set(
+  (process.env.ADMIN_EMAIL_ALLOWLIST ?? "")
+    .split(",")
+    .map((email) => email.trim().toLowerCase())
+    .filter(Boolean),
+);
+
+function isEmailAllowlisted(email: string) {
+  return adminAllowlist.has(email.trim().toLowerCase());
+}
+
+function resolveUserRole(email: string) {
+  return isEmailAllowlisted(email) ? "admin" : "user";
+}
 
 export async function getUserByEmail(email: string) {
   const [user] = await db
@@ -79,6 +93,7 @@ export async function createCredentialsUser(input: RegisterInput) {
       passwordHash,
       firstName: input.firstName,
       lastName: input.lastName,
+      role: resolveUserRole(input.email),
     })
     .returning();
 
@@ -103,10 +118,35 @@ export async function createOauthUser({
       passwordHash,
       firstName,
       lastName,
+      role: resolveUserRole(email),
     })
     .returning();
 
   return user;
+}
+
+export async function updateUserLoginMetadata({
+  userId,
+  email,
+}: {
+  userId: string;
+  email?: string | null;
+}) {
+  const updates: Partial<typeof users.$inferInsert> = {
+    lastLoginAt: new Date(),
+  };
+
+  if (email && isEmailAllowlisted(email)) {
+    updates.role = "admin";
+  }
+
+  const [user] = await db
+    .update(users)
+    .set(updates)
+    .where(eq(users.id, userId))
+    .returning();
+
+  return user ?? null;
 }
 
 function splitName(name?: string | null) {

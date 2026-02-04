@@ -1,16 +1,24 @@
 import type { Metadata } from "next";
+
+import { getAdminAnalyticsData } from "@/actions/admin-analytics";
+import { AdminAnalyticsView } from "@/components/admin/admin-analytics-view";
+import { parseAdminAnalyticsQuery } from "@/lib/admin/analytics-query";
+
 export const metadata: Metadata = {
   title: "Admin",
   description: "Admin overview and system monitoring for Entry.",
 };
 
-export default function AdminPage() {
-  return (
-    <div className="space-y-2">
-      <h2 className="text-base font-semibold">Overview</h2>
-      <p className="text-sm text-muted-foreground">
-        Admin tools and monitoring will live here.
-      </p>
-    </div>
-  );
+type PageProps = {
+  searchParams?:
+    | Record<string, string | string[] | undefined>
+    | Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function AdminPage({ searchParams }: PageProps) {
+  const resolvedSearchParams = await searchParams;
+  const query = parseAdminAnalyticsQuery(resolvedSearchParams ?? {});
+  const data = await getAdminAnalyticsData(query);
+
+  return <AdminAnalyticsView data={data} query={query} />;
 }

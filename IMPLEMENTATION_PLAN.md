@@ -367,23 +367,21 @@ Auth Pages Implementation Plan:
 
 ### Phase 7 — Website Metadata & SEO
 
-- [ ] Define default metadata baseline (title template, description, keywords, app name)
-- [ ] Add global `metadata` in `app/layout.tsx` (App Router):
-  - [ ] Title template + default title
-  - [ ] `description`, `applicationName`, `authors`
-  - [ ] `robots` set to `noindex, nofollow` in non-prod (if env supports)
-- [ ] Add Open Graph + Twitter defaults with placeholder images:
-  - [ ] `openGraph` title/description/siteName/type/images
-  - [ ] `twitter` card `summary_large_image` + images
-- [ ] Add per-route metadata for auth and protected pages:
-  - [ ] `/login`, `/register`
-  - [ ] `/`, `/summary`, `/dashboard`, `/profile`
-  - [ ] Use “Entry — {Page}” titles + concise descriptions
-- [ ] Add app icons + manifest placeholders:
-  - [ ] `favicon.ico`, `icon.png`, `apple-touch-icon.png`
-  - [ ] `site.webmanifest` with name, theme colors, icons
-- [ ] Verify rendered metadata for key routes
-- [ ] Validate Open Graph/Twitter tags
+- [x] Define default metadata baseline (title template, description, keywords, app name)
+- [x] Add global `metadata` in `app/layout.tsx` (App Router):
+  - [x] Title template + default title
+  - [x] `description`, `applicationName`, `authors`
+  - [x] `robots` set to `noindex, nofollow` in non-prod (if env supports)
+- [x] Add Open Graph + Twitter defaults with placeholder images:
+  - [x] `openGraph` title/description/siteName/type/images
+  - [x] `twitter` card `summary_large_image` + images
+- [x] Add per-route metadata for auth and protected pages:
+  - [x] `/login`, `/register`
+  - [x] `/`, `/dashboard`, `/profile`, `/goodbye`
+  - [x] Use “Entry — {Page}” titles + concise descriptions
+- [x] Add app icons + manifest placeholders:
+  - [x] `favicon.ico`, `icon.svg`, `apple-touch-icon.svg`
+  - [x] `site.webmanifest` with name, theme colors, icons
 
 ### Phase 8 — Subscriptions and payments with polarr
 
@@ -449,6 +447,10 @@ Auth Pages Implementation Plan:
 - [ ] Set `openGraph.url` and canonical URLs
 - [ ] Replace placeholder social images with branded assets
 - [ ] Revisit robots policy for production
+- [ ] Swap placeholder icons (`icon.svg`, `apple-touch-icon.svg`, `og-placeholder.svg`) for branded assets
+- [ ] Review sitemap outputs once public routes finalize (may need adjustments)
+- [ ] Verify rendered metadata for key routes
+- [ ] Validate Open Graph/Twitter tags
 
 ---
 

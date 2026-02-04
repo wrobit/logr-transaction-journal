@@ -367,6 +367,24 @@ Auth Pages Implementation Plan:
 
 ### Phase 7 — Website Metadata & SEO
 
+- [ ] Define default metadata baseline (title template, description, keywords, app name)
+- [ ] Add global `metadata` in `app/layout.tsx` (App Router):
+  - [ ] Title template + default title
+  - [ ] `description`, `applicationName`, `authors`
+  - [ ] `robots` set to `noindex, nofollow` in non-prod (if env supports)
+- [ ] Add Open Graph + Twitter defaults with placeholder images:
+  - [ ] `openGraph` title/description/siteName/type/images
+  - [ ] `twitter` card `summary_large_image` + images
+- [ ] Add per-route metadata for auth and protected pages:
+  - [ ] `/login`, `/register`
+  - [ ] `/`, `/summary`, `/dashboard`, `/profile`
+  - [ ] Use “Entry — {Page}” titles + concise descriptions
+- [ ] Add app icons + manifest placeholders:
+  - [ ] `favicon.ico`, `icon.png`, `apple-touch-icon.png`
+  - [ ] `site.webmanifest` with name, theme colors, icons
+- [ ] Verify rendered metadata for key routes
+- [ ] Validate Open Graph/Twitter tags
+
 ### Phase 8 — Subscriptions and payments with polarr
 
 ### Phase 9 — Import & Export with various providers
@@ -422,6 +440,15 @@ Auth Pages Implementation Plan:
 - [ ] Add tests for encryption/decryption correctness
 - [ ] Add tests for key management and rotation
 - [ ] Document encryption approach and recovery procedures
+
+## Phase 12 - Internationalization
+
+### Post-domain metadata (later)
+
+- [ ] Set `metadataBase` to production URL
+- [ ] Set `openGraph.url` and canonical URLs
+- [ ] Replace placeholder social images with branded assets
+- [ ] Revisit robots policy for production
 
 ---
 

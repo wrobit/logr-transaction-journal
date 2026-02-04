@@ -14,6 +14,7 @@ import {
 import { revalidatePath } from "next/cache";
 
 import { getAdminSession } from "@/lib/auth/admin";
+import { logAdminAction, getEntriesCountForUser } from "@/actions/admin-audit";
 import { db } from "@/lib/db";
 import { entries, users } from "@/lib/db/schema";
 import { dayjs } from "@/lib/dayjs";
@@ -212,6 +213,12 @@ export async function softDeleteUser(userId: string): Promise<AdminActionResult>
     })
     .where(eq(users.id, userId));
 
+  await logAdminAction({
+    actorUserId: session.user.id,
+    action: "user.deactivated",
+    targetUserId: userId,
+  });
+
   revalidatePath("/admin/users");
   revalidatePath(`/admin/users/${userId}`);
 
@@ -236,6 +243,12 @@ export async function restoreUser(userId: string): Promise<AdminActionResult> {
     })
     .where(eq(users.id, userId));
 
+  await logAdminAction({
+    actorUserId: session.user.id,
+    action: "user.restored",
+    targetUserId: userId,
+  });
+
   revalidatePath("/admin/users");
   revalidatePath(`/admin/users/${userId}`);
 
@@ -253,7 +266,16 @@ export async function purgeUserEntries(userId: string): Promise<AdminActionResul
     return { status: "error", message: "User ID is required." };
   }
 
+  const entriesCount = await getEntriesCountForUser(userId);
+
   await db.delete(entries).where(eq(entries.userId, userId));
+
+  await logAdminAction({
+    actorUserId: session.user.id,
+    action: "entries.purged",
+    targetUserId: userId,
+    metadata: { entriesPurged: entriesCount },
+  });
 
   revalidatePath("/admin/users");
   revalidatePath(`/admin/users/${userId}`);

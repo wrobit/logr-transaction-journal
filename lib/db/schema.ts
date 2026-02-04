@@ -1,6 +1,7 @@
 import {
   date,
   index,
+  jsonb,
   numeric,
   pgEnum,
   pgTable,
@@ -112,6 +113,30 @@ export const feedbacks = pgTable("feedbacks", {
     .notNull(),
 });
 
+export const adminAuditLogs = pgTable(
+  "admin_audit_logs",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    actorUserId: uuid("actor_user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    targetUserId: uuid("target_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
+    action: text("action").notNull(),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => ({
+    actorIndex: index("admin_audit_actor_idx").on(table.actorUserId),
+    targetIndex: index("admin_audit_target_idx").on(table.targetUserId),
+    createdAtIndex: index("admin_audit_created_at_idx").on(table.createdAt),
+    actionIndex: index("admin_audit_action_idx").on(table.action),
+  }),
+);
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 
@@ -123,3 +148,6 @@ export type NewFxRateCache = typeof fxRatesCache.$inferInsert;
 
 export type Feedback = typeof feedbacks.$inferSelect;
 export type NewFeedback = typeof feedbacks.$inferInsert;
+
+export type AdminAuditLog = typeof adminAuditLogs.$inferSelect;
+export type NewAdminAuditLog = typeof adminAuditLogs.$inferInsert;

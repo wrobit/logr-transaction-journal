@@ -385,14 +385,14 @@ Auth Pages Implementation Plan:
 
 ### Phase 8 — Footer Crypto Ticker
 
-- [ ] Fetch top 10 assets from CoinPaprika (`/v1/tickers?limit=10`) with `revalidate: 60`
-- [ ] Normalize response into `TickerItem` (symbol, name, priceUsd, changePct, trend)
-- [ ] Render ticker only for authenticated users (hide on auth routes)
-- [ ] Build sticky bottom bar with muted, minimal styling
-- [ ] Implement infinite horizontal carousel animation with duplicated items
-- [ ] Show symbol, USD price, % change, and up/down arrow per asset
-- [ ] Respect `prefers-reduced-motion` and pause on hover
-- [ ] Hide ticker on empty or failed API response
+- [x] Fetch top 10 assets from CoinPaprika (`/v1/tickers?limit=10`) with `revalidate: 60`
+- [x] Normalize response into `TickerItem` (symbol, name, priceUsd, changePct, trend)
+- [x] Render ticker only for authenticated users (hide on auth routes)
+- [x] Build sticky bottom bar with muted, minimal styling
+- [x] Implement infinite horizontal carousel animation with duplicated items
+- [x] Show symbol, USD price, % change, and up/down arrow per asset
+- [x] Respect `prefers-reduced-motion` and pause on hover
+- [x] Hide ticker on empty or failed API response
 
 ### Phase 9 — Subscriptions and payments with polarr
 

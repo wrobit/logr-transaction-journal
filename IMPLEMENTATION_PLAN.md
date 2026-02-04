@@ -383,11 +383,22 @@ Auth Pages Implementation Plan:
   - [x] `favicon.ico`, `icon.svg`, `apple-touch-icon.svg`
   - [x] `site.webmanifest` with name, theme colors, icons
 
-### Phase 8 — Subscriptions and payments with polarr
+### Phase 8 — Footer Crypto Ticker
 
-### Phase 9 — Import & Export with various providers
+- [x] Fetch top 10 assets from CoinPaprika (`/v1/tickers?limit=10`) with `revalidate: 60`
+- [x] Normalize response into `TickerItem` (symbol, name, priceUsd, changePct, trend)
+- [x] Render ticker only for authenticated users (hide on auth routes)
+- [x] Build sticky bottom bar with muted, minimal styling
+- [x] Implement infinite horizontal carousel animation with duplicated items
+- [x] Show symbol, USD price, % change, and up/down arrow per asset
+- [x] Respect `prefers-reduced-motion` and pause on hover
+- [x] Hide ticker on empty or failed API response
 
-### Phase 10 — Administration Panel
+### Phase 9 — Subscriptions and payments with polarr
+
+### Phase 10 — Import & Export with various providers
+
+### Phase 11 — Administration Panel
 
 - [ ] Create admin role and permissions system
 - [ ] Add admin flag to users table
@@ -411,7 +422,7 @@ Auth Pages Implementation Plan:
 - [ ] Add admin activity audit log
 - [ ] Add tests for admin authorization and actions
 
-### Phase 11 — Data Encryption for Entries
+### Phase 12 — Data Encryption for Entries
 
 - [ ] Design encryption strategy:
   - [ ] Determine encryption scope (all entry fields vs sensitive only)
@@ -439,7 +450,7 @@ Auth Pages Implementation Plan:
 - [ ] Add tests for key management and rotation
 - [ ] Document encryption approach and recovery procedures
 
-## Phase 12 - Internationalization
+## Phase 13 - Internationalization
 
 ### Post-domain metadata (later)
 

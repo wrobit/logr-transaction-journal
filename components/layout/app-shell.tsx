@@ -6,7 +6,13 @@ import { Navbar } from "@/components/layout/navbar";
 
 const AUTH_ROUTES = new Set(["/login", "/register", "/goodbye"]);
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({
+  children,
+  showTicker = false,
+}: {
+  children: React.ReactNode;
+  showTicker?: boolean;
+}) {
   const pathname = usePathname();
   const showShell = !AUTH_ROUTES.has(pathname);
 
@@ -19,7 +25,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="flex min-h-screen flex-col md:flex-row">
         <div className="flex min-h-screen flex-1 flex-col">
           <Navbar />
-          <main className="flex-1">{children}</main>
+          <main className={`flex-1 ${showTicker ? "pb-12" : ""}`}>{children}</main>
         </div>
       </div>
     </div>

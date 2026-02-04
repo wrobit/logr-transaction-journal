@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Figtree } from "next/font/google";
+import { getServerSession } from "next-auth";
+
 import { AppShell } from "@/components/layout/app-shell";
 import { Providers } from "@/components/layout/providers";
+import { FooterTicker } from "@/components/ticker/footer-ticker";
+import { authOptions } from "@/lib/auth/options";
 import "./globals.css";
 
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
@@ -63,17 +67,21 @@ export const metadata: Metadata = {
   manifest: "/site.webmanifest",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const session = await getServerSession(authOptions);
+  const showTicker = Boolean(session?.user?.id);
+
   return (
     <html lang="en" className={`${figtree.variable} dark`}>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <Providers>
-          <AppShell>{children}</AppShell>
+          <AppShell showTicker={showTicker}>{children}</AppShell>
         </Providers>
+        {showTicker ? <FooterTicker /> : null}
       </body>
     </html>
   );

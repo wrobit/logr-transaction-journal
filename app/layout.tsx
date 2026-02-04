@@ -26,6 +26,8 @@ const appDescription =
   "The best minimalistic encrypted crypto journal with PLN valuation via NBP rates.";
 const isProduction = process.env.NODE_ENV === "production";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: {
     default: `Entry - ${appTagline}`,

@@ -52,14 +52,18 @@ export function AdminAuditTable({ rows }: AdminAuditTableProps) {
               <td className="px-3 py-3 text-muted-foreground">
                 <div className="space-y-1">
                   <div>{row.actorEmail ?? row.actorLogin}</div>
-                  <div className="text-[11px]">{row.actorLogin}</div>
+                  {row.actorLogin && row.actorLogin !== row.actorEmail ? (
+                    <div className="text-[11px]">{row.actorLogin}</div>
+                  ) : null}
                 </div>
               </td>
               <td className="px-3 py-3 text-muted-foreground">
                 {row.targetEmail ? (
                   <div className="space-y-1">
                     <div>{row.targetEmail}</div>
-                    <div className="text-[11px]">{row.targetLogin}</div>
+                    {row.targetLogin && row.targetLogin !== row.targetEmail ? (
+                      <div className="text-[11px]">{row.targetLogin}</div>
+                    ) : null}
                   </div>
                 ) : (
                   "—"

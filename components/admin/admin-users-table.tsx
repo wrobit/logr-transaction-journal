@@ -53,7 +53,8 @@ export function AdminUsersTable({ users, currentUserId }: AdminUsersTableProps) 
                       {user.firstName} {user.lastName}
                     </Link>
                     <div className="text-xs text-muted-foreground">
-                      {user.email} · {user.login}
+                      {user.email}
+                      {user.login && user.login !== user.email ? ` · ${user.login}` : ""}
                     </div>
                   </div>
                 </td>

@@ -45,7 +45,9 @@ export function AdminFeedbackTable({ rows }: AdminFeedbackTableProps) {
                 {row.userEmail ? (
                   <div className="space-y-1">
                     <div>{row.userEmail}</div>
-                    <div className="text-[11px]">{row.userLogin}</div>
+                    {row.userLogin && row.userLogin !== row.userEmail ? (
+                      <div className="text-[11px]">{row.userLogin}</div>
+                    ) : null}
                   </div>
                 ) : (
                   "Deleted user"

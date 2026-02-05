@@ -1,9 +1,11 @@
 import { fetchJsonWithRetry } from "@/lib/integrations/http";
+import { dayjs } from "@/lib/dayjs";
 import type { RateProvider, RateProviderInput } from "@/lib/integrations/providers/interfaces";
 import type { NormalizedRateResult } from "@/lib/integrations/types";
 import { normalizeCurrency, normalizeIsoDate, nowIso } from "@/lib/integrations/utils";
 
 const ECB_BASE_URL = "https://data-api.ecb.europa.eu/service/data/EXR";
+const MAX_LOOKBACK_DAYS = 7;
 
 export class EcbRateProvider implements RateProvider {
   readonly name = "ecb" as const;
@@ -63,41 +65,44 @@ export class EcbRateProvider implements RateProvider {
       return 1;
     }
 
-    const endpoint = `${ECB_BASE_URL}/D.${currency}.EUR.SP00.A?startPeriod=${date}&endPeriod=${date}&format=jsondata`;
-    const payload = await fetchJsonWithRetry<unknown>(endpoint, {}, { retries: 1 }).catch(
-      () => null,
-    );
+    for (let offset = 0; offset <= MAX_LOOKBACK_DAYS; offset += 1) {
+      const candidateDate = dayjs.utc(date).subtract(offset, "day").format("YYYY-MM-DD");
+      const endpoint = `${ECB_BASE_URL}/D.${currency}.EUR.SP00.A?startPeriod=${candidateDate}&endPeriod=${candidateDate}&format=jsondata`;
+      const payload = await fetchJsonWithRetry<unknown>(endpoint, {}, { retries: 1 }).catch(
+        () => null,
+      );
 
-    if (!payload) {
-      return null;
+      if (!payload || typeof payload !== "object") {
+        continue;
+      }
+
+      const dataSets = (payload as { dataSets?: Array<{ series?: Record<string, unknown> }> }).dataSets;
+      const series = dataSets?.[0]?.series;
+      if (!series) {
+        continue;
+      }
+
+      const firstSeries = Object.values(series)[0];
+      if (!firstSeries || typeof firstSeries !== "object") {
+        continue;
+      }
+
+      const observations = (firstSeries as { observations?: Record<string, number[]> }).observations;
+      if (!observations) {
+        continue;
+      }
+
+      const observation = Object.values(observations)[0];
+      if (!observation || !Array.isArray(observation) || observation.length === 0) {
+        continue;
+      }
+
+      const rate = observation[0];
+      if (typeof rate === "number") {
+        return rate;
+      }
     }
 
-    if (typeof payload !== "object" || payload === null) {
-      return null;
-    }
-
-    const dataSets = (payload as { dataSets?: Array<{ series?: Record<string, unknown> }> }).dataSets;
-    const series = dataSets?.[0]?.series;
-    if (!series) {
-      return null;
-    }
-
-    const firstSeries = Object.values(series)[0];
-    if (!firstSeries || typeof firstSeries !== "object") {
-      return null;
-    }
-
-    const observations = (firstSeries as { observations?: Record<string, number[]> }).observations;
-    if (!observations) {
-      return null;
-    }
-
-    const observation = Object.values(observations)[0];
-    if (!observation || !Array.isArray(observation) || observation.length === 0) {
-      return null;
-    }
-
-    const rate = observation[0];
-    return typeof rate === "number" ? rate : null;
+    return null;
   }
 }

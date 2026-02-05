@@ -96,7 +96,7 @@ export async function runAdminIntegrationSmokeTests(): Promise<{
     };
   }
 
-  const today = dayjs.utc().format("YYYY-MM-DD");
+  const stableDate = dayjs.utc().subtract(3, "day").format("YYYY-MM-DD");
 
   const tests: Array<{ key: string; run: () => Promise<string> }> = [
     {
@@ -106,7 +106,7 @@ export async function runAdminIntegrationSmokeTests(): Promise<{
           countryCode: "DE",
           baseCurrency: "EUR",
           quoteCurrency: "PLN",
-          effectiveDate: today,
+          effectiveDate: stableDate,
           rateType: "historical",
         });
 
@@ -120,7 +120,7 @@ export async function runAdminIntegrationSmokeTests(): Promise<{
           countryCode: "GB",
           baseCurrency: "USD",
           quoteCurrency: "GBP",
-          effectiveDate: today,
+          effectiveDate: stableDate,
           rateType: "monthly",
         });
 

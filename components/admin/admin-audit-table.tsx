@@ -1,3 +1,5 @@
+"use client";
+
 import { dayjs } from "@/lib/dayjs";
 import type { AdminAuditRow } from "@/actions/admin-audit";
 import { Badge } from "@/components/ui/badge";

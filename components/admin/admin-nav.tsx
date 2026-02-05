@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { labelKey: "users", href: "/admin/users" },
   { labelKey: "feedback", href: "/admin/feedback" },
   { labelKey: "audit", href: "/admin/audit" },
+  { labelKey: "integrations", href: "/admin/integrations" },
 ];
 
 export function AdminNav() {

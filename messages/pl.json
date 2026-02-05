@@ -220,7 +220,8 @@
       "overview": "Przeglad",
       "users": "Uzytkownicy",
       "feedback": "Opinie",
-      "audit": "Audyt"
+      "audit": "Audyt",
+      "integrations": "Integracje"
     },
     "layout": {
       "title": "Konsola admina",
@@ -367,6 +368,45 @@
       "cancel": "Anuluj",
       "working": "Przetwarzanie...",
       "failed": "Akcja nie powiodla sie."
+    },
+    "integrations": {
+      "title": "Integracje",
+      "subtitle": "Uruchamiaj testy smoke dostawcow i przegladaj logi audytowe integracji.",
+      "summary": {
+        "fxRates": "Zapisane kursy FX",
+        "taxChecks": "Logi walidacji podatkowej"
+      },
+      "smoke": {
+        "run": "Uruchom testy smoke",
+        "resultsTitle": "Ostatni przebieg smoke",
+        "ok": "OK",
+        "failed": "Blad",
+        "success": "Testy smoke integracji zakonczone.",
+        "error": "Czesc testow smoke integracji nie powiodla sie."
+      },
+      "tables": {
+        "ratesTitle": "Kursy od dostawcow FX",
+        "taxTitle": "Logi walidacji podatkowej",
+        "emptyRates": "Brak zapisanych kursow od dostawcow.",
+        "emptyTax": "Brak logow walidacji podatkowej.",
+        "rateColumns": {
+          "pair": "Para",
+          "value": "Kurs",
+          "provider": "Dostawca",
+          "effectiveDate": "Data efektywna",
+          "type": "Typ",
+          "method": "Metoda",
+          "retrieved": "Pobrano"
+        },
+        "taxColumns": {
+          "country": "Kraj",
+          "idType": "Typ ID",
+          "masked": "Zamaskowana wartosc",
+          "result": "Wynik",
+          "provider": "Dostawca",
+          "checked": "Sprawdzono"
+        }
+      }
     }
   },
   "metadata": {
@@ -416,6 +456,10 @@
     "adminAudit": {
       "title": "Admin Audyt",
       "description": "Dziennik audytu akcji administratora."
+    },
+    "adminIntegrations": {
+      "title": "Admin Integracje",
+      "description": "Testy smoke dostawcow i logi audytowe integracji."
     }
   },
   "validation": {

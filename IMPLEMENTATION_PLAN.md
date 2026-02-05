@@ -636,6 +636,26 @@ Auth Pages Implementation Plan:
 - [ ] Verify metadata/canonical URLs use final public hosts
 - [ ] Add rollback plan for DNS cutover window
 
+## Phase 16 - Integration Consumption (post-foundation)
+
+### Phase 16.1 - Tax report integration
+
+- [ ] Use Phase 14 rate service in tax report generation flows
+- [ ] Include provider/method/effective date/source metadata in tax exports
+- [ ] Ensure report output remains deterministic and reproducible from persisted snapshots
+
+### Phase 16.2 - Import pipeline enrichment
+
+- [ ] Apply country/provider policy resolution during import normalization
+- [ ] Attach integration metadata to imported transaction records
+- [ ] Add fallback and warning markers for import-time rate gaps
+
+### Phase 16.3 - Optional live UI attribution
+
+- [ ] Add source attribution badges (provider + method + date) on key financial surfaces
+- [ ] Show explicit warnings when fallback rates are used
+- [ ] Keep attribution concise and aligned with existing dashboard/entries visual language
+
 ---
 
 ## 11) MVP Acceptance Criteria

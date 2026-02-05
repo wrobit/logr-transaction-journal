@@ -6,13 +6,15 @@ import { listEntries } from "@/actions/entries";
 import { EntriesView } from "@/components/entries/entries-view";
 import { authOptions } from "@/lib/auth/options";
 import { ENTRY_PAGE_SIZE, parseEntryQuery } from "@/lib/entries/query";
+import { getServerTranslator } from "@/lib/i18n/translate";
 
-export const metadata: Metadata = {
-  title: {
-    absolute: "Entry - The best minimalistic encrypted crypto journal",
-  },
-  description: "Review and add crypto transactions with PLN valuation.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerTranslator();
+  return {
+    title: t("metadata.entries.title"),
+    description: t("metadata.entries.description"),
+  };
+}
 
 type PageProps = {
   searchParams?:
@@ -32,7 +34,7 @@ export default async function Page({ searchParams }: PageProps) {
   const entriesResult = await listEntries(session.user, query);
 
   return (
-    <div className="min-h-screen bg-black px-6 py-10">
+    <div className="min-h-screen bg-black px-3 py-10 md:px-4">
       <div className="mx-auto w-full max-w-6xl">
         <EntriesView
           entries={entriesResult.entries}
@@ -40,6 +42,8 @@ export default async function Page({ searchParams }: PageProps) {
           totalCount={entriesResult.totalCount}
           pageSize={ENTRY_PAGE_SIZE}
           query={query}
+          displayCurrency={entriesResult.displayCurrency}
+          displayRatesByEntryId={entriesResult.displayRatesByEntryId}
         />
       </div>
     </div>

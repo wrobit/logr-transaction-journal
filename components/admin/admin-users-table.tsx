@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
 import { softDeleteUser, restoreUser, purgeUserEntries } from "@/actions/admin-users";
 import { AdminUserActionDialog } from "@/components/admin/admin-user-action-dialog";
@@ -18,10 +19,12 @@ type AdminUsersTableProps = {
 };
 
 export function AdminUsersTable({ users, currentUserId }: AdminUsersTableProps) {
+  const t = useTranslations("admin.users");
+
   if (users.length === 0) {
     return (
       <div className="rounded-sm border border-border bg-muted/40 p-6 text-center text-sm text-muted-foreground">
-        No users match this filter.
+        {t("empty")}
       </div>
     );
   }
@@ -31,13 +34,13 @@ export function AdminUsersTable({ users, currentUserId }: AdminUsersTableProps) 
       <table className="w-full border-collapse text-left text-xs text-foreground">
         <thead className="bg-muted/50 text-[11px] uppercase tracking-wide text-muted-foreground">
           <tr>
-            <th className="px-3 py-3 font-medium">User</th>
-            <th className="px-3 py-3 font-medium">Role</th>
-            <th className="px-3 py-3 font-medium">Entries</th>
-            <th className="px-3 py-3 font-medium">Created</th>
-            <th className="px-3 py-3 font-medium">Last login</th>
-            <th className="px-3 py-3 font-medium">Status</th>
-            <th className="px-3 py-3 font-medium text-right">Actions</th>
+            <th className="px-3 py-3 font-medium">{t("columns.user")}</th>
+            <th className="px-3 py-3 font-medium">{t("columns.role")}</th>
+            <th className="px-3 py-3 font-medium">{t("columns.entries")}</th>
+            <th className="px-3 py-3 font-medium">{t("columns.created")}</th>
+            <th className="px-3 py-3 font-medium">{t("columns.lastLogin")}</th>
+            <th className="px-3 py-3 font-medium">{t("columns.status")}</th>
+            <th className="px-3 py-3 font-medium text-right">{t("columns.actions")}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
@@ -63,7 +66,7 @@ export function AdminUsersTable({ users, currentUserId }: AdminUsersTableProps) 
                     variant={user.role === "admin" ? "secondary" : "outline"}
                     className={user.role === "admin" ? "bg-emerald-500/10 text-emerald-200" : ""}
                   >
-                    {user.role}
+                    {user.role === "admin" ? t("roleAdmin") : t("roleUser")}
                   </Badge>
                 </td>
                 <td className="px-3 py-3 text-muted-foreground">{user.entriesCount}</td>
@@ -75,7 +78,7 @@ export function AdminUsersTable({ users, currentUserId }: AdminUsersTableProps) 
                 </td>
                 <td className="px-3 py-3">
                   <Badge variant={isDeleted ? "destructive" : "secondary"}>
-                    {isDeleted ? "Deleted" : "Active"}
+                    {isDeleted ? t("deleted") : t("active")}
                   </Badge>
                 </td>
                 <td className="px-3 py-3">
@@ -84,11 +87,11 @@ export function AdminUsersTable({ users, currentUserId }: AdminUsersTableProps) 
                       {isDeleted ? (
                         <AdminUserActionDialog
                           userId={user.id}
-                          title="Restore account"
-                          description="This restores user access and reactivates the account."
-                          triggerLabel="Restore"
-                          confirmLabel="Restore"
-                          successMessage="User restored."
+                          title={t("restoreTitle")}
+                          description={t("restoreDescription")}
+                          triggerLabel={t("restore")}
+                          confirmLabel={t("restore")}
+                          successMessage={t("restored")}
                           action={restoreUser}
                           triggerVariant="outline"
                           confirmVariant="default"
@@ -97,11 +100,11 @@ export function AdminUsersTable({ users, currentUserId }: AdminUsersTableProps) 
                       ) : (
                         <AdminUserActionDialog
                           userId={user.id}
-                          title="Deactivate account"
-                          description="This disables access for the user until restored."
-                          triggerLabel="Deactivate"
-                          confirmLabel="Deactivate"
-                          successMessage="User deactivated."
+                          title={t("deactivateTitle")}
+                          description={t("deactivateDescription")}
+                          triggerLabel={t("deactivate")}
+                          confirmLabel={t("deactivate")}
+                          successMessage={t("deactivated")}
                           action={softDeleteUser}
                           triggerVariant="destructive"
                           confirmVariant="destructive"
@@ -110,11 +113,11 @@ export function AdminUsersTable({ users, currentUserId }: AdminUsersTableProps) 
                       )}
                       <AdminUserActionDialog
                         userId={user.id}
-                        title="Purge entries"
-                        description="This permanently removes all entries for this user."
-                        triggerLabel="Purge entries"
-                        confirmLabel="Purge entries"
-                        successMessage="Entries purged."
+                        title={t("purgeTitle")}
+                        description={t("purgeDescription")}
+                        triggerLabel={t("purge")}
+                        confirmLabel={t("purge")}
+                        successMessage={t("purged")}
                         action={purgeUserEntries}
                         triggerVariant="outline"
                         confirmVariant="destructive"
@@ -122,7 +125,7 @@ export function AdminUsersTable({ users, currentUserId }: AdminUsersTableProps) 
                     </div>
                     {isSelf ? (
                       <span className="text-[11px] text-muted-foreground">
-                        You cannot change your own status.
+                        {t("selfGuard")}
                       </span>
                     ) : null}
                   </div>

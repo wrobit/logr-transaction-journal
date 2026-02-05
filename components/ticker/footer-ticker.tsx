@@ -119,7 +119,7 @@ export const FooterTicker = () => {
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10 bg-black/80 text-xs backdrop-blur">
-      <div className="mx-auto max-w-6xl overflow-hidden px-6 py-2">
+      <div className="w-full overflow-hidden px-3 py-2 md:px-4">
         <div className="group flex min-w-full items-center">
           <div className="flex w-max items-center gap-8 pr-8 tabular-nums animate-[ticker-scroll_40s_linear_infinite] motion-reduce:animate-none group-hover:[animation-play-state:paused] group-focus-within:[animation-play-state:paused]">
             {items.map((asset, index) => (

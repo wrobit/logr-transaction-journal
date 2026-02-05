@@ -151,12 +151,12 @@ export async function updateUserLoginMetadata({
 
 function splitName(name?: string | null) {
   if (!name) {
-    return { firstName: "Entry", lastName: DEFAULT_LAST_NAME };
+    return { firstName: "Logr", lastName: DEFAULT_LAST_NAME };
   }
 
   const [firstName, ...rest] = name.trim().split(" ");
   return {
-    firstName: firstName || "Entry",
+    firstName: firstName || "Logr",
     lastName: rest.join(" ") || DEFAULT_LAST_NAME,
   };
 }

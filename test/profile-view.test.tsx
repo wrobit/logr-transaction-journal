@@ -1,10 +1,11 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { DeleteAccountDialog } from "@/components/profile/delete-account-dialog";
 import { ProfileView } from "@/components/profile/profile-view";
 import type { UpdateProfileState } from "@/lib/profile/actions";
 import type { ProfileView as ProfileData } from "@/lib/profile/types";
+import { renderWithIntl } from "@/test/utils/render-with-intl";
 
 const refresh = vi.fn();
 
@@ -26,18 +27,19 @@ const profile: ProfileData = {
   lastName: "Lovelace",
   login: "ada",
   email: "ada@example.com",
+  displayCurrency: "PLN",
   createdAt: "2025-01-01T00:00:00Z",
   updatedAt: "2025-02-01T00:00:00Z",
 };
 
 describe("ProfileView", () => {
   it("renders profile summary", () => {
-    render(<ProfileView profile={profile} />);
+    renderWithIntl(<ProfileView profile={profile} />);
 
     expect(screen.getByText("Profile")).toBeInTheDocument();
     expect(screen.getByText("Ada Lovelace")).toBeInTheDocument();
     expect(screen.getByText("ada@example.com")).toBeInTheDocument();
-    expect(screen.getByText("2025-01-01")).toBeInTheDocument();
+    expect(screen.getByText("01/01/2025")).toBeInTheDocument();
   });
 
   it("shows validation errors from update action", async () => {
@@ -46,7 +48,7 @@ describe("ProfileView", () => {
       errors: { firstName: "First name is required." },
     }));
 
-    render(<ProfileView profile={profile} updateAction={updateAction} />);
+    renderWithIntl(<ProfileView profile={profile} updateAction={updateAction} />);
 
     fireEvent.click(screen.getByRole("button", { name: /save changes/i }));
 
@@ -59,7 +61,7 @@ describe("DeleteAccountDialog", () => {
   it("shows exit step before enabling delete", () => {
     const action = vi.fn(async () => ({ status: "idle" as const }));
 
-    render(<DeleteAccountDialog open onOpenChange={vi.fn()} action={action} />);
+    renderWithIntl(<DeleteAccountDialog open onOpenChange={vi.fn()} action={action} />);
 
     expect(screen.getByText("Delete account")).toBeInTheDocument();
 

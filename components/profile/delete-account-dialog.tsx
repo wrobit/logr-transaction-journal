@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useCallback, useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { signOut } from "next-auth/react";
 
 import { deleteAccount } from "@/actions/profile";
@@ -40,6 +41,7 @@ export function DeleteAccountDialog({
   onOpenChange,
   action,
 }: DeleteAccountDialogProps) {
+  const t = useTranslations("profile");
   const [step, setStep] = useState<DeleteStep>("warning");
   const [confirmation, setConfirmation] = useState("");
   const [reason, setReason] = useState("");
@@ -82,32 +84,29 @@ export function DeleteAccountDialog({
           {step === "warning" ? (
             <>
               <AlertDialogHeader>
-                <AlertDialogTitle>Delete account</AlertDialogTitle>
-                <AlertDialogDescription>
-                  You&apos;re about to permanently delete your Entry profile.
-                  We&apos;ll ask for quick feedback next.
-                </AlertDialogDescription>
+                <AlertDialogTitle>{t("deleteDialog.title")}</AlertDialogTitle>
+                <AlertDialogDescription>{t("deleteDialog.description")}</AlertDialogDescription>
               </AlertDialogHeader>
               <div className="rounded-sm border border-border bg-muted/40 p-3 text-xs text-muted-foreground">
-                <p>This action will remove:</p>
+                <p>{t("deleteDialog.removeListTitle")}</p>
                 <ul className="mt-2 list-disc space-y-1 pl-4">
-                  <li>All transaction entries and valuations</li>
-                  <li>Saved notes and sources</li>
+                  <li>{t("deleteDialog.removeEntries")}</li>
+                  <li>{t("deleteDialog.removeNotes")}</li>
                 </ul>
-                <p className="mt-3">This cannot be undone once confirmed.</p>
+                <p className="mt-3">{t("deleteDialog.cannotUndo")}</p>
               </div>
             </>
           ) : (
             <>
               <AlertDialogHeader>
-                <AlertDialogTitle>Before you go</AlertDialogTitle>
+                <AlertDialogTitle>{t("deleteDialog.beforeYouGo")}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Share a quick reason, then confirm deletion.
+                  {t("deleteDialog.feedbackPrompt")}
                 </AlertDialogDescription>
               </AlertDialogHeader>
 
               <div className="space-y-2">
-                <p className={labelClassName}>Why are you leaving? (optional)</p>
+                <p className={labelClassName}>{t("deleteDialog.reasonOptional")}</p>
                 <div className="grid gap-2 text-sm">
                   {feedbackOptions.map((option) => (
                     <label key={option.value} className="flex items-center gap-2">
@@ -119,7 +118,7 @@ export function DeleteAccountDialog({
                         onChange={(event) => setReason(event.target.value)}
                         className="h-4 w-4 accent-foreground"
                       />
-                      <span>{option.label}</span>
+                      <span>{t(`deleteDialog.reasons.${option.value}`)}</span>
                     </label>
                   ))}
                 </div>
@@ -127,21 +126,21 @@ export function DeleteAccountDialog({
 
               <div className="space-y-2">
                 <Label htmlFor="notes" className={labelClassName}>
-                  Anything else to share?
+                  {t("deleteDialog.notesLabel")}
                 </Label>
                 <Textarea
                   id="notes"
                   name="notes"
                   value={notes}
                   onChange={(event) => setNotes(event.target.value)}
-                  placeholder="Optional feedback"
+                  placeholder={t("deleteDialog.notesPlaceholder")}
                   className="min-h-[120px] rounded-none border-border bg-background text-sm text-foreground"
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="confirmation" className={labelClassName}>
-                  Type DELETE to confirm
+                  {t("deleteDialog.typeDelete")}
                 </Label>
                 <Input
                   id="confirmation"
@@ -154,7 +153,7 @@ export function DeleteAccountDialog({
                   placeholder="DELETE"
                 />
                 <p className="text-xs text-muted-foreground">
-                  Your session will end immediately after deletion.
+                  {t("deleteDialog.sessionEnds")}
                 </p>
               </div>
             </>
@@ -165,14 +164,14 @@ export function DeleteAccountDialog({
           ) : null}
 
           <AlertDialogFooter>
-            <AlertDialogCancel type="button">Cancel</AlertDialogCancel>
+            <AlertDialogCancel type="button">{t("deleteDialog.cancel")}</AlertDialogCancel>
             {step === "warning" ? (
               <Button
                 type="button"
                 className="bg-foreground text-background hover:bg-foreground/90"
                 onClick={() => setStep("feedback")}
               >
-                Continue
+                {t("deleteDialog.continue")}
               </Button>
             ) : (
               <>
@@ -181,14 +180,14 @@ export function DeleteAccountDialog({
                   variant="outline"
                   onClick={() => setStep("warning")}
                 >
-                  Back
+                  {t("deleteDialog.back")}
                 </Button>
                 <Button
                   type="submit"
                   variant="destructive"
                   disabled={!isConfirmed || isPending}
                 >
-                  {isPending ? "Deleting..." : "Delete account"}
+                  {isPending ? t("deleteDialog.deleting") : t("deleteDialog.confirm")}
                 </Button>
               </>
             )}

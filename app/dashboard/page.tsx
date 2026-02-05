@@ -6,11 +6,15 @@ import { getDashboardData } from "@/actions/dashboard";
 import { DashboardView } from "@/components/dashboard/dashboard-view";
 import { authOptions } from "@/lib/auth/options";
 import { parseDashboardQuery } from "@/lib/dashboard/query";
+import { getServerTranslator } from "@/lib/i18n/translate";
 
-export const metadata: Metadata = {
-  title: "Dashboard",
-  description: "Track performance and PnL across your crypto entries.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerTranslator();
+  return {
+    title: t("metadata.dashboard.title"),
+    description: t("metadata.dashboard.description"),
+  };
+}
 
 type PageProps = {
   searchParams?:
@@ -30,7 +34,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
   const data = await getDashboardData(session.user, query);
 
   return (
-    <div className="min-h-screen bg-black px-6 py-10">
+    <div className="min-h-screen bg-black px-3 py-10 md:px-4">
       <div className="mx-auto w-full max-w-6xl">
         <DashboardView data={data} query={query} />
       </div>

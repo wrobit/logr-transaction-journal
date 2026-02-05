@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,13 +14,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-const STATUS_OPTIONS = [
-  { value: "all", label: "All users" },
-  { value: "active", label: "Active" },
-  { value: "deleted", label: "Deleted" },
-];
-
 export function AdminUsersFilters() {
+  const t = useTranslations("admin.users");
+  const tc = useTranslations("admin.common");
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
@@ -27,9 +24,18 @@ export function AdminUsersFilters() {
   const search = searchParams.get("q") ?? "";
   const status = searchParams.get("status") ?? "all";
 
+  const statusOptions = useMemo(
+    () => [
+      { value: "all", label: t("allUsers") },
+      { value: "active", label: t("active") },
+      { value: "deleted", label: t("deleted") },
+    ],
+    [t],
+  );
+
   const statusValue = useMemo(
-    () => STATUS_OPTIONS.find((option) => option.value === status)?.value ?? "all",
-    [status],
+    () => statusOptions.find((option) => option.value === status)?.value ?? "all",
+    [status, statusOptions],
   );
 
   const updateParams = useCallback(
@@ -57,18 +63,18 @@ export function AdminUsersFilters() {
   return (
     <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
       <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center">
-        <Input
-          placeholder="Search by name, email, login"
+          <Input
+          placeholder={t("searchPlaceholder")}
           defaultValue={search}
           onBlur={(event) => updateParams(event.target.value.trim(), statusValue)}
           className="max-w-sm border-border bg-background text-sm"
         />
         <Select value={statusValue} onValueChange={(value) => updateParams(search, value)}>
-          <SelectTrigger size="sm" className="min-w-[140px]">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent align="start">
-            {STATUS_OPTIONS.map((option) => (
+            <SelectTrigger size="sm" className="min-w-[140px]">
+            <SelectValue placeholder={t("statusPlaceholder")} />
+            </SelectTrigger>
+            <SelectContent align="start">
+            {statusOptions.map((option) => (
               <SelectItem key={option.value} value={option.value}>
                 {option.label}
               </SelectItem>
@@ -84,7 +90,7 @@ export function AdminUsersFilters() {
         onClick={() => updateParams("", "all")}
         disabled={isPending}
       >
-        Reset filters
+        {tc("resetFilters")}
       </Button>
     </div>
   );

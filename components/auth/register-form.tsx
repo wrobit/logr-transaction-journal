@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { signIn } from "next-auth/react";
 
 import { OauthButtons } from "@/components/auth/oauth-buttons";
@@ -13,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 
 export function RegisterForm() {
   const router = useRouter();
+  const t = useTranslations("auth");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -42,7 +44,7 @@ export function RegisterForm() {
 
     if (!response.ok) {
       const data = await response.json().catch(() => ({}));
-      setError(data.error ?? "Unable to create account.");
+      setError(data.error ?? t("registerError"));
       setIsSubmitting(false);
       return;
     }
@@ -55,7 +57,7 @@ export function RegisterForm() {
     });
 
     if (signInResult?.error) {
-      setError("Account created, but sign in failed.");
+      setError(t("registerSignInError"));
       setIsSubmitting(false);
       return;
     }
@@ -67,9 +69,9 @@ export function RegisterForm() {
   return (
     <div className="space-y-6">
       <div className="space-y-2 text-center">
-        <h1 className="text-xl font-semibold">Create your Entry account</h1>
+        <h1 className="text-xl font-semibold">{t("registerTitle")}</h1>
         <p className="text-sm text-muted-foreground">
-          Start tracking transactions with clarity.
+          {t("registerSubtitle")}
         </p>
       </div>
 
@@ -77,7 +79,7 @@ export function RegisterForm() {
 
       <div className="flex items-center gap-3 text-xs text-muted-foreground">
         <Separator className="flex-1 bg-border" />
-        <span>or sign up with email</span>
+        <span>{t("orSignUpEmail")}</span>
         <Separator className="flex-1 bg-border" />
       </div>
 
@@ -85,7 +87,7 @@ export function RegisterForm() {
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-2">
             <Label htmlFor="firstName" className={labelClassName}>
-              First name
+              {t("firstName")}
             </Label>
             <Input
               id="firstName"
@@ -97,7 +99,7 @@ export function RegisterForm() {
           </div>
           <div className="space-y-2">
             <Label htmlFor="lastName" className={labelClassName}>
-              Last name
+              {t("lastName")}
             </Label>
             <Input
               id="lastName"
@@ -111,7 +113,7 @@ export function RegisterForm() {
 
         <div className="space-y-2">
           <Label htmlFor="login" className={labelClassName}>
-            Login
+            {t("login")}
           </Label>
           <Input
             id="login"
@@ -125,7 +127,7 @@ export function RegisterForm() {
 
         <div className="space-y-2">
           <Label htmlFor="email" className={labelClassName}>
-            Email
+            {t("email")}
           </Label>
           <Input
             id="email"
@@ -140,7 +142,7 @@ export function RegisterForm() {
 
         <div className="space-y-2">
           <Label htmlFor="password" className={labelClassName}>
-            Password
+            {t("password")}
           </Label>
           <Input
             id="password"
@@ -160,14 +162,14 @@ export function RegisterForm() {
           className="w-full bg-foreground text-background hover:bg-foreground/90"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Creating account..." : "Create account"}
+          {isSubmitting ? t("creatingAccount") : t("createAccount")}
         </Button>
       </form>
 
       <p className="text-center text-xs text-muted-foreground">
-        Already have an account?{" "}
+        {t("hasAccount")} {" "}
         <Link href="/login" className="text-foreground hover:text-foreground">
-          Sign in
+          {t("signIn")}
         </Link>
       </p>
     </div>

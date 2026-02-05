@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +16,8 @@ import {
 import { ADMIN_AUDIT_ACTION_OPTIONS } from "@/lib/admin/audit-query";
 
 export function AdminAuditFilters() {
+  const t = useTranslations("admin.audit");
+  const tc = useTranslations("admin.common");
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
@@ -60,24 +63,28 @@ export function AdminAuditFilters() {
   return (
     <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
       <div className="flex flex-1 flex-col gap-2 sm:flex-row sm:items-center">
-        <Input
-          placeholder="Search actor or target"
+          <Input
+            placeholder={t("searchPlaceholder")}
           defaultValue={search}
           onBlur={(event) => updateParams({ search: event.target.value.trim() })}
           className="max-w-sm border-border bg-background text-sm"
         />
         <Select value={actionValue} onValueChange={(value) => updateParams({ action: value })}>
-          <SelectTrigger size="sm" className="min-w-[180px]">
-            <SelectValue placeholder="Action" />
-          </SelectTrigger>
-          <SelectContent align="start">
-            <SelectItem value="all">All actions</SelectItem>
-            {ADMIN_AUDIT_ACTION_OPTIONS.map((option) => (
-              <SelectItem key={option.value} value={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
+            <SelectTrigger size="sm" className="min-w-[180px]">
+              <SelectValue placeholder={t("actionPlaceholder")} />
+            </SelectTrigger>
+            <SelectContent align="start">
+              <SelectItem value="all">{t("allActions")}</SelectItem>
+              {ADMIN_AUDIT_ACTION_OPTIONS.map((option) => (
+                <SelectItem key={option.value} value={option.value}>
+                  {option.value === "user.deactivated"
+                    ? t("actionLabels.userDeactivated")
+                    : option.value === "user.restored"
+                      ? t("actionLabels.userRestored")
+                      : t("actionLabels.entriesPurged")}
+                </SelectItem>
+              ))}
+            </SelectContent>
         </Select>
       </div>
       <Button
@@ -88,7 +95,7 @@ export function AdminAuditFilters() {
         onClick={() => updateParams({ action: "all", search: "" })}
         disabled={isPending}
       >
-        Reset filters
+        {tc("resetFilters")}
       </Button>
     </div>
   );

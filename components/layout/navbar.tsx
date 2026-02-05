@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { UserIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -17,31 +18,33 @@ import {
 export function Navbar() {
   const { data: session } = useSession();
   const isAdmin = session?.user?.role === "admin";
+  const t = useTranslations("nav");
 
   return (
-    <header className="border-b border-border bg-background/90 px-6 py-4 text-foreground backdrop-blur">
+    <header className="sticky top-0 z-50 relative border-b border-border bg-background/90 px-4 py-4 text-foreground backdrop-blur md:px-5">
+      <Link href="/" className="absolute left-4 top-1/2 flex -translate-y-1/2 items-center gap-2 md:left-5">
+        <Image
+          src="/logo.svg"
+          alt="Logr"
+          width={120}
+          height={32}
+          className="h-6 w-auto opacity-90 dark:invert"
+          priority
+        />
+      </Link>
+
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between">
         <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center gap-2">
-            <Image
-              src="/logo.svg"
-              alt="Entry"
-              width={120}
-              height={32}
-              className="h-6 w-auto opacity-90 dark:invert"
-              priority
-            />
-          </Link>
           <nav className="flex items-center gap-4 text-xs text-muted-foreground">
             <Link href="/" className="transition hover:text-foreground">
-              Entries
+              {t("entries")}
             </Link>
             <Link href="/dashboard" className="transition hover:text-foreground">
-              Dashboard
+              {t("dashboard")}
             </Link>
             {isAdmin ? (
               <Link href="/admin" className="transition hover:text-foreground">
-                Admin
+                {t("admin")}
               </Link>
             ) : null}
           </nav>
@@ -64,7 +67,7 @@ export function Navbar() {
               className="w-44 border border-border bg-popover text-popover-foreground shadow-xl"
             >
               <DropdownMenuItem className="text-muted-foreground" asChild>
-                <Link href="/profile">Profile</Link>
+                <Link href="/profile">{t("profile")}</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-border" />
               <DropdownMenuItem
@@ -72,7 +75,7 @@ export function Navbar() {
                 variant="destructive"
                 onClick={() => signOut({ callbackUrl: "/login" })}
               >
-                Logout
+                {t("logout")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

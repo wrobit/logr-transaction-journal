@@ -1,0 +1,444 @@
+{
+  "common": {
+    "localeLabel": "Jezyk",
+    "localeEnglish": "Angielski",
+    "localePolish": "Polski",
+    "dash": "-"
+  },
+  "nav": {
+    "entries": "Wpisy",
+    "dashboard": "Panel",
+    "admin": "Administracja",
+    "profile": "Profil",
+    "logout": "Wyloguj"
+  },
+  "auth": {
+    "oauthGoogle": "Kontynuuj z Google",
+    "oauthGithub": "Kontynuuj z GitHub",
+    "orContinueEmail": "lub kontynuuj przez e-mail",
+    "orSignUpEmail": "lub zarejestruj sie przez e-mail",
+    "loginTitle": "Witamy w Logr",
+    "loginSubtitle": "Minimalny dziennik krypto do precyzyjnego sledzenia.",
+    "registerTitle": "Utworz konto Logr",
+    "registerSubtitle": "Zacznij sledzic transakcje z pelna przejrzystoscia.",
+    "email": "E-mail",
+    "password": "Haslo",
+    "firstName": "Imie",
+    "lastName": "Nazwisko",
+    "login": "Login",
+    "loginError": "Nieprawidlowy e-mail lub haslo.",
+    "registerError": "Nie udalo sie utworzyc konta.",
+    "registerSignInError": "Konto utworzone, ale logowanie sie nie powiodlo.",
+    "signingIn": "Logowanie...",
+    "continue": "Kontynuuj",
+    "creatingAccount": "Tworzenie konta...",
+    "createAccount": "Utworz konto",
+    "noAccount": "Nie masz konta?",
+    "hasAccount": "Masz juz konto?",
+    "register": "Zarejestruj sie",
+    "signIn": "Zaloguj sie"
+  },
+  "entries": {
+    "title": "Wpisy",
+    "subtitle": "Sledz kazda transakcje z deterministyczna wycena w PLN.",
+    "refreshing": "Odswiezanie...",
+    "addEntry": "Dodaj wpis",
+    "startDate": "Data od",
+    "endDate": "Data do",
+    "asset": "Aktywum",
+    "operation": "Operacja",
+    "allAssets": "Wszystkie aktywa",
+    "allOperations": "Wszystkie operacje",
+    "buy": "Kupno",
+    "sell": "Sprzedaz",
+    "showing": "Pokazano {shown} z {total} wpisow",
+    "page": "Strona {current} z {total}",
+    "previous": "Poprzednia",
+    "next": "Nastepna",
+    "rowsPerPage": "Wiersze na strone:",
+    "createdSuccess": "Wpis zostal dodany.",
+    "updatedSuccess": "Wpis zostal zaktualizowany.",
+    "deletedSuccess": "Wpis zostal usuniety.",
+    "empty": "Brak wpisow. Dodaj pierwsza transakcje, aby zaczac.",
+    "table": {
+      "index": "#",
+      "created": "Utworzono",
+      "updated": "Zaktualizowano",
+      "operation": "Operacja",
+      "asset": "Aktywum",
+      "quantity": "Ilosc",
+      "price": "Cena",
+      "full": "Wartosc",
+      "commission": "Prowizja",
+      "source": "Zrodlo",
+      "nbp": "NBP",
+      "valuePln": "Wartosc {currency}",
+      "note": "Notatka",
+      "actions": "Akcje",
+      "openActions": "Otworz akcje wpisu",
+      "edit": "Edytuj wpis",
+      "delete": "Usun wpis"
+    },
+    "addDialog": {
+      "title": "Nowy wpis",
+      "subtitle": "Uzupelnij szczegoly transakcji, aby obliczyc wartosc w PLN.",
+      "close": "Zamknij",
+      "date": "Data",
+      "operation": "Operacja",
+      "asset": "Aktywum",
+      "quoteCurrency": "Waluta kwotowana",
+      "quantity": "Ilosc",
+      "pricePerUnit": "Cena za sztuke",
+      "commission": "Prowizja",
+      "source": "Zrodlo",
+      "note": "Notatka",
+      "livePreview": "Podglad",
+      "fullPrice": "Wartosc calkowita",
+      "nbpRate": "Kurs NBP",
+      "valuePln": "Wartosc PLN",
+      "resolvedOnSave": "Wyliczane przy zapisie",
+      "cancel": "Anuluj",
+      "saving": "Zapisywanie...",
+      "saveEntry": "Zapisz wpis"
+    },
+    "editDialog": {
+      "title": "Edytuj wpis",
+      "subtitle": "Zaktualizuj szczegoly transakcji i przelicz wartosci PLN.",
+      "saveChanges": "Zapisz zmiany"
+    },
+    "deleteDialog": {
+      "title": "Usun wpis",
+      "description": "To trwale usunie wpis dla {asset} z dnia {date}. Tej operacji nie mozna cofnac.",
+      "cancel": "Anuluj",
+      "deleting": "Usuwanie...",
+      "confirm": "Usun wpis"
+    }
+  },
+  "dashboard": {
+    "title": "Panel",
+    "subtitle": "Przeglad zrealizowanego PnL z podzialem na aktywa.",
+    "refreshing": "Odswiezanie...",
+    "range": "Zakres",
+    "allAssets": "Wszystkie aktywa",
+    "ranges": {
+      "7d": "7D",
+      "30d": "30D",
+      "90d": "90D",
+      "ytd": "YTD",
+      "all": "Caly okres"
+    },
+    "kpi": {
+      "totalBuys": "Suma kupna",
+      "totalSells": "Suma sprzedazy",
+      "realizedPnl": "Zrealizowany PnL",
+      "realizedCost": "Koszt zrealizowany",
+      "realizedProceeds": "Przychod zrealizowany",
+      "difference": "Roznica kupno vs sprzedaz"
+    },
+    "panels": {
+      "pnlOverTime": "PnL w czasie",
+      "holdingsMix": "Struktura aktywow",
+      "buyVsSellVolume": "Wolumen kupno vs sprzedaz",
+      "holdingsByAsset": "Aktywa",
+      "buyVsSellByAsset": "Kupno vs sprzedaz per aktywo"
+    },
+    "holdingsTable": {
+      "asset": "Aktywum",
+      "netQty": "Netto ilosc",
+      "buyPln": "Kupno {currency}",
+      "pnlPln": "PnL {currency}"
+    },
+    "empty": {
+      "pnl": "Brak danych PnL dla tego zakresu.",
+      "holdingsMix": "Brak danych o strukturze aktywow.",
+      "volume": "Brak danych wolumenu dla tego zakresu.",
+      "holdings": "Brak aktywow.",
+      "assetVolume": "Brak danych wolumenu per aktywo."
+    }
+  },
+  "profile": {
+    "title": "Profil",
+    "subtitle": "Zarzadzaj danymi osobowymi i ustawieniami konta.",
+    "summary": "Podsumowanie",
+    "refreshing": "Odswiezanie...",
+    "name": "Imie i nazwisko",
+    "login": "Login",
+    "email": "E-mail",
+    "currency": "Waluta wyswietlania",
+    "memberSince": "Czlonek od",
+    "lastUpdated": "Ostatnia aktualizacja",
+    "editTitle": "Edytuj profil",
+    "editSubtitle": "Zmien podstawowe dane tozsamosci. Zmiany dzialaja od razu.",
+    "firstName": "Imie",
+    "lastName": "Nazwisko",
+    "saveChanges": "Zapisz zmiany",
+    "saving": "Zapisywanie...",
+    "updatedToast": "Profil zostal zaktualizowany.",
+    "deleteTitle": "Usun konto",
+    "deleteSubtitle": "Usuniecie konta usuwa wszystkie wpisy, wyceny i notatki. Operacja jest nieodwracalna.",
+    "deleteButton": "Usun konto",
+    "deleteHint": "Podasz krotki powod i potwierdzisz wpisujac DELETE.",
+    "deleteDialog": {
+      "title": "Usun konto",
+      "description": "Za chwile trwale usuniesz profil Logr. Najpierw poprosimy o krotka opinie.",
+      "removeListTitle": "Ta operacja usunie:",
+      "removeEntries": "Wszystkie wpisy i wyceny transakcji",
+      "removeNotes": "Zapisane notatki i zrodla",
+      "cannotUndo": "Po potwierdzeniu tej operacji nie da sie cofnac.",
+      "beforeYouGo": "Zanim odejdziesz",
+      "feedbackPrompt": "Podaj krotki powod, a potem potwierdz usuniecie.",
+      "reasonOptional": "Dlaczego odchodzisz? (opcjonalnie)",
+      "notesLabel": "Chcesz dodac cos jeszcze?",
+      "notesPlaceholder": "Opcjonalna opinia",
+      "typeDelete": "Wpisz DELETE, aby potwierdzic",
+      "sessionEnds": "Po usunieciu sesja zostanie natychmiast zakonczona.",
+      "cancel": "Anuluj",
+      "continue": "Dalej",
+      "back": "Wstecz",
+      "deleting": "Usuwanie...",
+      "confirm": "Usun konto",
+      "reasons": {
+        "tracking_elsewhere": "Prowadze tracking gdzie indziej",
+        "no_longer_needed": "Nie jest mi juz potrzebne",
+        "missing_features": "Brakuje funkcji",
+        "too_complex": "Jest zbyt zlozone",
+        "privacy": "Obawy o prywatnosc",
+        "other": "Inny powod"
+      }
+    },
+    "goodbye": {
+      "title": "Konto usuniete",
+      "subtitle": "Profil Logr i transakcje zostaly usuniete.",
+      "allSet": "Gotowe",
+      "allSetSubtitle": "Dzieki za wyprobowanie Logr. Mozesz zaczac od nowa, kiedy chcesz.",
+      "createNew": "Utworz nowe konto",
+      "signIn": "Zaloguj sie"
+    }
+  },
+  "admin": {
+    "nav": {
+      "overview": "Przeglad",
+      "users": "Uzytkownicy",
+      "feedback": "Opinie",
+      "audit": "Audyt"
+    },
+    "layout": {
+      "title": "Konsola admina",
+      "subtitle": "Monitoruj aktywnosc platformy, uzytkownikow i sygnaly operacyjne."
+    },
+    "common": {
+      "dash": "-",
+      "refreshing": "Odswiezanie...",
+      "page": "Strona {page} z {total}",
+      "previous": "Poprzednia",
+      "next": "Nastepna",
+      "resetFilters": "Wyczysc filtry"
+    },
+    "users": {
+      "title": "Uzytkownicy",
+      "subtitle": "Przegladaj konta, zmieniaj status i czysc wpisy, gdy trzeba.",
+      "summary": "{count} uzytkownikow · strona {page}",
+      "searchPlaceholder": "Szukaj po imieniu, e-mailu, loginie",
+      "statusPlaceholder": "Status",
+      "allUsers": "Wszyscy uzytkownicy",
+      "active": "Aktywny",
+      "deleted": "Usuniety",
+      "empty": "Brak uzytkownikow dla tego filtra.",
+      "columns": {
+        "user": "Uzytkownik",
+        "role": "Rola",
+        "entries": "Wpisy",
+        "created": "Utworzono",
+        "lastLogin": "Ostatnie logowanie",
+        "status": "Status",
+        "actions": "Akcje"
+      },
+      "roleAdmin": "Admin",
+      "roleUser": "Uzytkownik",
+      "restoreTitle": "Przywroc konto",
+      "restoreDescription": "Przywraca dostep i aktywuje konto.",
+      "restore": "Przywroc",
+      "restored": "Uzytkownik przywrocony.",
+      "deactivateTitle": "Dezaktywuj konto",
+      "deactivateDescription": "Blokuje dostep do czasu przywrocenia.",
+      "deactivate": "Dezaktywuj",
+      "deactivated": "Uzytkownik zdezaktywowany.",
+      "purgeTitle": "Wyczysc wpisy",
+      "purgeDescription": "Trwale usuwa wszystkie wpisy tego uzytkownika.",
+      "purge": "Wyczysc wpisy",
+      "purged": "Wpisy usuniete.",
+      "selfGuard": "Nie mozesz zmienic statusu wlasnego konta."
+    },
+    "userDetail": {
+      "summaryTitle": "Podsumowanie konta",
+      "login": "Login",
+      "role": "Rola",
+      "created": "Utworzono",
+      "lastLogin": "Ostatnie logowanie",
+      "updated": "Zaktualizowano",
+      "status": "Status",
+      "entriesTitle": "Wpisy",
+      "entriesSubtitle": "Ostatnie 50 wpisow tego uzytkownika.",
+      "entriesEmpty": "Brak wpisow dla tego uzytkownika.",
+      "columns": {
+        "date": "Data",
+        "operation": "Operacja",
+        "asset": "Aktywum",
+        "quantity": "Ilosc",
+        "value": "Wartosc {currency}",
+        "source": "Zrodlo"
+      },
+      "buy": "Kupno",
+      "sell": "Sprzedaz"
+    },
+    "feedback": {
+      "title": "Opinie",
+      "subtitle": "Przegladaj opinie po usunieciu konta i eksportuj rekordy.",
+      "exportCsv": "Eksport CSV",
+      "summary": "{count} opinii · strona {page}",
+      "reason": "Powod",
+      "reasonPlaceholder": "Powod",
+      "allReasons": "Wszystkie powody",
+      "from": "Od",
+      "to": "Do",
+      "empty": "Brak opinii dla tego filtra.",
+      "columns": {
+        "submitted": "Zgloszono",
+        "reason": "Powod",
+        "notes": "Uwagi",
+        "user": "Uzytkownik"
+      },
+      "deletedUser": "Usuniety uzytkownik"
+    },
+    "audit": {
+      "title": "Dziennik audytu",
+      "subtitle": "Sledz akcje administracyjne w obszarze zarzadzania uzytkownikami.",
+      "summary": "{count} akcji · strona {page}",
+      "searchPlaceholder": "Szukaj aktora lub celu",
+      "actionPlaceholder": "Akcja",
+      "allActions": "Wszystkie akcje",
+      "empty": "Brak aktywnosci audytowej dla tego filtra.",
+      "columns": {
+        "timestamp": "Znacznik czasu",
+        "action": "Akcja",
+        "actor": "Aktor",
+        "target": "Cel",
+        "details": "Szczegoly"
+      },
+      "actionLabels": {
+        "userDeactivated": "Uzytkownik zdezaktywowany",
+        "userRestored": "Uzytkownik przywrocony",
+        "entriesPurged": "Wpisy usuniete"
+      }
+    },
+    "analytics": {
+      "title": "Przeglad",
+      "subtitle": "Aktywnosc uzytkownikow i sygnaly operacyjne dla wybranego zakresu.",
+      "range": "Zakres",
+      "ranges": {
+        "7d": "7D",
+        "30d": "30D",
+        "90d": "90D",
+        "ytd": "YTD",
+        "all": "Caly okres"
+      },
+      "kpi": {
+        "newUsers": "Nowi uzytkownicy",
+        "activeLogins": "Aktywne logowania",
+        "entries": "Wpisy",
+        "feedback": "Opinie"
+      },
+      "panels": {
+        "registrationsOverTime": "Rejestracje w czasie",
+        "feedbackByReason": "Opinie wg powodu",
+        "activeLogins": "Aktywne logowania",
+        "entryCreation": "Tworzenie wpisow",
+        "feedbackVolume": "Wolumen opinii"
+      },
+      "empty": {
+        "registrations": "Brak danych o rejestracjach dla tego zakresu.",
+        "feedbackReasons": "Brak zebranych opinii.",
+        "activeLogins": "Brak aktywnosci logowania dla tego zakresu.",
+        "entries": "Brak utworzonych wpisow w tym zakresie.",
+        "feedbackVolume": "Brak opinii w tym zakresie."
+      }
+    },
+    "actionDialog": {
+      "cancel": "Anuluj",
+      "working": "Przetwarzanie...",
+      "failed": "Akcja nie powiodla sie."
+    }
+  },
+  "metadata": {
+    "root": {
+      "description": "Najlepszy minimalistyczny szyfrowany dziennik krypto z wycena PLN wg NBP."
+    },
+    "entries": {
+      "title": "Wpisy",
+      "description": "Przegladaj i dodawaj transakcje krypto z wycena w PLN."
+    },
+    "dashboard": {
+      "title": "Panel",
+      "description": "Sledz wyniki i PnL dla wpisow krypto."
+    },
+    "profile": {
+      "title": "Profil",
+      "description": "Zarzadzaj szczegolami i ustawieniami konta Logr."
+    },
+    "goodbye": {
+      "title": "Pozegnanie",
+      "description": "Potwierdzenie usuniecia konta i opinia dla Logr."
+    },
+    "login": {
+      "title": "Logowanie",
+      "description": "Zaloguj sie, aby uzyskac dostep do dziennika krypto Logr."
+    },
+    "register": {
+      "title": "Rejestracja",
+      "description": "Utworz konto Logr, aby sledzic transakcje krypto."
+    },
+    "admin": {
+      "title": "Admin",
+      "description": "Przeglad i monitoring systemu Logr."
+    },
+    "adminUsers": {
+      "title": "Admin Uzytkownicy",
+      "description": "Zarzadzaj kontami i dostepem uzytkownikow Logr."
+    },
+    "adminUser": {
+      "title": "Admin Uzytkownik",
+      "description": "Przegladaj i zarzadzaj konkretnym kontem uzytkownika."
+    },
+    "adminFeedback": {
+      "title": "Admin Opinie",
+      "description": "Przegladaj opinie po usunieciu konta."
+    },
+    "adminAudit": {
+      "title": "Admin Audyt",
+      "description": "Dziennik audytu akcji administratora."
+    }
+  },
+  "validation": {
+    "firstNameRequired": "Imie jest wymagane.",
+    "lastNameRequired": "Nazwisko jest wymagane.",
+    "loginMin": "Login musi miec co najmniej 3 znaki.",
+    "emailValid": "Adres e-mail musi byc poprawny.",
+    "typeDelete": "Wpisz DELETE, aby potwierdzic.",
+    "dateRequired": "Data jest wymagana.",
+    "assetRequired": "Aktywum jest wymagane.",
+    "quoteCurrencyRequired": "Waluta kwotowana jest wymagana."
+  },
+  "errors": {
+    "authRequiredProfileUpdate": "Musisz byc zalogowany, aby zaktualizowac profil.",
+    "authRequiredEntryCreate": "Musisz byc zalogowany, aby dodawac wpisy.",
+    "authRequiredEntryUpdate": "Musisz byc zalogowany, aby edytowac wpisy.",
+    "authRequiredEntryDelete": "Musisz byc zalogowany, aby usuwac wpisy.",
+    "userMissing": "Brak rekordu uzytkownika. Zaloguj sie ponownie.",
+    "emailInUse": "Adres e-mail jest juz zajety.",
+    "loginInUse": "Login jest juz zajety.",
+    "profileNotFound": "Nie znaleziono profilu.",
+    "entryIdMissing": "Brakuje identyfikatora wpisu.",
+    "entryNotFound": "Nie znaleziono wpisu.",
+    "entryCreateFailed": "Nie udalo sie utworzyc wpisu."
+  }
+}

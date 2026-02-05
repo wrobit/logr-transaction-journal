@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Entry crypto journal">
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Logr crypto journal">
   <rect width="1200" height="630" fill="#0a0a0a" />
   <text
     x="50%"
@@ -10,7 +10,7 @@
     text-anchor="middle"
     dominant-baseline="middle"
   >
-    Entry
+    Logr
   </text>
   <text
     x="50%"

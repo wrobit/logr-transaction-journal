@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useCallback, useEffect, useMemo, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 
 import {
   calculateFullPrice,
@@ -62,6 +63,8 @@ export function EditEntryDialog({
   onUpdated,
   action,
 }: EditEntryDialogProps) {
+  const locale = useLocale();
+  const t = useTranslations("entries");
   const [operation, setOperation] = useState(DEFAULT_OPERATION);
   const [baseAsset, setBaseAsset] = useState(DEFAULT_ASSET);
   const [quoteCurrency, setQuoteCurrency] = useState(DEFAULT_CURRENCY);
@@ -159,18 +162,16 @@ export function EditEntryDialog({
       <div className="w-full max-w-2xl rounded-sm border border-border bg-background p-6 text-sm text-foreground shadow-xl">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-lg font-semibold">Edit entry</h2>
-            <p className="text-xs text-muted-foreground">
-              Update the transaction details and recalculate PLN values.
-            </p>
-          </div>
+              <h2 className="text-lg font-semibold">{t("editDialog.title")}</h2>
+              <p className="text-xs text-muted-foreground">{t("editDialog.subtitle")}</p>
+            </div>
           <Button
             type="button"
             variant="ghost"
             className="text-muted-foreground"
             onClick={() => onOpenChange(false)}
           >
-            Close
+            {t("addDialog.close")}
           </Button>
         </div>
 
@@ -179,7 +180,7 @@ export function EditEntryDialog({
 
           <div className="space-y-2">
             <Label htmlFor="edit-date" className={labelClassName}>
-              Date
+              {t("addDialog.date")}
             </Label>
             <Input
               id="edit-date"
@@ -197,7 +198,7 @@ export function EditEntryDialog({
 
           <div className="space-y-2">
             <Label htmlFor="edit-operation" className={labelClassName}>
-              Operation
+              {t("addDialog.operation")}
             </Label>
             <select
               id="edit-operation"
@@ -206,8 +207,8 @@ export function EditEntryDialog({
               onChange={(event) => setOperation(event.target.value)}
               className={selectClassName}
             >
-              <option value="BUY">Buy</option>
-              <option value="SELL">Sell</option>
+              <option value="BUY">{t("buy")}</option>
+              <option value="SELL">{t("sell")}</option>
             </select>
             {state.errors?.operation ? (
               <p className="text-xs text-red-400">{state.errors.operation}</p>
@@ -216,7 +217,7 @@ export function EditEntryDialog({
 
           <div className="space-y-2">
             <Label htmlFor="edit-baseAsset" className={labelClassName}>
-              Asset
+              {t("addDialog.asset")}
             </Label>
             <select
               id="edit-baseAsset"
@@ -239,7 +240,7 @@ export function EditEntryDialog({
 
           <div className="space-y-2">
             <Label htmlFor="edit-quoteCurrency" className={labelClassName}>
-              Quote currency
+              {t("addDialog.quoteCurrency")}
             </Label>
             <select
               id="edit-quoteCurrency"
@@ -262,7 +263,7 @@ export function EditEntryDialog({
 
           <div className="space-y-2">
             <Label htmlFor="edit-quantity" className={labelClassName}>
-              Quantity
+              {t("addDialog.quantity")}
             </Label>
             <Input
               id="edit-quantity"
@@ -283,7 +284,7 @@ export function EditEntryDialog({
 
           <div className="space-y-2">
             <Label htmlFor="edit-pricePerUnit" className={labelClassName}>
-              Price per unit
+              {t("addDialog.pricePerUnit")}
             </Label>
             <Input
               id="edit-pricePerUnit"
@@ -304,7 +305,7 @@ export function EditEntryDialog({
 
           <div className="space-y-2">
             <Label htmlFor="edit-commission" className={labelClassName}>
-              Commission
+              {t("addDialog.commission")}
             </Label>
             <Input
               id="edit-commission"
@@ -324,7 +325,7 @@ export function EditEntryDialog({
 
           <div className="space-y-2">
             <Label htmlFor="edit-source" className={labelClassName}>
-              Source
+              {t("addDialog.source")}
             </Label>
             <Input
               id="edit-source"
@@ -337,7 +338,7 @@ export function EditEntryDialog({
 
           <div className="space-y-2 md:col-span-2">
             <Label htmlFor="edit-note" className={labelClassName}>
-              Note
+              {t("addDialog.note")}
             </Label>
             <textarea
               id="edit-note"
@@ -350,23 +351,23 @@ export function EditEntryDialog({
 
           <div className="rounded-sm border border-border bg-muted/40 p-4 text-xs text-muted-foreground md:col-span-2">
             <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
-              Live preview
+              {t("addDialog.livePreview")}
             </p>
             <div className="mt-3 grid gap-2 text-xs text-foreground md:grid-cols-3">
               <div>
-                <p className="text-muted-foreground">Full price</p>
-                <p>{preview ? formatNumber(preview.fullPrice) : "—"}</p>
+                <p className="text-muted-foreground">{t("addDialog.fullPrice")}</p>
+                <p>{preview ? formatNumber(preview.fullPrice, undefined, locale) : "-"}</p>
               </div>
               <div>
-                <p className="text-muted-foreground">NBP rate</p>
-                <p>{preview?.isPln ? "1.00" : "Resolved on save"}</p>
+                <p className="text-muted-foreground">{t("addDialog.nbpRate")}</p>
+                <p>{preview?.isPln ? "1.00" : t("addDialog.resolvedOnSave")}</p>
               </div>
               <div>
-                <p className="text-muted-foreground">Value PLN</p>
+                <p className="text-muted-foreground">{t("addDialog.valuePln")}</p>
                 <p>
                   {preview?.valuePln !== null && preview?.valuePln !== undefined
-                    ? formatPln(preview.valuePln)
-                    : "Resolved on save"}
+                    ? formatPln(preview.valuePln, locale)
+                    : t("addDialog.resolvedOnSave")}
                 </p>
               </div>
             </div>
@@ -383,14 +384,14 @@ export function EditEntryDialog({
               onClick={() => onOpenChange(false)}
               className="border-border text-foreground hover:bg-muted"
             >
-              Cancel
+              {t("addDialog.cancel")}
             </Button>
             <Button
               type="submit"
               className="bg-foreground text-background hover:bg-foreground/90"
               disabled={isPending}
             >
-              {isPending ? "Saving..." : "Save changes"}
+              {isPending ? t("addDialog.saving") : t("editDialog.saveChanges")}
             </Button>
           </div>
         </form>

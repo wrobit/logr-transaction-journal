@@ -1,8 +1,8 @@
-# Entry — Crypto Journal
+# Logr — Crypto Journal
 
 Implementation Plan (Next.js App Router + TypeScript + Drizzle + Neon + shadcn/ui)
 
-**Entry** is a minimal, personal crypto transaction journal focused on correctness, transparency, and accounting-style clarity. No hype, no trading features — just structured records, PLN valuation via NBP, and clear profit/loss.
+**Logr** is a minimal, personal crypto transaction journal focused on correctness, transparency, and accounting-style clarity. No hype, no trading features — just structured records, PLN valuation via NBP, and clear profit/loss.
 
 ---
 
@@ -277,7 +277,7 @@ Live preview:
 
 Auth Pages Implementation Plan:
 
-- Define Cursor-style layout (ENTRY top-left, centered content, dark canvas)
+- Define Cursor-style layout (LOGR top-left, centered content, dark canvas)
 - Set up NextAuth with Credentials + Google + GitHub providers
 - Configure env vars: `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, `GOOGLE_CLIENT_ID/SECRET`, `GITHUB_ID/SECRET`
 - Build `/login` and `/register` pages with shadcn/ui, OAuth buttons first
@@ -320,6 +320,7 @@ Auth Pages Implementation Plan:
 - [x] Add tests for query param parsing and DB filtering
 - [x] Add rows numbering
 - [x] Add actions column with edit / preview / delete row (destructive)
+- [x] Make entries table horizontally scrollable on smaller viewports
 
 ### Phase 5 — Dashboard
 
@@ -346,6 +347,7 @@ Auth Pages Implementation Plan:
 - [x] Read-only summary section
 - [x] Minimal edit controls for profile fields
 - [x] Validation + inline errors
+- [x] Add display currency selector (`PLN | EUR | USD`) and persist preference
 
 #### Phase 6.3 — Account Deletion Flow
 
@@ -378,7 +380,7 @@ Auth Pages Implementation Plan:
 - [x] Add per-route metadata for auth and protected pages:
   - [x] `/login`, `/register`
   - [x] `/`, `/dashboard`, `/profile`, `/goodbye`
-  - [x] Use “Entry — {Page}” titles + concise descriptions
+  - [x] Use “Logr — {Page}” titles + concise descriptions
 - [x] Add app icons + manifest placeholders:
   - [x] `favicon.ico`, `icon.svg`, `apple-touch-icon.svg`
   - [x] `site.webmanifest` with name, theme colors, icons
@@ -427,46 +429,111 @@ Auth Pages Implementation Plan:
 
 ### Phase 12 — Data Encryption for Entries
 
-- [ ] Finalize scope and threat model:
-  - [ ] Encrypt all entry fields except `date` (kept plaintext for range filtering)
-  - [ ] Leave profile fields unencrypted
-  - [ ] Confirm server-side filtering only by `userId` + `date`
-- [ ] Define crypto primitives and key hierarchy:
-  - [ ] Use `AES-256-GCM` for authenticated encryption
-  - [ ] Generate per-user DEK and wrap with `ENTRY_KEK` (env var)
-  - [ ] Add encryption versioning for future rotations
-- [ ] Implement encryption layer:
-  - [ ] Add `encryptPayload` / `decryptPayload` utilities
-  - [ ] Store wrapped DEK on user record
-  - [ ] Support nonce + tag storage (packed or structured)
-- [ ] Update schema and data model:
-  - [ ] Add `users.encryptionKeyEncrypted` + `users.encryptionVersion`
-  - [ ] Add `entries.encryptedPayload` + `entries.encryptionVersion`
-  - [ ] Keep `entries.date` plaintext; all other entry fields encrypted
-- [ ] Update entry CRUD operations:
-  - [ ] Encrypt entries on creation/update
-  - [ ] Decrypt entries on read
-  - [ ] Migrate existing unencrypted entries to encrypted payloads
-- [ ] Update query and aggregation logic:
-  - [ ] Fetch by `userId` + `date` only
-  - [ ] Perform filters, summaries, and dashboard aggregations post-decrypt
-- [ ] Add key rotation + recovery flows:
-  - [ ] Rewrap DEKs when `ENTRY_KEK` changes
-  - [ ] Re-encrypt user entries when rotating DEK
-  - [ ] Define recovery/lockout behavior if KEK is missing
-- [ ] Update backup and export features:
-  - [ ] Ensure backups store only encrypted entry payloads
-  - [ ] Provide decrypted exports on demand
-- [ ] Add tests:
-  - [ ] Encrypt/decrypt roundtrip + tamper detection
-  - [ ] KEK/DEK unwrap failures
-  - [ ] Migration correctness
-  - [ ] Aggregation correctness post-decrypt
-- [ ] Document encryption approach and recovery procedures
+- [x] Finalize scope and threat model:
+  - [x] Encrypt all entry fields except `date` (kept plaintext for range filtering)
+  - [x] Leave profile fields unencrypted
+  - [x] Confirm server-side filtering only by `userId` + `date`
+- [x] Define crypto primitives and key hierarchy:
+  - [x] Use `AES-256-GCM` for authenticated encryption
+  - [x] Generate per-user DEK and wrap with `ENTRY_KEK` (env var)
+  - [x] Add encryption versioning for future rotations
+- [x] Implement encryption layer:
+  - [x] Add `encryptPayload` / `decryptPayload` utilities
+  - [x] Store wrapped DEK on user record
+  - [x] Support nonce + tag storage (packed or structured)
+- [x] Update schema and data model:
+  - [x] Add `users.encryptionKeyEncrypted` + `users.encryptionVersion`
+  - [x] Add `entries.encryptedPayload` + `entries.encryptionVersion`
+  - [x] Keep `entries.date` plaintext; all other entry fields encrypted
+- [x] Update entry CRUD operations:
+  - [x] Encrypt entries on creation/update
+  - [x] Decrypt entries on read
+  - [x] Migrate existing unencrypted entries to encrypted payloads
+- [x] Update query and aggregation logic:
+  - [x] Fetch by `userId` + `date` only
+  - [x] Perform filters, summaries, and dashboard aggregations post-decrypt
+- [x] Add key rotation + recovery flows:
+  - [x] Rewrap DEKs when `ENTRY_KEK` changes
+  - [x] Re-encrypt user entries when rotating DEK
+  - [x] Define recovery/lockout behavior if KEK is missing
+- [x] Update backup and export features:
+  - [x] Ensure backups store only encrypted entry payloads
+  - [x] Provide decrypted exports on demand
+- [x] Add tests:
+  - [x] Encrypt/decrypt roundtrip + tamper detection
+  - [x] KEK/DEK unwrap failures
+  - [x] Migration correctness
+  - [x] Aggregation correctness post-decrypt
+- [x] Document encryption approach and recovery procedures
 
 ## Phase 13 - Internationalization
 
-### Post-domain metadata (later)
+### Phase 13.1 - Foundation and locale strategy (cookie-based)
+
+- [x] Confirm initial locales: `en` + `pl`
+- [x] Adopt cookie-based locale storage for the authenticated app (no locale URL prefixes)
+- [x] Add i18n library and wiring (recommended: `next-intl`)
+- [x] Add locale detection order: cookie -> user profile preference (optional) -> default `en`
+- [x] Add fallback behavior for missing translations (warn in non-prod, safe fallback in prod)
+
+### Phase 13.2 - Message catalog architecture
+
+- [x] Create locale message catalogs (`messages/en/*.json`, `messages/pl/*.json`)
+- [x] Define namespaces: `common`, `auth`, `entries`, `dashboard`, `profile`, `admin`, `validation`, `metadata`
+- [x] Add key naming conventions and ownership guidelines
+- [ ] Add checks/scripts for missing and unused translation keys
+
+### Phase 13.3 - App shell and switching
+
+- [x] Wrap root providers/layout with i18n provider and current locale
+- [x] Add language switcher in app navigation/profile settings
+- [x] Persist language changes to cookie and apply immediately
+- [x] Ensure auth redirects and protected routes preserve selected locale from cookie
+
+### Phase 13.4 - User-facing UI translation rollout
+
+- [x] Translate auth pages and components (`/login`, `/register`, OAuth section)
+- [x] Translate entries page, filters, dialogs, table labels, toasts, and empty states
+- [x] Translate dashboard labels, filters, cards, charts, and empty states
+- [x] Translate profile, delete-account flow, and goodbye screen
+- [x] Translate shared layout labels (navbar, buttons, generic UI copy)
+
+### Phase 13.5 - Admin area translation rollout
+
+- [x] Translate admin navigation, users tables, filters, dialogs, and action labels
+- [x] Translate admin feedback and audit screens
+- [x] Translate admin analytics labels and empty states
+- [x] Keep enum/database values stable; translate display labels only
+
+### Phase 13.6 - Locale-aware formatting and metadata
+
+- [x] Refactor formatting helpers to use active locale (number/currency/date presentation)
+- [x] Keep accounting precision and backend calculations locale-agnostic
+- [x] Localize per-route metadata titles/descriptions where applicable
+- [x] Verify `html lang` reflects selected locale
+
+### Phase 13.7 - Validation and server message localization
+
+- [x] Externalize user-facing validation messages (zod/forms)
+- [x] Standardize server action/API error keys and translate in the UI layer
+- [x] Ensure toasts, confirmation dialogs, and inline errors are localized consistently
+
+### Phase 13.8 - Testing and QA
+
+- [x] Update existing tests to avoid brittle hardcoded copy when appropriate
+- [x] Add tests for locale switching and cookie persistence
+- [x] Add tests for translation fallback and missing keys behavior
+- [x] Add tests for locale-specific formatting output
+- [x] Run smoke checks for key flows in both `en` and `pl`
+
+### Phase 13.9 - Rollout and docs
+
+- [x] Release with `en` default and `pl` enabled
+- [x] Add migration notes for remaining hardcoded strings
+- [x] Document translator/developer workflow for future features
+- [x] Define approach for adding future locales
+
+### Phase 13.10 - Post-domain metadata (later)
 
 - [ ] Set `metadataBase` to production URL
 - [ ] Set `openGraph.url` and canonical URLs
@@ -476,6 +543,98 @@ Auth Pages Implementation Plan:
 - [ ] Review sitemap outputs once public routes finalize (may need adjustments)
 - [ ] Verify rendered metadata for key routes
 - [ ] Validate Open Graph/Twitter tags
+
+## Phase 14 - International Integrations (later phase)
+
+### Phase 14.1 - Scope and policy
+
+- [ ] Define country-aware integration policy (`country -> provider`) for FX, tax validation, and bank imports
+- [ ] Keep this phase focused on integrations and auditability (exclude deep local e-filing APIs)
+- [ ] Add feature flags for incremental country rollout
+
+### Phase 14.2 - Provider adapters (official sources first)
+
+- [ ] Add `RateProvider` adapter interface (`getRate`, `getLatest`, `getMetadata`)
+- [ ] Add `TaxValidationProvider` interface (`validate(id, country)`)
+- [ ] Add `ECB` adapter for Eurozone users
+- [ ] Add `HMRC` adapter for UK tax workflows (monthly rates)
+- [ ] Add IRS-compatible US conversion workflow adapter (store method + source metadata)
+- [ ] Add `BoC` adapter for Canada
+- [ ] Add optional `RBA` adapter for Australia (enable only if AU launch is near-term)
+- [ ] Add EU `VIES` VAT ID validation adapter
+
+### Phase 14.3 - Data model and auditability
+
+- [ ] Extend FX persistence with: `rateValue`, `sourceProvider`, `publishedAt`, `retrievedAt`, `rateType`, `method`
+- [ ] Persist provider response snapshot/hash for reproducibility and audit
+- [ ] Add effective-date normalization rules (weekend/holiday/business-day fallback)
+- [ ] Keep historical rates immutable once stored
+
+### Phase 14.4 - Resilience and fallback behavior
+
+- [ ] Add strict timeouts + retry with exponential backoff for provider calls
+- [ ] Define per-country fallback chain (official -> cached prior valid -> user warning)
+- [ ] Add cache TTL strategy for latest rates and immutable cache for historical rates
+- [ ] Add stale-rate and provider-downtime alerting
+
+### Phase 14.5 - Banking integrations
+
+- [ ] Integrate one open-banking aggregator (`TrueLayer` or `Tink` or `GoCardless Bank Account Data`)
+- [ ] Build normalized transaction ingestion pipeline for aggregator data
+- [ ] Maintain robust CSV import fallback for unsupported banks/countries
+
+### Phase 14.6 - Product and UX updates
+
+- [ ] Show FX source attribution in UI (provider + publication period/date)
+- [ ] Surface explicit warnings when fallback rates are used
+- [ ] Add admin control to lock provider policy per entity/country
+
+### Phase 14.7 - Rollout order
+
+- [ ] Step 1: `ECB + HMRC + VIES`
+- [ ] Step 2: Banking aggregator + CSV fallback
+- [ ] Step 3: `US + CA` adapters with compliance metadata
+- [ ] Step 4: `AU` and additional markets based on telemetry
+
+### Phase 14.8 - Acceptance criteria
+
+- [ ] Every FX conversion is reproducible and includes source metadata
+- [ ] Country policy auto-selects expected provider
+- [ ] EU VAT ID validation is available and logged
+- [ ] Bank import works via one aggregator and CSV fallback
+- [ ] Monitoring reports fallback usage spikes and stale-rate conditions
+
+## Phase 15 - Domain and deployment topology (landing + app)
+
+### Phase 15.1 - Domain strategy
+
+- [ ] Confirm production host split: `logr.space` for landing website, `app.logr.space` for authenticated app
+- [ ] Keep one brand across both hosts while separating marketing and product concerns
+
+### Phase 15.2 - DNS and hosting setup
+
+- [ ] Configure DNS records at domain provider for root (`@`) and `app` subdomain
+- [ ] Map `logr.space` and `app.logr.space` to correct hosting project(s)
+- [ ] Enable HTTPS certificates for both hosts and verify renewal
+
+### Phase 15.3 - App configuration
+
+- [ ] Set production `NEXTAUTH_URL=https://app.logr.space`
+- [ ] Keep `NEXTAUTH_SECRET` configured in production environment
+- [ ] Update OAuth redirect URLs to `https://app.logr.space/api/auth/callback/{provider}`
+- [ ] Verify auth cookie/session behavior on `app.logr.space`
+
+### Phase 15.4 - Routing and middleware checks
+
+- [ ] Keep app routes on `app.logr.space` without route-path refactor (current default)
+- [ ] Verify middleware matchers and sign-in redirects behave correctly under subdomain deployment
+- [ ] Validate deep links and post-login redirects from landing to app
+
+### Phase 15.5 - QA and launch checklist
+
+- [ ] Smoke test login/register/session flows on production host
+- [ ] Verify metadata/canonical URLs use final public hosts
+- [ ] Add rollback plan for DNS cutover window
 
 ---
 
@@ -498,4 +657,4 @@ Auth Pages Implementation Plan:
 
 ---
 
-**Entry** is intentionally simple: every transaction is just an entry — precise, traceable, and complete.
+**Logr** is intentionally simple: every transaction is just an entry — precise, traceable, and complete.

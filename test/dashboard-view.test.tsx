@@ -1,9 +1,10 @@
 import { beforeAll, describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 
 import { DashboardView } from "@/components/dashboard/dashboard-view";
 import type { DashboardData } from "@/actions/dashboard";
 import type { DashboardQuery } from "@/lib/dashboard/query";
+import { renderWithIntl } from "@/test/utils/render-with-intl";
 
 const push = vi.fn();
 
@@ -67,6 +68,7 @@ beforeAll(() => {
 const baseQuery: DashboardQuery = { range: "all" };
 
 const sampleData: DashboardData = {
+  displayCurrency: "PLN",
   totals: { buyValue: 300, sellValue: 560, pnlValue: 260 },
   series: [
     { date: "2025-01-01", buyValue: 100, sellValue: 60, pnlValue: -40 },
@@ -96,7 +98,7 @@ const sampleData: DashboardData = {
 
 describe("DashboardView", () => {
   it("renders KPI values and holdings", () => {
-    render(<DashboardView data={sampleData} query={baseQuery} />);
+    renderWithIntl(<DashboardView data={sampleData} query={baseQuery} />);
 
     expect(screen.getByText("Dashboard")).toBeInTheDocument();
     expect(screen.getByText("Total buys")).toBeInTheDocument();
@@ -108,6 +110,7 @@ describe("DashboardView", () => {
 
   it("shows empty state messaging", () => {
     const emptyData: DashboardData = {
+      displayCurrency: "PLN",
       totals: { buyValue: 0, sellValue: 0, pnlValue: 0 },
       series: [],
       holdings: [],
@@ -115,7 +118,7 @@ describe("DashboardView", () => {
       assets: [],
     };
 
-    render(<DashboardView data={emptyData} query={baseQuery} />);
+    renderWithIntl(<DashboardView data={emptyData} query={baseQuery} />);
 
     expect(screen.getByText("No PnL data for this range.")).toBeInTheDocument();
     expect(screen.getByText("No holdings yet.")).toBeInTheDocument();

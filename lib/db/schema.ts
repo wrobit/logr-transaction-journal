@@ -21,6 +21,7 @@ export const feedbackReasonEnum = pgEnum("feedback_reason", [
   "other",
 ]);
 export const userRoleEnum = pgEnum("user_role", ["user", "admin"]);
+export const displayCurrencyEnum = pgEnum("display_currency", ["PLN", "EUR", "USD"]);
 
 export type EncryptedBlob = {
   version: number;
@@ -39,6 +40,7 @@ export const users = pgTable(
     firstName: text("first_name").notNull(),
     lastName: text("last_name").notNull(),
     role: userRoleEnum("role").notNull().default("user"),
+    displayCurrency: displayCurrencyEnum("display_currency").notNull().default("PLN"),
     encryptionKeyEncrypted: jsonb("encryption_key_encrypted").$type<EncryptedBlob>(),
     encryptionVersion: integer("encryption_version").notNull().default(1),
     lastLoginAt: timestamp("last_login_at", { withTimezone: true, mode: "date" }),

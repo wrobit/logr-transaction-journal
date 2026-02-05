@@ -42,6 +42,14 @@ const createSelectChain = <T,>(result: T) => ({
   }),
 });
 
+const createSelectLimitChain = <T,>(result: T) => ({
+  from: () => ({
+    where: () => ({
+      limit: () => Promise.resolve(result),
+    }),
+  }),
+});
+
 
 const createUpdateChain = () => ({
   set: () => ({
@@ -76,6 +84,7 @@ describe("dashboard aggregations", () => {
     const result = await getDashboardData({}, baseQuery);
 
     expect(result).toEqual({
+      displayCurrency: "PLN",
       totals: { buyValue: 0, sellValue: 0, pnlValue: 0 },
       series: [],
       holdings: [],
@@ -133,7 +142,9 @@ describe("dashboard aggregations", () => {
       },
     ];
 
-    selectMock.mockReturnValueOnce(createSelectChain(entryRows));
+    selectMock
+      .mockReturnValueOnce(createSelectLimitChain([{ displayCurrency: "PLN" }]))
+      .mockReturnValueOnce(createSelectChain(entryRows));
 
     const result = await getDashboardData({ id: "user-1" }, baseQuery);
 

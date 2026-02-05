@@ -3,11 +3,15 @@ import type { Metadata } from "next";
 import { getAdminAnalyticsData } from "@/actions/admin-analytics";
 import { AdminAnalyticsView } from "@/components/admin/admin-analytics-view";
 import { parseAdminAnalyticsQuery } from "@/lib/admin/analytics-query";
+import { getServerTranslator } from "@/lib/i18n/translate";
 
-export const metadata: Metadata = {
-  title: "Admin",
-  description: "Admin overview and system monitoring for Entry.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerTranslator();
+  return {
+    title: t("metadata.admin.title"),
+    description: t("metadata.admin.description"),
+  };
+}
 
 type PageProps = {
   searchParams?:

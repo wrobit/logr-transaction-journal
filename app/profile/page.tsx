@@ -5,11 +5,15 @@ import { redirect } from "next/navigation";
 import { getProfile } from "@/actions/profile";
 import { ProfileView } from "@/components/profile/profile-view";
 import { authOptions } from "@/lib/auth/options";
+import { getServerTranslator } from "@/lib/i18n/translate";
 
-export const metadata: Metadata = {
-  title: "Profile",
-  description: "Manage your Entry account details and settings.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerTranslator();
+  return {
+    title: t("metadata.profile.title"),
+    description: t("metadata.profile.description"),
+  };
+}
 
 export default async function ProfilePage() {
   const session = await getServerSession(authOptions);
@@ -25,8 +29,8 @@ export default async function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-black px-6 py-10">
-      <div className="mx-auto w-full max-w-4xl">
+    <div className="min-h-screen bg-black px-3 py-10 md:px-4">
+      <div className="mx-auto w-full max-w-6xl">
         <ProfileView profile={profile} />
       </div>
     </div>

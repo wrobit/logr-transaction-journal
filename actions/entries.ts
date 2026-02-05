@@ -6,9 +6,14 @@ import { getServerSession } from "next-auth";
 import { z } from "zod";
 
 import { authOptions } from "@/lib/auth/options";
-import { ensureUserId } from "@/lib/auth/users";
+import { ensureUserId, getUserById } from "@/lib/auth/users";
 import { db } from "@/lib/db";
 import { entries } from "@/lib/db/schema";
+import {
+  DEFAULT_DISPLAY_CURRENCY,
+  isDisplayCurrency,
+  type DisplayCurrency,
+} from "@/lib/currency/display";
 import type { EntryPayload, EntryView } from "@/lib/entries/types";
 import {
   buildEntryWhere,
@@ -38,6 +43,8 @@ import type {
 } from "@/lib/entries/actions";
 import { entryInputSchema } from "@/lib/entries/validation";
 import { dayjs } from "@/lib/dayjs";
+import { translateValidationMessage } from "@/lib/i18n/errors";
+import { getServerTranslator } from "@/lib/i18n/translate";
 import { getNbpRate } from "@/lib/nbp";
 
 export type EntryListResult = {
@@ -46,7 +53,35 @@ export type EntryListResult = {
   assets: string[];
   page: number;
   pageSize: number;
+  displayCurrency: DisplayCurrency;
+  displayRatesByEntryId: Record<string, number>;
 };
+
+async function resolveDisplayRatesByEntryId(
+  entriesList: EntryView[],
+  displayCurrency: DisplayCurrency,
+) {
+  if (displayCurrency === "PLN") {
+    return Object.fromEntries(entriesList.map((entry) => [entry.id, 1]));
+  }
+
+  const ratesByDate = new Map<string, number>();
+  const uniqueDates = Array.from(new Set(entriesList.map((entry) => entry.nbpRateDate)));
+
+  await Promise.all(
+    uniqueDates.map(async (dateString) => {
+      const rateResult = await getNbpRate(
+        displayCurrency,
+        dayjs.utc(dateString, "YYYY-MM-DD", true).toDate(),
+      );
+      ratesByDate.set(dateString, rateResult.rate);
+    }),
+  );
+
+  return Object.fromEntries(
+    entriesList.map((entry) => [entry.id, ratesByDate.get(entry.nbpRateDate) ?? 1]),
+  );
+}
 
 const getSortValue = (entry: EntryView, sortBy: EntrySortKey) => {
   switch (sortBy) {
@@ -121,8 +156,15 @@ export async function listEntries(
       assets: [],
       page: query.page,
       pageSize: ENTRY_PAGE_SIZE,
+      displayCurrency: DEFAULT_DISPLAY_CURRENCY,
+      displayRatesByEntryId: {},
     };
   }
+
+  const userRecord = await getUserById(userId);
+  const displayCurrency = isDisplayCurrency(userRecord?.displayCurrency)
+    ? userRecord.displayCurrency
+    : DEFAULT_DISPLAY_CURRENCY;
 
   const whereClause = buildEntryWhere(userId, query.filters);
   const rows = await db
@@ -157,13 +199,20 @@ export async function listEntries(
 
   const sortedEntries = sortEntries(filteredEntries, query.sortBy, query.sortDir);
   const offset = (query.page - 1) * ENTRY_PAGE_SIZE;
+  const paginatedEntries = sortedEntries.slice(offset, offset + ENTRY_PAGE_SIZE);
+  const displayRatesByEntryId = await resolveDisplayRatesByEntryId(
+    paginatedEntries,
+    displayCurrency,
+  );
 
   return {
-    entries: sortedEntries.slice(offset, offset + ENTRY_PAGE_SIZE),
+    entries: paginatedEntries,
     totalCount: filteredEntries.length,
     assets,
     page: query.page,
     pageSize: ENTRY_PAGE_SIZE,
+    displayCurrency,
+    displayRatesByEntryId,
   };
 }
 
@@ -179,12 +228,12 @@ const buildEntryInput = (formData: FormData) => ({
   note: formData.get("note"),
 });
 
-const getValidationErrors = (error: z.ZodError) => {
+const getValidationErrors = (error: z.ZodError, t: (key: string) => string) => {
   const errors: Record<string, string> = {};
   for (const issue of error.issues) {
     const field = issue.path[0];
     if (typeof field === "string" && !errors[field]) {
-      errors[field] = issue.message;
+      errors[field] = translateValidationMessage(issue.message, t);
     }
   }
   return errors;
@@ -280,12 +329,13 @@ export async function createEntry(
   _prevState: CreateEntryState,
   formData: FormData,
 ): Promise<CreateEntryState> {
+  const t = await getServerTranslator();
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
     return {
       status: "error",
-      message: "You must be signed in to add entries.",
+      message: t("errors.authRequiredEntryCreate"),
     };
   }
 
@@ -294,7 +344,7 @@ export async function createEntry(
   if (!userId) {
     return {
       status: "error",
-      message: "User record missing. Please sign in again.",
+      message: t("errors.userMissing"),
     };
   }
 
@@ -302,7 +352,7 @@ export async function createEntry(
 
   const parsed = entryInputSchema.safeParse(rawInput);
   if (!parsed.success) {
-    return { status: "error", errors: getValidationErrors(parsed.error) };
+    return { status: "error", errors: getValidationErrors(parsed.error, t) };
   }
 
   const resolved = await resolveEntryFields(parsed);
@@ -321,7 +371,7 @@ export async function createEntry(
     .returning();
 
   if (!created) {
-    return { status: "error", message: "Failed to create entry." };
+    return { status: "error", message: t("errors.entryCreateFailed") };
   }
 
   revalidatePath("/");
@@ -338,12 +388,13 @@ export async function updateEntry(
   _prevState: UpdateEntryState,
   formData: FormData,
 ): Promise<UpdateEntryState> {
+  const t = await getServerTranslator();
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
     return {
       status: "error",
-      message: "You must be signed in to edit entries.",
+      message: t("errors.authRequiredEntryUpdate"),
     };
   }
 
@@ -352,19 +403,19 @@ export async function updateEntry(
   if (!userId) {
     return {
       status: "error",
-      message: "User record missing. Please sign in again.",
+      message: t("errors.userMissing"),
     };
   }
 
   const entryId = formData.get("id");
   if (!entryId || typeof entryId !== "string") {
-    return { status: "error", message: "Entry id is missing." };
+    return { status: "error", message: t("errors.entryIdMissing") };
   }
 
   const rawInput = buildEntryInput(formData);
   const parsed = entryInputSchema.safeParse(rawInput);
   if (!parsed.success) {
-    return { status: "error", errors: getValidationErrors(parsed.error) };
+    return { status: "error", errors: getValidationErrors(parsed.error, t) };
   }
 
   const resolved = await resolveEntryFields(parsed);
@@ -390,7 +441,7 @@ export async function updateEntry(
     .returning();
 
   if (!updated) {
-    return { status: "error", message: "Entry not found." };
+    return { status: "error", message: t("errors.entryNotFound") };
   }
 
   revalidatePath("/");
@@ -407,12 +458,13 @@ export async function deleteEntry(
   _prevState: DeleteEntryState,
   formData: FormData,
 ): Promise<DeleteEntryState> {
+  const t = await getServerTranslator();
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
     return {
       status: "error",
-      message: "You must be signed in to delete entries.",
+      message: t("errors.authRequiredEntryDelete"),
     };
   }
 
@@ -421,13 +473,13 @@ export async function deleteEntry(
   if (!userId) {
     return {
       status: "error",
-      message: "User record missing. Please sign in again.",
+      message: t("errors.userMissing"),
     };
   }
 
   const entryId = formData.get("id");
   if (!entryId || typeof entryId !== "string") {
-    return { status: "error", message: "Entry id is missing." };
+    return { status: "error", message: t("errors.entryIdMissing") };
   }
 
   const [deleted] = await db
@@ -443,7 +495,7 @@ export async function deleteEntry(
     .returning({ id: entries.id });
 
   if (!deleted) {
-    return { status: "error", message: "Entry not found." };
+    return { status: "error", message: t("errors.entryNotFound") };
   }
 
   revalidatePath("/");

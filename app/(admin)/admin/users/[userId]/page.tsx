@@ -7,11 +7,15 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { requireAdminSession } from "@/lib/auth/admin";
 import { dayjs } from "@/lib/dayjs";
+import { getServerTranslator } from "@/lib/i18n/translate";
 
-export const metadata: Metadata = {
-  title: "Admin User",
-  description: "Review and manage a specific user account.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerTranslator();
+  return {
+    title: t("metadata.adminUser.title"),
+    description: t("metadata.adminUser.description"),
+  };
+}
 
 const formatDate = (value?: Date | null) =>
   value ? dayjs.utc(value).format("YYYY-MM-DD") : "—";
@@ -21,6 +25,7 @@ type PageProps = {
 };
 
 export default async function AdminUserDetailPage({ params }: PageProps) {
+  const t = await getServerTranslator();
   await requireAdminSession();
 
   const user = await getAdminUser(params.userId);
@@ -43,45 +48,45 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
       <Card>
         <CardHeader className="border-b border-border/60">
           <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
-            Account summary
+            {t("admin.userDetail.summaryTitle")}
           </div>
         </CardHeader>
         <CardContent className="grid gap-4 text-sm md:grid-cols-2">
           <div>
-            <p className="text-xs text-muted-foreground">Login</p>
+            <p className="text-xs text-muted-foreground">{t("admin.userDetail.login")}</p>
             <p>{user.login}</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Role</p>
+            <p className="text-xs text-muted-foreground">{t("admin.userDetail.role")}</p>
             <Badge variant={user.role === "admin" ? "secondary" : "outline"}>
-              {user.role}
+              {user.role === "admin" ? t("admin.users.roleAdmin") : t("admin.users.roleUser")}
             </Badge>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Created</p>
+            <p className="text-xs text-muted-foreground">{t("admin.userDetail.created")}</p>
             <p>{formatDate(user.createdAt)}</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Last login</p>
+            <p className="text-xs text-muted-foreground">{t("admin.userDetail.lastLogin")}</p>
             <p>{formatDate(user.lastLoginAt)}</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Updated</p>
+            <p className="text-xs text-muted-foreground">{t("admin.userDetail.updated")}</p>
             <p>{formatDate(user.updatedAt)}</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Status</p>
+            <p className="text-xs text-muted-foreground">{t("admin.userDetail.status")}</p>
             <Badge variant={user.deletedAt ? "destructive" : "secondary"}>
-              {user.deletedAt ? "Deleted" : "Active"}
+              {user.deletedAt ? t("admin.users.deleted") : t("admin.users.active")}
             </Badge>
           </div>
         </CardContent>
       </Card>
 
       <div className="space-y-2">
-        <h3 className="text-sm font-semibold">Entries</h3>
+        <h3 className="text-sm font-semibold">{t("admin.userDetail.entriesTitle")}</h3>
         <p className="text-xs text-muted-foreground">
-          Latest 50 entries associated with this user.
+          {t("admin.userDetail.entriesSubtitle")}
         </p>
       </div>
       <AdminUserEntriesTable entries={entries} />

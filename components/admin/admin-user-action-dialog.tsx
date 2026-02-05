@@ -2,6 +2,7 @@
 
 import type React from "react";
 import { useCallback, useState, useTransition } from "react";
+import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import {
@@ -42,6 +43,7 @@ export function AdminUserActionDialog({
   confirmVariant = "destructive",
   disabled = false,
 }: AdminUserActionDialogProps) {
+  const t = useTranslations("admin.actionDialog");
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
 
@@ -53,7 +55,7 @@ export function AdminUserActionDialog({
         toast.success(successMessage);
         setOpen(false);
       } else {
-        toast.error(result.message ?? "Action failed.");
+        toast.error(result.message ?? t("failed"));
       }
     });
   }, [action, successMessage, userId]);
@@ -71,14 +73,14 @@ export function AdminUserActionDialog({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
           <AlertDialogAction
             type="button"
             variant={confirmVariant}
             onClick={handleConfirm}
             disabled={isPending}
           >
-            {isPending ? "Working..." : confirmLabel}
+            {isPending ? t("working") : confirmLabel}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

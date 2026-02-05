@@ -9,10 +9,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import type { DisplayCurrency } from "@/lib/currency/display";
 import type { EntrySortDirection, EntrySortKey } from "@/lib/entries/query";
 import type { EntryView } from "@/lib/entries/types";
 import { dayjs } from "@/lib/dayjs";
-import { formatNumber, formatPln } from "@/lib/format/numbers";
+import { formatCurrency, formatNumber } from "@/lib/format/numbers";
 
 const sortableColumns: Array<{ key: EntrySortKey; keyLabel: string }> = [
   { keyLabel: "created", key: "createdAt" },
@@ -30,6 +31,8 @@ const sortableColumns: Array<{ key: EntrySortKey; keyLabel: string }> = [
 
 type EntriesTableProps = {
   entries: EntryView[];
+  displayCurrency: DisplayCurrency;
+  displayRatesByEntryId: Record<string, number>;
   rowOffset?: number;
   showActions?: boolean;
   sortBy: EntrySortKey;
@@ -41,6 +44,8 @@ type EntriesTableProps = {
 
 export function EntriesTable({
   entries,
+  displayCurrency,
+  displayRatesByEntryId,
   rowOffset = 0,
   showActions = false,
   sortBy,
@@ -70,6 +75,10 @@ export function EntriesTable({
             <th className="px-3 py-3 font-medium">{t("table.index")}</th>
             {sortableColumns.map((column) => {
               const isActive = sortBy === column.key;
+              const label =
+                column.keyLabel === "valuePln"
+                  ? t("table.valuePln", { currency: displayCurrency })
+                  : t(`table.${column.keyLabel}`);
               return (
                 <th key={column.key} className="px-3 py-3 font-medium">
                   <button
@@ -77,7 +86,7 @@ export function EntriesTable({
                     onClick={() => onSort(column.key)}
                     className="inline-flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground transition hover:text-foreground"
                   >
-                    {t(`table.${column.keyLabel}`)}
+                    {label}
                     {isActive ? (
                       sortDir === "asc" ? (
                         <ArrowUp className="size-3" />
@@ -118,30 +127,49 @@ export function EntriesTable({
                 </Badge>
               </td>
               <td className="px-3 py-3">
-                {entry.baseAsset} / {entry.quoteCurrency}
+                {entry.baseAsset} / {displayCurrency}
               </td>
               <td className="px-3 py-3">
-                  {formatNumber(Number(entry.quantity), undefined, locale)}
+                {formatNumber(Number(entry.quantity), undefined, locale)}
               </td>
               <td className="px-3 py-3">
-                  {formatNumber(Number(entry.pricePerUnit), undefined, locale)}
+                {formatNumber(
+                  (Number(entry.pricePerUnit) * Number(entry.nbpRate)) /
+                    (displayRatesByEntryId[entry.id] ?? 1),
+                  undefined,
+                  locale,
+                )}
               </td>
               <td className="px-3 py-3">
-                  {formatNumber(Number(entry.fullPrice), undefined, locale)}
+                {formatNumber(
+                  (Number(entry.fullPrice) * Number(entry.nbpRate)) /
+                    (displayRatesByEntryId[entry.id] ?? 1),
+                  undefined,
+                  locale,
+                )}
               </td>
               <td className="px-3 py-3 text-muted-foreground">
                 {entry.commission
-                    ? formatNumber(Number(entry.commission), undefined, locale)
+                    ? formatNumber(
+                        (Number(entry.commission) * Number(entry.nbpRate)) /
+                          (displayRatesByEntryId[entry.id] ?? 1),
+                        undefined,
+                        locale,
+                      )
                     : "-"}
               </td>
               <td className="px-3 py-3 text-muted-foreground">
                 {entry.source ?? "-"}
               </td>
               <td className="px-3 py-3 text-muted-foreground">
-                {formatNumber(Number(entry.nbpRate), undefined, locale)}
+                {formatNumber(displayRatesByEntryId[entry.id] ?? 1, undefined, locale)}
               </td>
               <td className="px-3 py-3">
-                {formatPln(Number(entry.valuePln), locale)}
+                {formatCurrency(
+                  Number(entry.valuePln) / (displayRatesByEntryId[entry.id] ?? 1),
+                  displayCurrency,
+                  locale,
+                )}
               </td>
               <td className="px-3 py-3 text-muted-foreground">
                 {entry.note ?? "-"}

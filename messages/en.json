@@ -72,7 +72,7 @@
       "commission": "Commission",
       "source": "Source",
       "nbp": "NBP",
-      "valuePln": "Value PLN",
+      "valuePln": "Value {currency}",
       "note": "Note",
       "actions": "Actions",
       "openActions": "Open entry actions",
@@ -145,8 +145,8 @@
     "holdingsTable": {
       "asset": "Asset",
       "netQty": "Net qty",
-      "buyPln": "Buy PLN",
-      "pnlPln": "PnL PLN"
+      "buyPln": "Buy {currency}",
+      "pnlPln": "PnL {currency}"
     },
     "empty": {
       "pnl": "No PnL data for this range.",
@@ -164,6 +164,7 @@
     "name": "Name",
     "login": "Login",
     "email": "Email",
+    "currency": "Display currency",
     "memberSince": "Member since",
     "lastUpdated": "Last updated",
     "editTitle": "Edit profile",

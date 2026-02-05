@@ -27,6 +27,7 @@ const profile: ProfileData = {
   lastName: "Lovelace",
   login: "ada",
   email: "ada@example.com",
+  displayCurrency: "PLN",
   createdAt: "2025-01-01T00:00:00Z",
   updatedAt: "2025-02-01T00:00:00Z",
 };

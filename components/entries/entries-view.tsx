@@ -9,6 +9,7 @@ import { AddEntryDialog } from "@/components/entries/add-entry-dialog";
 import { DeleteEntryDialog } from "@/components/entries/delete-entry-dialog";
 import { EditEntryDialog } from "@/components/entries/edit-entry-dialog";
 import { EntriesTable } from "@/components/entries/entries-table";
+import type { DisplayCurrency } from "@/lib/currency/display";
 import { buildEntryQueryParams, type EntryQuery } from "@/lib/entries/query";
 import type { EntryView } from "@/lib/entries/types";
 import { formatNumber } from "@/lib/format/numbers";
@@ -19,6 +20,8 @@ export type EntriesViewProps = {
   totalCount: number;
   pageSize: number;
   query: EntryQuery;
+  displayCurrency: DisplayCurrency;
+  displayRatesByEntryId: Record<string, number>;
   enableActions?: boolean;
 };
 
@@ -28,6 +31,8 @@ export function EntriesView({
   totalCount,
   pageSize,
   query,
+  displayCurrency,
+  displayRatesByEntryId,
   enableActions = true,
 }: EntriesViewProps) {
   const router = useRouter();
@@ -243,6 +248,8 @@ export function EntriesView({
       <div aria-busy={isPending} aria-live="polite">
         <EntriesTable
           entries={entries}
+          displayCurrency={displayCurrency}
+          displayRatesByEntryId={displayRatesByEntryId}
           rowOffset={rowOffset}
           showActions={enableActions}
           sortBy={query.sortBy}

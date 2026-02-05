@@ -68,6 +68,7 @@ beforeAll(() => {
 const baseQuery: DashboardQuery = { range: "all" };
 
 const sampleData: DashboardData = {
+  displayCurrency: "PLN",
   totals: { buyValue: 300, sellValue: 560, pnlValue: 260 },
   series: [
     { date: "2025-01-01", buyValue: 100, sellValue: 60, pnlValue: -40 },
@@ -109,6 +110,7 @@ describe("DashboardView", () => {
 
   it("shows empty state messaging", () => {
     const emptyData: DashboardData = {
+      displayCurrency: "PLN",
       totals: { buyValue: 0, sellValue: 0, pnlValue: 0 },
       series: [],
       holdings: [],

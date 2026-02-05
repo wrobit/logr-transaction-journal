@@ -75,6 +75,8 @@ describe("EntriesView", () => {
         totalCount={entries.length}
         pageSize={10}
         query={baseQuery}
+        displayCurrency="PLN"
+        displayRatesByEntryId={{ "1": 1, "2": 1 }}
         enableActions={false}
       />,
     );
@@ -100,6 +102,8 @@ describe("EntriesView", () => {
         totalCount={12}
         pageSize={10}
         query={baseQuery}
+        displayCurrency="PLN"
+        displayRatesByEntryId={Object.fromEntries(manyEntries.map((entry) => [entry.id, 1]))}
         enableActions={false}
       />,
     );

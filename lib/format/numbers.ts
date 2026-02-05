@@ -12,9 +12,17 @@ export function formatNumber(
 }
 
 export function formatPln(value: number, locale: string = DEFAULT_LOCALE) {
+  return formatCurrency(value, "PLN", locale);
+}
+
+export function formatCurrency(
+  value: number,
+  currency: string,
+  locale: string = DEFAULT_LOCALE,
+) {
   return new Intl.NumberFormat(toIntlLocale(locale), {
     style: "currency",
-    currency: "PLN",
+    currency,
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   }).format(value);

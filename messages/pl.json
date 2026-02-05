@@ -72,7 +72,7 @@
       "commission": "Prowizja",
       "source": "Zrodlo",
       "nbp": "NBP",
-      "valuePln": "Wartosc PLN",
+      "valuePln": "Wartosc {currency}",
       "note": "Notatka",
       "actions": "Akcje",
       "openActions": "Otworz akcje wpisu",
@@ -145,8 +145,8 @@
     "holdingsTable": {
       "asset": "Aktywum",
       "netQty": "Netto ilosc",
-      "buyPln": "Kupno PLN",
-      "pnlPln": "PnL PLN"
+      "buyPln": "Kupno {currency}",
+      "pnlPln": "PnL {currency}"
     },
     "empty": {
       "pnl": "Brak danych PnL dla tego zakresu.",
@@ -164,6 +164,7 @@
     "name": "Imie i nazwisko",
     "login": "Login",
     "email": "E-mail",
+    "currency": "Waluta wyswietlania",
     "memberSince": "Czlonek od",
     "lastUpdated": "Ostatnia aktualizacja",
     "editTitle": "Edytuj profil",

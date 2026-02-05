@@ -45,6 +45,7 @@ const buildProfileInput = (formData: FormData) => ({
   lastName: String(formData.get("lastName") ?? ""),
   login: String(formData.get("login") ?? ""),
   email: String(formData.get("email") ?? ""),
+  displayCurrency: String(formData.get("displayCurrency") ?? "PLN"),
 });
 
 const getValidationErrors = (error: z.ZodError) => {
@@ -126,6 +127,7 @@ export async function updateProfile(
       lastName: parsed.data.lastName,
       login: parsed.data.login,
       email: parsed.data.email,
+      displayCurrency: parsed.data.displayCurrency,
       updatedAt: dayjs.utc().toDate(),
     })
     .where(eq(users.id, userId))

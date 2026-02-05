@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { feedbackReasons } from "@/lib/profile/feedback";
+import { DISPLAY_CURRENCIES } from "@/lib/currency/display";
 
 const optionalTextField = (label: string) =>
   z.preprocess(
@@ -13,6 +14,7 @@ export const profileUpdateSchema = z.object({
   lastName: z.string().trim().min(1, "Last name is required."),
   login: z.string().trim().min(3, "Login must be at least 3 characters."),
   email: z.string().trim().email("Email must be valid."),
+  displayCurrency: z.enum(DISPLAY_CURRENCIES),
 });
 
 const feedbackReasonSchema = z.enum(feedbackReasons);

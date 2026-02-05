@@ -38,7 +38,7 @@ import {
   type DashboardQuery,
 } from "@/lib/dashboard/query";
 import { dayjs } from "@/lib/dayjs";
-import { formatNumber, formatPln } from "@/lib/format/numbers";
+import { formatCurrency, formatNumber } from "@/lib/format/numbers";
 import { cn } from "@/lib/utils";
 
 const HOLDINGS_MIX_COLORS = [
@@ -173,17 +173,17 @@ export function DashboardView({ data, query }: DashboardViewProps) {
       <div className="grid gap-3 md:grid-cols-3">
         <KpiCard
           label={t("kpi.totalBuys")}
-          value={formatPln(totals.buyValue, locale)}
+          value={formatCurrency(totals.buyValue, data.displayCurrency, locale)}
           subtitle={t("kpi.realizedCost")}
         />
         <KpiCard
           label={t("kpi.totalSells")}
-          value={formatPln(totals.sellValue, locale)}
+          value={formatCurrency(totals.sellValue, data.displayCurrency, locale)}
           subtitle={t("kpi.realizedProceeds")}
         />
         <KpiCard
           label={t("kpi.realizedPnl")}
-          value={formatPln(totals.pnlValue, locale)}
+          value={formatCurrency(totals.pnlValue, data.displayCurrency, locale)}
           secondaryValue={pnlPercentLabel}
           subtitle={t("kpi.difference")}
           highlight={totals.pnlValue >= 0 ? "positive" : "negative"}
@@ -215,7 +215,15 @@ export function DashboardView({ data, query }: DashboardViewProps) {
                     axisLine={false}
                     tickLine={false}
                   />
-                  <ChartTooltip content={<ChartTooltipContent valueFormatter={formatPln} />} />
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        valueFormatter={(value) =>
+                          formatCurrency(Number(value), data.displayCurrency, locale)
+                        }
+                      />
+                    }
+                  />
                   <Line
                     type="monotone"
                     dataKey="pnlValue"
@@ -252,7 +260,13 @@ export function DashboardView({ data, query }: DashboardViewProps) {
                   />
                   <ChartTooltip
                     content={
-                      <ChartTooltipContent nameKey="asset" hideLabel valueFormatter={formatPln} />
+                      <ChartTooltipContent
+                        nameKey="asset"
+                        hideLabel
+                        valueFormatter={(value) =>
+                          formatCurrency(Number(value), data.displayCurrency, locale)
+                        }
+                      />
                     }
                   />
                   <ChartLegend content={<ChartLegendContent nameKey="asset" />} />
@@ -290,7 +304,15 @@ export function DashboardView({ data, query }: DashboardViewProps) {
                     axisLine={false}
                     tickLine={false}
                   />
-                  <ChartTooltip content={<ChartTooltipContent valueFormatter={formatPln} />} />
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        valueFormatter={(value) =>
+                          formatCurrency(Number(value), data.displayCurrency, locale)
+                        }
+                      />
+                    }
+                  />
                   <ChartLegend content={<ChartLegendContent />} />
                   <Bar
                     dataKey="buyValue"
@@ -328,8 +350,12 @@ export function DashboardView({ data, query }: DashboardViewProps) {
                     <tr>
                       <th className="py-2 pr-2">{t("holdingsTable.asset")}</th>
                       <th className="py-2 pr-2">{t("holdingsTable.netQty")}</th>
-                      <th className="py-2 pr-2">{t("holdingsTable.buyPln")}</th>
-                      <th className="py-2">{t("holdingsTable.pnlPln")}</th>
+                      <th className="py-2 pr-2">
+                        {t("holdingsTable.buyPln", { currency: data.displayCurrency })}
+                      </th>
+                      <th className="py-2">
+                        {t("holdingsTable.pnlPln", { currency: data.displayCurrency })}
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
@@ -341,14 +367,16 @@ export function DashboardView({ data, query }: DashboardViewProps) {
                             maximumFractionDigits: 6,
                           }, locale)}
                         </td>
-                        <td className="py-2 pr-2">{formatPln(holding.buyValue, locale)}</td>
+                        <td className="py-2 pr-2">
+                          {formatCurrency(holding.buyValue, data.displayCurrency, locale)}
+                        </td>
                         <td
                           className={cn(
                             "py-2",
                             holding.pnlValue >= 0 ? "text-emerald-300" : "text-red-300"
                           )}
                         >
-                          {formatPln(holding.pnlValue, locale)}
+                          {formatCurrency(holding.pnlValue, data.displayCurrency, locale)}
                         </td>
                       </tr>
                     ))}
@@ -385,7 +413,15 @@ export function DashboardView({ data, query }: DashboardViewProps) {
                     axisLine={false}
                     tickLine={false}
                   />
-                  <ChartTooltip content={<ChartTooltipContent valueFormatter={formatPln} />} />
+                  <ChartTooltip
+                    content={
+                      <ChartTooltipContent
+                        valueFormatter={(value) =>
+                          formatCurrency(Number(value), data.displayCurrency, locale)
+                        }
+                      />
+                    }
+                  />
                   <ChartLegend content={<ChartLegendContent />} />
                   <Bar
                     dataKey="buyValue"

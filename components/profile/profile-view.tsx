@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { dayjs } from "@/lib/dayjs";
+import { DISPLAY_CURRENCIES } from "@/lib/currency/display";
 import {
   defaultUpdateProfileState,
   type UpdateProfileState,
@@ -51,6 +52,7 @@ export function ProfileView({
     lastName: profile.lastName,
     login: profile.login,
     email: profile.email,
+    displayCurrency: profile.displayCurrency,
   });
 
   useEffect(() => {
@@ -60,6 +62,7 @@ export function ProfileView({
       lastName: profile.lastName,
       login: profile.login,
       email: profile.email,
+      displayCurrency: profile.displayCurrency,
     });
   }, [profile]);
 
@@ -75,6 +78,7 @@ export function ProfileView({
           lastName: result.profile.lastName,
           login: result.profile.login,
           email: result.profile.email,
+          displayCurrency: result.profile.displayCurrency,
         });
         startTransition(() => router.refresh());
       }
@@ -120,13 +124,17 @@ export function ProfileView({
             <p>{profileState.login}</p>
           </div>
           <div>
-              <p className="text-xs text-muted-foreground">{t("email")}</p>
+            <p className="text-xs text-muted-foreground">{t("email")}</p>
             <p>{profileState.email}</p>
           </div>
           <div>
-              <p className="text-xs text-muted-foreground">{t("memberSince")}</p>
-              <p>{formatDate(profileState.createdAt, locale)}</p>
-            </div>
+            <p className="text-xs text-muted-foreground">{t("currency")}</p>
+            <p>{profileState.displayCurrency}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">{t("memberSince")}</p>
+            <p>{formatDate(profileState.createdAt, locale)}</p>
+          </div>
             <div>
               <p className="text-xs text-muted-foreground">{t("lastUpdated")}</p>
               <p>{formatDate(profileState.updatedAt, locale)}</p>
@@ -230,6 +238,34 @@ export function ProfileView({
             />
             {state.errors?.email ? (
               <p className="text-xs text-red-400">{state.errors.email}</p>
+            ) : null}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="displayCurrency" className={labelClassName}>
+              {t("currency")}
+            </Label>
+            <select
+              id="displayCurrency"
+              name="displayCurrency"
+              value={formValues.displayCurrency}
+              onChange={(event) =>
+                setFormValues((prev) => ({
+                  ...prev,
+                  displayCurrency: event.target.value as (typeof DISPLAY_CURRENCIES)[number],
+                }))
+              }
+              required
+              className="h-9 w-full rounded-none border border-border bg-background px-3 text-sm text-foreground"
+            >
+              {DISPLAY_CURRENCIES.map((currency) => (
+                <option key={currency} value={currency}>
+                  {currency}
+                </option>
+              ))}
+            </select>
+            {state.errors?.displayCurrency ? (
+              <p className="text-xs text-red-400">{state.errors.displayCurrency}</p>
             ) : null}
           </div>
 

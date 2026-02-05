@@ -3,11 +3,17 @@
 import { and, asc, eq, gte, isNull, lte } from "drizzle-orm";
 
 import { ensureUserId } from "@/lib/auth/users";
+import {
+  DEFAULT_DISPLAY_CURRENCY,
+  isDisplayCurrency,
+  type DisplayCurrency,
+} from "@/lib/currency/display";
 import { db } from "@/lib/db";
-import { entries } from "@/lib/db/schema";
+import { entries, users } from "@/lib/db/schema";
 import { resolveDashboardRange, type DashboardQuery } from "@/lib/dashboard/query";
 import { dayjs } from "@/lib/dayjs";
 import { getUserDek, resolveEntryPayload } from "@/lib/entries/encryption";
+import { getNbpRate } from "@/lib/nbp";
 
 export type DashboardSeriesPoint = {
   date: string;
@@ -26,6 +32,7 @@ export type DashboardHolding = {
 };
 
 export type DashboardData = {
+  displayCurrency: DisplayCurrency;
   totals: {
     buyValue: number;
     sellValue: number;
@@ -47,6 +54,7 @@ export async function getDashboardData(
 
   if (!userId) {
     return {
+      displayCurrency: DEFAULT_DISPLAY_CURRENCY,
       totals: { buyValue: 0, sellValue: 0, pnlValue: 0 },
       series: [],
       holdings: [],
@@ -54,6 +62,16 @@ export async function getDashboardData(
       assets: [],
     };
   }
+
+  const [userRecord] = await db
+    .select({ displayCurrency: users.displayCurrency })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+
+  const displayCurrency = isDisplayCurrency(userRecord?.displayCurrency)
+    ? userRecord.displayCurrency
+    : DEFAULT_DISPLAY_CURRENCY;
 
   const range = resolveDashboardRange(query.range);
   const conditions = [eq(entries.userId, userId), isNull(entries.deletedAt)];
@@ -86,6 +104,20 @@ export async function getDashboardData(
     ? resolvedEntries.filter((entry) => entry.payload.baseAsset === query.asset)
     : resolvedEntries;
 
+  const displayRatesByDate = new Map<string, number>();
+  if (displayCurrency !== "PLN") {
+    const uniqueDates = Array.from(new Set(filteredEntries.map((entry) => entry.payload.nbpRateDate)));
+    await Promise.all(
+      uniqueDates.map(async (dateString) => {
+        const rateResult = await getNbpRate(
+          displayCurrency,
+          dayjs.utc(dateString, "YYYY-MM-DD", true).toDate(),
+        );
+        displayRatesByDate.set(dateString, rateResult.rate);
+      }),
+    );
+  }
+
   const totals = { buyValue: 0, sellValue: 0, pnlValue: 0 };
   const seriesMap = new Map<string, { buyValue: number; sellValue: number }>();
   const holdingsMap = new Map<
@@ -94,7 +126,10 @@ export async function getDashboardData(
   >();
 
   for (const entry of filteredEntries) {
-    const value = toNumber(entry.payload.valuePln);
+    const valuePln = toNumber(entry.payload.valuePln);
+    const displayRate =
+      displayCurrency === "PLN" ? 1 : (displayRatesByDate.get(entry.payload.nbpRateDate) ?? 1);
+    const value = valuePln / displayRate;
     const quantity = toNumber(entry.payload.quantity);
     const dateKey = dayjs.utc(entry.row.date).format("YYYY-MM-DD");
     const seriesEntry =
@@ -164,6 +199,7 @@ export async function getDashboardData(
   ).sort((left, right) => left.localeCompare(right));
 
   return {
+    displayCurrency,
     totals,
     series,
     holdings,

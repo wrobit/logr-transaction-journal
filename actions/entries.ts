@@ -6,9 +6,14 @@ import { getServerSession } from "next-auth";
 import { z } from "zod";
 
 import { authOptions } from "@/lib/auth/options";
-import { ensureUserId } from "@/lib/auth/users";
+import { ensureUserId, getUserById } from "@/lib/auth/users";
 import { db } from "@/lib/db";
 import { entries } from "@/lib/db/schema";
+import {
+  DEFAULT_DISPLAY_CURRENCY,
+  isDisplayCurrency,
+  type DisplayCurrency,
+} from "@/lib/currency/display";
 import type { EntryPayload, EntryView } from "@/lib/entries/types";
 import {
   buildEntryWhere,
@@ -46,7 +51,35 @@ export type EntryListResult = {
   assets: string[];
   page: number;
   pageSize: number;
+  displayCurrency: DisplayCurrency;
+  displayRatesByEntryId: Record<string, number>;
 };
+
+async function resolveDisplayRatesByEntryId(
+  entriesList: EntryView[],
+  displayCurrency: DisplayCurrency,
+) {
+  if (displayCurrency === "PLN") {
+    return Object.fromEntries(entriesList.map((entry) => [entry.id, 1]));
+  }
+
+  const ratesByDate = new Map<string, number>();
+  const uniqueDates = Array.from(new Set(entriesList.map((entry) => entry.nbpRateDate)));
+
+  await Promise.all(
+    uniqueDates.map(async (dateString) => {
+      const rateResult = await getNbpRate(
+        displayCurrency,
+        dayjs.utc(dateString, "YYYY-MM-DD", true).toDate(),
+      );
+      ratesByDate.set(dateString, rateResult.rate);
+    }),
+  );
+
+  return Object.fromEntries(
+    entriesList.map((entry) => [entry.id, ratesByDate.get(entry.nbpRateDate) ?? 1]),
+  );
+}
 
 const getSortValue = (entry: EntryView, sortBy: EntrySortKey) => {
   switch (sortBy) {
@@ -121,8 +154,15 @@ export async function listEntries(
       assets: [],
       page: query.page,
       pageSize: ENTRY_PAGE_SIZE,
+      displayCurrency: DEFAULT_DISPLAY_CURRENCY,
+      displayRatesByEntryId: {},
     };
   }
+
+  const userRecord = await getUserById(userId);
+  const displayCurrency = isDisplayCurrency(userRecord?.displayCurrency)
+    ? userRecord.displayCurrency
+    : DEFAULT_DISPLAY_CURRENCY;
 
   const whereClause = buildEntryWhere(userId, query.filters);
   const rows = await db
@@ -157,13 +197,20 @@ export async function listEntries(
 
   const sortedEntries = sortEntries(filteredEntries, query.sortBy, query.sortDir);
   const offset = (query.page - 1) * ENTRY_PAGE_SIZE;
+  const paginatedEntries = sortedEntries.slice(offset, offset + ENTRY_PAGE_SIZE);
+  const displayRatesByEntryId = await resolveDisplayRatesByEntryId(
+    paginatedEntries,
+    displayCurrency,
+  );
 
   return {
-    entries: sortedEntries.slice(offset, offset + ENTRY_PAGE_SIZE),
+    entries: paginatedEntries,
     totalCount: filteredEntries.length,
     assets,
     page: query.page,
     pageSize: ENTRY_PAGE_SIZE,
+    displayCurrency,
+    displayRatesByEntryId,
   };
 }
 

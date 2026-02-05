@@ -40,6 +40,8 @@ export default async function Page({ searchParams }: PageProps) {
           totalCount={entriesResult.totalCount}
           pageSize={ENTRY_PAGE_SIZE}
           query={query}
+          displayCurrency={entriesResult.displayCurrency}
+          displayRatesByEntryId={entriesResult.displayRatesByEntryId}
         />
       </div>
     </div>

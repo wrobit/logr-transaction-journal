@@ -542,6 +542,98 @@ Auth Pages Implementation Plan:
 - [ ] Verify rendered metadata for key routes
 - [ ] Validate Open Graph/Twitter tags
 
+## Phase 14 - International Integrations (later phase)
+
+### Phase 14.1 - Scope and policy
+
+- [ ] Define country-aware integration policy (`country -> provider`) for FX, tax validation, and bank imports
+- [ ] Keep this phase focused on integrations and auditability (exclude deep local e-filing APIs)
+- [ ] Add feature flags for incremental country rollout
+
+### Phase 14.2 - Provider adapters (official sources first)
+
+- [ ] Add `RateProvider` adapter interface (`getRate`, `getLatest`, `getMetadata`)
+- [ ] Add `TaxValidationProvider` interface (`validate(id, country)`)
+- [ ] Add `ECB` adapter for Eurozone users
+- [ ] Add `HMRC` adapter for UK tax workflows (monthly rates)
+- [ ] Add IRS-compatible US conversion workflow adapter (store method + source metadata)
+- [ ] Add `BoC` adapter for Canada
+- [ ] Add optional `RBA` adapter for Australia (enable only if AU launch is near-term)
+- [ ] Add EU `VIES` VAT ID validation adapter
+
+### Phase 14.3 - Data model and auditability
+
+- [ ] Extend FX persistence with: `rateValue`, `sourceProvider`, `publishedAt`, `retrievedAt`, `rateType`, `method`
+- [ ] Persist provider response snapshot/hash for reproducibility and audit
+- [ ] Add effective-date normalization rules (weekend/holiday/business-day fallback)
+- [ ] Keep historical rates immutable once stored
+
+### Phase 14.4 - Resilience and fallback behavior
+
+- [ ] Add strict timeouts + retry with exponential backoff for provider calls
+- [ ] Define per-country fallback chain (official -> cached prior valid -> user warning)
+- [ ] Add cache TTL strategy for latest rates and immutable cache for historical rates
+- [ ] Add stale-rate and provider-downtime alerting
+
+### Phase 14.5 - Banking integrations
+
+- [ ] Integrate one open-banking aggregator (`TrueLayer` or `Tink` or `GoCardless Bank Account Data`)
+- [ ] Build normalized transaction ingestion pipeline for aggregator data
+- [ ] Maintain robust CSV import fallback for unsupported banks/countries
+
+### Phase 14.6 - Product and UX updates
+
+- [ ] Show FX source attribution in UI (provider + publication period/date)
+- [ ] Surface explicit warnings when fallback rates are used
+- [ ] Add admin control to lock provider policy per entity/country
+
+### Phase 14.7 - Rollout order
+
+- [ ] Step 1: `ECB + HMRC + VIES`
+- [ ] Step 2: Banking aggregator + CSV fallback
+- [ ] Step 3: `US + CA` adapters with compliance metadata
+- [ ] Step 4: `AU` and additional markets based on telemetry
+
+### Phase 14.8 - Acceptance criteria
+
+- [ ] Every FX conversion is reproducible and includes source metadata
+- [ ] Country policy auto-selects expected provider
+- [ ] EU VAT ID validation is available and logged
+- [ ] Bank import works via one aggregator and CSV fallback
+- [ ] Monitoring reports fallback usage spikes and stale-rate conditions
+
+## Phase 15 - Domain and deployment topology (landing + app)
+
+### Phase 15.1 - Domain strategy
+
+- [ ] Confirm production host split: `logr.space` for landing website, `app.logr.space` for authenticated app
+- [ ] Keep one brand across both hosts while separating marketing and product concerns
+
+### Phase 15.2 - DNS and hosting setup
+
+- [ ] Configure DNS records at domain provider for root (`@`) and `app` subdomain
+- [ ] Map `logr.space` and `app.logr.space` to correct hosting project(s)
+- [ ] Enable HTTPS certificates for both hosts and verify renewal
+
+### Phase 15.3 - App configuration
+
+- [ ] Set production `NEXTAUTH_URL=https://app.logr.space`
+- [ ] Keep `NEXTAUTH_SECRET` configured in production environment
+- [ ] Update OAuth redirect URLs to `https://app.logr.space/api/auth/callback/{provider}`
+- [ ] Verify auth cookie/session behavior on `app.logr.space`
+
+### Phase 15.4 - Routing and middleware checks
+
+- [ ] Keep app routes on `app.logr.space` without route-path refactor (current default)
+- [ ] Verify middleware matchers and sign-in redirects behave correctly under subdomain deployment
+- [ ] Validate deep links and post-login redirects from landing to app
+
+### Phase 15.5 - QA and launch checklist
+
+- [ ] Smoke test login/register/session flows on production host
+- [ ] Verify metadata/canonical URLs use final public hosts
+- [ ] Add rollback plan for DNS cutover window
+
 ---
 
 ## 11) MVP Acceptance Criteria

@@ -34,7 +34,7 @@ export default async function Page({ searchParams }: PageProps) {
   const entriesResult = await listEntries(session.user, query);
 
   return (
-    <div className="min-h-screen bg-black px-6 py-10">
+    <div className="min-h-screen bg-black px-3 py-10 md:px-4">
       <div className="mx-auto w-full max-w-6xl">
         <EntriesView
           entries={entriesResult.entries}

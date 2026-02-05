@@ -21,19 +21,20 @@ export function Navbar() {
   const t = useTranslations("nav");
 
   return (
-    <header className="border-b border-border bg-background/90 px-6 py-4 text-foreground backdrop-blur">
+    <header className="sticky top-0 z-50 relative border-b border-border bg-background/90 px-4 py-4 text-foreground backdrop-blur md:px-5">
+      <Link href="/" className="absolute left-4 top-1/2 flex -translate-y-1/2 items-center gap-2 md:left-5">
+        <Image
+          src="/logo.svg"
+          alt="Logr"
+          width={120}
+          height={32}
+          className="h-6 w-auto opacity-90 dark:invert"
+          priority
+        />
+      </Link>
+
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between">
         <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center gap-2">
-            <Image
-              src="/logo.svg"
-              alt="Logr"
-              width={120}
-              height={32}
-              className="h-6 w-auto opacity-90 dark:invert"
-              priority
-            />
-          </Link>
           <nav className="flex items-center gap-4 text-xs text-muted-foreground">
             <Link href="/" className="transition hover:text-foreground">
               {t("entries")}

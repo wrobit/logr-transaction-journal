@@ -9,7 +9,7 @@ export default function AuthLayout({
 }) {
   return (
     <div className="relative min-h-screen bg-neutral-950 text-white">
-      <div className="absolute inset-x-6 top-6 flex items-center justify-between gap-4">
+      <div className="absolute inset-x-3 top-6 flex items-center justify-between gap-4 md:inset-x-4">
         <Image
           src="/logo.svg"
           alt="Logr"
@@ -20,7 +20,7 @@ export default function AuthLayout({
         />
         <LocaleSwitcher />
       </div>
-      <div className="flex min-h-screen items-center justify-center px-6 py-16">
+      <div className="flex min-h-screen items-center justify-center px-3 py-16 md:px-4">
         <div className="w-full max-w-sm">{children}</div>
       </div>
     </div>

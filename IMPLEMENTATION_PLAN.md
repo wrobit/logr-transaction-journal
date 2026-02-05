@@ -427,46 +427,111 @@ Auth Pages Implementation Plan:
 
 ### Phase 12 — Data Encryption for Entries
 
-- [ ] Finalize scope and threat model:
-  - [ ] Encrypt all entry fields except `date` (kept plaintext for range filtering)
-  - [ ] Leave profile fields unencrypted
-  - [ ] Confirm server-side filtering only by `userId` + `date`
-- [ ] Define crypto primitives and key hierarchy:
-  - [ ] Use `AES-256-GCM` for authenticated encryption
-  - [ ] Generate per-user DEK and wrap with `ENTRY_KEK` (env var)
-  - [ ] Add encryption versioning for future rotations
-- [ ] Implement encryption layer:
-  - [ ] Add `encryptPayload` / `decryptPayload` utilities
-  - [ ] Store wrapped DEK on user record
-  - [ ] Support nonce + tag storage (packed or structured)
-- [ ] Update schema and data model:
-  - [ ] Add `users.encryptionKeyEncrypted` + `users.encryptionVersion`
-  - [ ] Add `entries.encryptedPayload` + `entries.encryptionVersion`
-  - [ ] Keep `entries.date` plaintext; all other entry fields encrypted
-- [ ] Update entry CRUD operations:
-  - [ ] Encrypt entries on creation/update
-  - [ ] Decrypt entries on read
-  - [ ] Migrate existing unencrypted entries to encrypted payloads
-- [ ] Update query and aggregation logic:
-  - [ ] Fetch by `userId` + `date` only
-  - [ ] Perform filters, summaries, and dashboard aggregations post-decrypt
-- [ ] Add key rotation + recovery flows:
-  - [ ] Rewrap DEKs when `ENTRY_KEK` changes
-  - [ ] Re-encrypt user entries when rotating DEK
-  - [ ] Define recovery/lockout behavior if KEK is missing
-- [ ] Update backup and export features:
-  - [ ] Ensure backups store only encrypted entry payloads
-  - [ ] Provide decrypted exports on demand
-- [ ] Add tests:
-  - [ ] Encrypt/decrypt roundtrip + tamper detection
-  - [ ] KEK/DEK unwrap failures
-  - [ ] Migration correctness
-  - [ ] Aggregation correctness post-decrypt
-- [ ] Document encryption approach and recovery procedures
+- [x] Finalize scope and threat model:
+  - [x] Encrypt all entry fields except `date` (kept plaintext for range filtering)
+  - [x] Leave profile fields unencrypted
+  - [x] Confirm server-side filtering only by `userId` + `date`
+- [x] Define crypto primitives and key hierarchy:
+  - [x] Use `AES-256-GCM` for authenticated encryption
+  - [x] Generate per-user DEK and wrap with `ENTRY_KEK` (env var)
+  - [x] Add encryption versioning for future rotations
+- [x] Implement encryption layer:
+  - [x] Add `encryptPayload` / `decryptPayload` utilities
+  - [x] Store wrapped DEK on user record
+  - [x] Support nonce + tag storage (packed or structured)
+- [x] Update schema and data model:
+  - [x] Add `users.encryptionKeyEncrypted` + `users.encryptionVersion`
+  - [x] Add `entries.encryptedPayload` + `entries.encryptionVersion`
+  - [x] Keep `entries.date` plaintext; all other entry fields encrypted
+- [x] Update entry CRUD operations:
+  - [x] Encrypt entries on creation/update
+  - [x] Decrypt entries on read
+  - [x] Migrate existing unencrypted entries to encrypted payloads
+- [x] Update query and aggregation logic:
+  - [x] Fetch by `userId` + `date` only
+  - [x] Perform filters, summaries, and dashboard aggregations post-decrypt
+- [x] Add key rotation + recovery flows:
+  - [x] Rewrap DEKs when `ENTRY_KEK` changes
+  - [x] Re-encrypt user entries when rotating DEK
+  - [x] Define recovery/lockout behavior if KEK is missing
+- [x] Update backup and export features:
+  - [x] Ensure backups store only encrypted entry payloads
+  - [x] Provide decrypted exports on demand
+- [x] Add tests:
+  - [x] Encrypt/decrypt roundtrip + tamper detection
+  - [x] KEK/DEK unwrap failures
+  - [x] Migration correctness
+  - [x] Aggregation correctness post-decrypt
+- [x] Document encryption approach and recovery procedures
 
 ## Phase 13 - Internationalization
 
-### Post-domain metadata (later)
+### Phase 13.1 - Foundation and locale strategy (cookie-based)
+
+- [ ] Confirm initial locales: `en` + `pl`
+- [ ] Adopt cookie-based locale storage for the authenticated app (no locale URL prefixes)
+- [ ] Add i18n library and wiring (recommended: `next-intl`)
+- [ ] Add locale detection order: cookie -> user profile preference (optional) -> default `en`
+- [ ] Add fallback behavior for missing translations (warn in non-prod, safe fallback in prod)
+
+### Phase 13.2 - Message catalog architecture
+
+- [ ] Create locale message catalogs (`messages/en/*.json`, `messages/pl/*.json`)
+- [ ] Define namespaces: `common`, `auth`, `entries`, `dashboard`, `profile`, `admin`, `validation`, `metadata`
+- [ ] Add key naming conventions and ownership guidelines
+- [ ] Add checks/scripts for missing and unused translation keys
+
+### Phase 13.3 - App shell and switching
+
+- [ ] Wrap root providers/layout with i18n provider and current locale
+- [ ] Add language switcher in app navigation/profile settings
+- [ ] Persist language changes to cookie and apply immediately
+- [ ] Ensure auth redirects and protected routes preserve selected locale from cookie
+
+### Phase 13.4 - User-facing UI translation rollout
+
+- [ ] Translate auth pages and components (`/login`, `/register`, OAuth section)
+- [ ] Translate entries page, filters, dialogs, table labels, toasts, and empty states
+- [ ] Translate dashboard labels, filters, cards, charts, and empty states
+- [ ] Translate profile, delete-account flow, and goodbye screen
+- [ ] Translate shared layout labels (navbar, buttons, generic UI copy)
+
+### Phase 13.5 - Admin area translation rollout
+
+- [ ] Translate admin navigation, users tables, filters, dialogs, and action labels
+- [ ] Translate admin feedback and audit screens
+- [ ] Translate admin analytics labels and empty states
+- [ ] Keep enum/database values stable; translate display labels only
+
+### Phase 13.6 - Locale-aware formatting and metadata
+
+- [ ] Refactor formatting helpers to use active locale (number/currency/date presentation)
+- [ ] Keep accounting precision and backend calculations locale-agnostic
+- [ ] Localize per-route metadata titles/descriptions where applicable
+- [ ] Verify `html lang` reflects selected locale
+
+### Phase 13.7 - Validation and server message localization
+
+- [ ] Externalize user-facing validation messages (zod/forms)
+- [ ] Standardize server action/API error keys and translate in the UI layer
+- [ ] Ensure toasts, confirmation dialogs, and inline errors are localized consistently
+
+### Phase 13.8 - Testing and QA
+
+- [ ] Update existing tests to avoid brittle hardcoded copy when appropriate
+- [ ] Add tests for locale switching and cookie persistence
+- [ ] Add tests for translation fallback and missing keys behavior
+- [ ] Add tests for locale-specific formatting output
+- [ ] Run smoke checks for key flows in both `en` and `pl`
+
+### Phase 13.9 - Rollout and docs
+
+- [ ] Release with `en` default and `pl` enabled
+- [ ] Add migration notes for remaining hardcoded strings
+- [ ] Document translator/developer workflow for future features
+- [ ] Define approach for adding future locales
+
+### Phase 13.10 - Post-domain metadata (later)
 
 - [ ] Set `metadataBase` to production URL
 - [ ] Set `openGraph.url` and canonical URLs

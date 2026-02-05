@@ -1,6 +1,7 @@
 import {
   date,
   index,
+  integer,
   jsonb,
   numeric,
   pgEnum,
@@ -22,6 +23,13 @@ export const feedbackReasonEnum = pgEnum("feedback_reason", [
 ]);
 export const userRoleEnum = pgEnum("user_role", ["user", "admin"]);
 
+export type EncryptedBlob = {
+  version: number;
+  nonce: string;
+  ciphertext: string;
+  tag: string;
+};
+
 export const users = pgTable(
   "users",
   {
@@ -32,6 +40,8 @@ export const users = pgTable(
     firstName: text("first_name").notNull(),
     lastName: text("last_name").notNull(),
     role: userRoleEnum("role").notNull().default("user"),
+    encryptionKeyEncrypted: jsonb("encryption_key_encrypted").$type<EncryptedBlob>(),
+    encryptionVersion: integer("encryption_version").notNull().default(1),
     lastLoginAt: timestamp("last_login_at", { withTimezone: true, mode: "date" }),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
       .defaultNow()
@@ -55,18 +65,20 @@ export const entries = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     date: date("date", { mode: "date" }).notNull(),
-    operation: entryOperationEnum("operation").notNull(),
-    baseAsset: text("base_asset").notNull(),
-    quoteCurrency: text("quote_currency").notNull(),
-    quantity: numeric("quantity", { precision: 30, scale: 12 }).notNull(),
-    pricePerUnit: numeric("price_per_unit", { precision: 30, scale: 12 }).notNull(),
-    fullPrice: numeric("full_price", { precision: 30, scale: 12 }).notNull(),
+    operation: entryOperationEnum("operation"),
+    baseAsset: text("base_asset"),
+    quoteCurrency: text("quote_currency"),
+    quantity: numeric("quantity", { precision: 30, scale: 12 }),
+    pricePerUnit: numeric("price_per_unit", { precision: 30, scale: 12 }),
+    fullPrice: numeric("full_price", { precision: 30, scale: 12 }),
     commission: numeric("commission", { precision: 30, scale: 12 }),
     source: text("source"),
     note: text("note"),
-    nbpRateDate: date("nbp_rate_date", { mode: "date" }).notNull(),
-    nbpRate: numeric("nbp_rate", { precision: 18, scale: 6 }).notNull(),
-    valuePln: numeric("value_pln", { precision: 30, scale: 2 }).notNull(),
+    nbpRateDate: date("nbp_rate_date", { mode: "date" }),
+    nbpRate: numeric("nbp_rate", { precision: 18, scale: 6 }),
+    valuePln: numeric("value_pln", { precision: 30, scale: 2 }),
+    encryptedPayload: jsonb("encrypted_payload").$type<EncryptedBlob>(),
+    encryptionVersion: integer("encryption_version").notNull().default(1),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
       .defaultNow()
       .notNull(),

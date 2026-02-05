@@ -70,6 +70,6 @@ describe("entry filter conditions", () => {
       endDate: "2025-01-31",
     });
 
-    expect(conditions).toHaveLength(6);
+    expect(conditions).toHaveLength(4);
   });
 });

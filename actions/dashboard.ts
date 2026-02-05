@@ -7,6 +7,7 @@ import { db } from "@/lib/db";
 import { entries } from "@/lib/db/schema";
 import { resolveDashboardRange, type DashboardQuery } from "@/lib/dashboard/query";
 import { dayjs } from "@/lib/dayjs";
+import { getUserDek, resolveEntryPayload } from "@/lib/entries/encryption";
 
 export type DashboardSeriesPoint = {
   date: string;
@@ -65,23 +66,25 @@ export async function getDashboardData(
     conditions.push(lte(entries.date, range.endDate));
   }
 
-  if (query.asset) {
-    conditions.push(eq(entries.baseAsset, query.asset));
-  }
-
   const whereClause = and(...conditions);
 
   const rows = await db
-    .select({
-      date: entries.date,
-      operation: entries.operation,
-      baseAsset: entries.baseAsset,
-      quantity: entries.quantity,
-      valuePln: entries.valuePln,
-    })
+    .select()
     .from(entries)
     .where(whereClause)
     .orderBy(asc(entries.date));
+
+  const dek = await getUserDek(userId);
+  const resolvedEntries = await Promise.all(
+    rows.map(async (row) => ({
+      row,
+      payload: await resolveEntryPayload(row, dek),
+    })),
+  );
+
+  const filteredEntries = query.asset
+    ? resolvedEntries.filter((entry) => entry.payload.baseAsset === query.asset)
+    : resolvedEntries;
 
   const totals = { buyValue: 0, sellValue: 0, pnlValue: 0 };
   const seriesMap = new Map<string, { buyValue: number; sellValue: number }>();
@@ -90,19 +93,19 @@ export async function getDashboardData(
     { buyValue: number; sellValue: number; netQuantity: number }
   >();
 
-  for (const row of rows) {
-    const value = toNumber(row.valuePln);
-    const quantity = toNumber(row.quantity);
-    const dateKey = dayjs.utc(row.date).format("YYYY-MM-DD");
+  for (const entry of filteredEntries) {
+    const value = toNumber(entry.payload.valuePln);
+    const quantity = toNumber(entry.payload.quantity);
+    const dateKey = dayjs.utc(entry.row.date).format("YYYY-MM-DD");
     const seriesEntry =
       seriesMap.get(dateKey) ?? { buyValue: 0, sellValue: 0 };
-    const holdingsEntry = holdingsMap.get(row.baseAsset) ?? {
+    const holdingsEntry = holdingsMap.get(entry.payload.baseAsset) ?? {
       buyValue: 0,
       sellValue: 0,
       netQuantity: 0,
     };
 
-    if (row.operation === "BUY") {
+    if (entry.payload.operation === "BUY") {
       totals.buyValue += value;
       seriesEntry.buyValue += value;
       holdingsEntry.buyValue += value;
@@ -115,7 +118,7 @@ export async function getDashboardData(
     }
 
     seriesMap.set(dateKey, seriesEntry);
-    holdingsMap.set(row.baseAsset, holdingsEntry);
+    holdingsMap.set(entry.payload.baseAsset, holdingsEntry);
   }
 
   totals.pnlValue = totals.sellValue - totals.buyValue;
@@ -156,17 +159,15 @@ export async function getDashboardData(
     }))
     .filter((holding) => holding.value > 0);
 
-  const assetRows = await db
-    .selectDistinct({ baseAsset: entries.baseAsset })
-    .from(entries)
-    .where(and(eq(entries.userId, userId), isNull(entries.deletedAt)))
-    .orderBy(asc(entries.baseAsset));
+  const assets = Array.from(
+    new Set(resolvedEntries.map((entry) => entry.payload.baseAsset)),
+  ).sort((left, right) => left.localeCompare(right));
 
   return {
     totals,
     series,
     holdings,
     holdingsMix,
-    assets: assetRows.map((row) => row.baseAsset),
+    assets,
   };
 }

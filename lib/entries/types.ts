@@ -1,9 +1,6 @@
 export type EntryOperation = "BUY" | "SELL";
 
-export type EntryView = {
-  id: string;
-  userId: string;
-  date: string;
+export type EntryPayload = {
   operation: EntryOperation;
   baseAsset: string;
   quoteCurrency: string;
@@ -16,6 +13,12 @@ export type EntryView = {
   nbpRateDate: string;
   nbpRate: string;
   valuePln: string;
+};
+
+export type EntryView = EntryPayload & {
+  id: string;
+  userId: string;
+  date: string;
   createdAt: string;
   updatedAt: string;
 };

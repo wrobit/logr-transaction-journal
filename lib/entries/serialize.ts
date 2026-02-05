@@ -1,27 +1,16 @@
 import type { Entry } from "@/lib/db/schema";
-import type { EntryView } from "@/lib/entries/types";
+import type { EntryPayload, EntryView } from "@/lib/entries/types";
 import { dayjs } from "@/lib/dayjs";
 
 const toDateString = (value: Date) => dayjs.utc(value).format("YYYY-MM-DD");
 const toDateTimeString = (value: Date) => dayjs.utc(value).toISOString();
 
-export function serializeEntry(entry: Entry): EntryView {
+export function serializeEntry(entry: Entry, payload: EntryPayload): EntryView {
   return {
     id: entry.id,
     userId: entry.userId,
     date: toDateString(entry.date),
-    operation: entry.operation,
-    baseAsset: entry.baseAsset,
-    quoteCurrency: entry.quoteCurrency,
-    quantity: String(entry.quantity),
-    pricePerUnit: String(entry.pricePerUnit),
-    fullPrice: String(entry.fullPrice),
-    commission: entry.commission ? String(entry.commission) : null,
-    source: entry.source,
-    note: entry.note,
-    nbpRateDate: toDateString(entry.nbpRateDate),
-    nbpRate: String(entry.nbpRate),
-    valuePln: String(entry.valuePln),
+    ...payload,
     createdAt: toDateTimeString(entry.createdAt),
     updatedAt: toDateTimeString(entry.updatedAt),
   };

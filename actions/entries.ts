@@ -1,6 +1,6 @@
 "use server";
 
-import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, desc, eq, isNull } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getServerSession } from "next-auth";
 import { z } from "zod";
@@ -9,11 +9,13 @@ import { authOptions } from "@/lib/auth/options";
 import { ensureUserId } from "@/lib/auth/users";
 import { db } from "@/lib/db";
 import { entries } from "@/lib/db/schema";
-import type { EntryView } from "@/lib/entries/types";
+import type { EntryPayload, EntryView } from "@/lib/entries/types";
 import {
   buildEntryWhere,
   ENTRY_PAGE_SIZE,
   type EntryQuery,
+  type EntrySortDirection,
+  type EntrySortKey,
 } from "@/lib/entries/query";
 import {
   calculateFullPrice,
@@ -22,6 +24,12 @@ import {
   toFixedNumber,
   toFixedString,
 } from "@/lib/entries/calculations";
+import {
+  ENTRY_ENCRYPTION_VERSION,
+  encryptEntryPayload,
+  getUserDek,
+  resolveEntryPayload,
+} from "@/lib/entries/encryption";
 import { serializeEntry } from "@/lib/entries/serialize";
 import type {
   CreateEntryState,
@@ -38,6 +46,62 @@ export type EntryListResult = {
   assets: string[];
   page: number;
   pageSize: number;
+};
+
+const getSortValue = (entry: EntryView, sortBy: EntrySortKey) => {
+  switch (sortBy) {
+    case "createdAt":
+      return new Date(entry.createdAt).getTime();
+    case "updatedAt":
+      return new Date(entry.updatedAt).getTime();
+    case "operation":
+      return entry.operation;
+    case "baseAsset":
+      return entry.baseAsset;
+    case "quantity":
+      return Number(entry.quantity);
+    case "pricePerUnit":
+      return Number(entry.pricePerUnit);
+    case "fullPrice":
+      return Number(entry.fullPrice);
+    case "commission":
+      return Number(entry.commission ?? 0);
+    case "source":
+      return entry.source ?? "";
+    case "nbpRate":
+      return Number(entry.nbpRate);
+    case "valuePln":
+      return Number(entry.valuePln);
+    default:
+      return 0;
+  }
+};
+
+const sortEntries = (
+  entriesList: EntryView[],
+  sortBy: EntrySortKey,
+  sortDir: EntrySortDirection,
+) => {
+  const direction = sortDir === "desc" ? -1 : 1;
+
+  return [...entriesList].sort((left, right) => {
+    const leftValue = getSortValue(left, sortBy);
+    const rightValue = getSortValue(right, sortBy);
+
+    if (typeof leftValue === "string" && typeof rightValue === "string") {
+      return direction * leftValue.localeCompare(rightValue);
+    }
+
+    if (leftValue < rightValue) {
+      return -1 * direction;
+    }
+
+    if (leftValue > rightValue) {
+      return 1 * direction;
+    }
+
+    return 0;
+  });
 };
 
 export async function listEntries(
@@ -61,48 +125,43 @@ export async function listEntries(
   }
 
   const whereClause = buildEntryWhere(userId, query.filters);
-  const offset = (query.page - 1) * ENTRY_PAGE_SIZE;
-
-  const orderColumn = {
-    createdAt: entries.createdAt,
-    updatedAt: entries.updatedAt,
-    operation: entries.operation,
-    baseAsset: entries.baseAsset,
-    quantity: entries.quantity,
-    pricePerUnit: entries.pricePerUnit,
-    fullPrice: entries.fullPrice,
-    commission: entries.commission,
-    source: entries.source,
-    nbpRate: entries.nbpRate,
-    valuePln: entries.valuePln,
-  }[query.sortBy];
-
-  const orderByClause =
-    query.sortDir === "desc" ? desc(orderColumn) : asc(orderColumn);
-
-  const [countResult] = await db
-    .select({ count: sql<number>`count(*)` })
-    .from(entries)
-    .where(whereClause);
-
   const rows = await db
     .select()
     .from(entries)
     .where(whereClause)
-    .orderBy(orderByClause)
-    .limit(ENTRY_PAGE_SIZE)
-    .offset(offset);
+    .orderBy(desc(entries.date));
 
-  const assetRows = await db
-    .selectDistinct({ baseAsset: entries.baseAsset })
-    .from(entries)
-    .where(and(eq(entries.userId, userId), isNull(entries.deletedAt)))
-    .orderBy(asc(entries.baseAsset));
+  const dek = await getUserDek(userId);
+  const resolvedEntries = await Promise.all(
+    rows.map(async (row) => {
+      const payload = await resolveEntryPayload(row, dek);
+      return serializeEntry(row, payload);
+    }),
+  );
+
+  const assets = Array.from(
+    new Set(resolvedEntries.map((entry) => entry.baseAsset)),
+  ).sort((left, right) => left.localeCompare(right));
+
+  const filteredEntries = resolvedEntries.filter((entry) => {
+    if (query.filters.asset && entry.baseAsset !== query.filters.asset) {
+      return false;
+    }
+
+    if (query.filters.operation && entry.operation !== query.filters.operation) {
+      return false;
+    }
+
+    return true;
+  });
+
+  const sortedEntries = sortEntries(filteredEntries, query.sortBy, query.sortDir);
+  const offset = (query.page - 1) * ENTRY_PAGE_SIZE;
 
   return {
-    entries: rows.map(serializeEntry),
-    totalCount: Number(countResult?.count ?? 0),
-    assets: assetRows.map((row) => row.baseAsset),
+    entries: sortedEntries.slice(offset, offset + ENTRY_PAGE_SIZE),
+    totalCount: filteredEntries.length,
+    assets,
     page: query.page,
     pageSize: ENTRY_PAGE_SIZE,
   };
@@ -168,6 +227,55 @@ const resolveEntryFields = async (parsed: {
   };
 };
 
+const buildEntryPayload = (
+  parsed: {
+    data: {
+      operation: "BUY" | "SELL";
+      baseAsset: string;
+      quoteCurrency: string;
+      quantity: number;
+      pricePerUnit: number;
+      commission?: number | null | undefined;
+      source?: string | undefined;
+      note?: string | undefined;
+    };
+  },
+  resolved: {
+    fullPrice: number;
+    valuePln: number;
+    commission: number | null;
+    nbp: { rate: number; rateDate: Date };
+  },
+): EntryPayload => ({
+  operation: parsed.data.operation,
+  baseAsset: parsed.data.baseAsset.trim().toUpperCase(),
+  quoteCurrency: parsed.data.quoteCurrency.trim().toUpperCase(),
+  quantity: toFixedString(parsed.data.quantity, NUMERIC_SCALES.quantity),
+  pricePerUnit: toFixedString(parsed.data.pricePerUnit, NUMERIC_SCALES.pricePerUnit),
+  fullPrice: toFixedString(
+    toFixedNumber(resolved.fullPrice, NUMERIC_SCALES.fullPrice),
+    NUMERIC_SCALES.fullPrice,
+  ),
+  commission:
+    resolved.commission === null
+      ? null
+      : toFixedString(
+          toFixedNumber(resolved.commission, NUMERIC_SCALES.commission),
+          NUMERIC_SCALES.commission,
+        ),
+  source: parsed.data.source?.trim() || null,
+  note: parsed.data.note?.trim() || null,
+  nbpRateDate: dayjs.utc(resolved.nbp.rateDate).format("YYYY-MM-DD"),
+  nbpRate: toFixedString(
+    toFixedNumber(resolved.nbp.rate, NUMERIC_SCALES.nbpRate),
+    NUMERIC_SCALES.nbpRate,
+  ),
+  valuePln: toFixedString(
+    toFixedNumber(resolved.valuePln, NUMERIC_SCALES.valuePln),
+    NUMERIC_SCALES.valuePln,
+  ),
+});
+
 export async function createEntry(
   _prevState: CreateEntryState,
   formData: FormData,
@@ -197,41 +305,18 @@ export async function createEntry(
     return { status: "error", errors: getValidationErrors(parsed.error) };
   }
 
-  const { entryDate, fullPrice, valuePln, commission, nbp } =
-    await resolveEntryFields(parsed);
+  const resolved = await resolveEntryFields(parsed);
+  const payload = buildEntryPayload(parsed, resolved);
+  const dek = await getUserDek(userId);
+  const encryptedPayload = encryptEntryPayload(payload, dek);
 
   const [created] = await db
     .insert(entries)
     .values({
       userId,
-      date: entryDate,
-      operation: parsed.data.operation,
-      baseAsset: parsed.data.baseAsset.trim().toUpperCase(),
-      quoteCurrency: parsed.data.quoteCurrency.trim().toUpperCase(),
-      quantity: toFixedString(parsed.data.quantity, NUMERIC_SCALES.quantity),
-      pricePerUnit: toFixedString(parsed.data.pricePerUnit, NUMERIC_SCALES.pricePerUnit),
-      fullPrice: toFixedString(
-        toFixedNumber(fullPrice, NUMERIC_SCALES.fullPrice),
-        NUMERIC_SCALES.fullPrice,
-      ),
-      commission:
-        commission === null
-          ? null
-          : toFixedString(
-              toFixedNumber(commission, NUMERIC_SCALES.commission),
-              NUMERIC_SCALES.commission,
-            ),
-      source: parsed.data.source?.trim() || null,
-      note: parsed.data.note?.trim() || null,
-      nbpRateDate: nbp.rateDate,
-      nbpRate: toFixedString(
-        toFixedNumber(nbp.rate, NUMERIC_SCALES.nbpRate),
-        NUMERIC_SCALES.nbpRate,
-      ),
-      valuePln: toFixedString(
-        toFixedNumber(valuePln, NUMERIC_SCALES.valuePln),
-        NUMERIC_SCALES.valuePln,
-      ),
+      date: resolved.entryDate,
+      encryptedPayload,
+      encryptionVersion: ENTRY_ENCRYPTION_VERSION,
     })
     .returning();
 
@@ -245,7 +330,7 @@ export async function createEntry(
 
   return {
     status: "success",
-    entry: serializeEntry(created),
+    entry: serializeEntry(created, payload),
   };
 }
 
@@ -282,40 +367,17 @@ export async function updateEntry(
     return { status: "error", errors: getValidationErrors(parsed.error) };
   }
 
-  const { entryDate, fullPrice, valuePln, commission, nbp } =
-    await resolveEntryFields(parsed);
+  const resolved = await resolveEntryFields(parsed);
+  const payload = buildEntryPayload(parsed, resolved);
+  const dek = await getUserDek(userId);
+  const encryptedPayload = encryptEntryPayload(payload, dek);
 
   const [updated] = await db
     .update(entries)
     .set({
-      date: entryDate,
-      operation: parsed.data.operation,
-      baseAsset: parsed.data.baseAsset.trim().toUpperCase(),
-      quoteCurrency: parsed.data.quoteCurrency.trim().toUpperCase(),
-      quantity: toFixedString(parsed.data.quantity, NUMERIC_SCALES.quantity),
-      pricePerUnit: toFixedString(parsed.data.pricePerUnit, NUMERIC_SCALES.pricePerUnit),
-      fullPrice: toFixedString(
-        toFixedNumber(fullPrice, NUMERIC_SCALES.fullPrice),
-        NUMERIC_SCALES.fullPrice,
-      ),
-      commission:
-        commission === null
-          ? null
-          : toFixedString(
-              toFixedNumber(commission, NUMERIC_SCALES.commission),
-              NUMERIC_SCALES.commission,
-            ),
-      source: parsed.data.source?.trim() || null,
-      note: parsed.data.note?.trim() || null,
-      nbpRateDate: nbp.rateDate,
-      nbpRate: toFixedString(
-        toFixedNumber(nbp.rate, NUMERIC_SCALES.nbpRate),
-        NUMERIC_SCALES.nbpRate,
-      ),
-      valuePln: toFixedString(
-        toFixedNumber(valuePln, NUMERIC_SCALES.valuePln),
-        NUMERIC_SCALES.valuePln,
-      ),
+      date: resolved.entryDate,
+      encryptedPayload,
+      encryptionVersion: ENTRY_ENCRYPTION_VERSION,
       updatedAt: dayjs.utc().toDate(),
     })
     .where(
@@ -337,7 +399,7 @@ export async function updateEntry(
 
   return {
     status: "success",
-    entry: serializeEntry(updated),
+    entry: serializeEntry(updated, payload),
   };
 }
 

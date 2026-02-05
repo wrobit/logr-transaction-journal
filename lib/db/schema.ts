@@ -1,6 +1,7 @@
 import {
   date,
   index,
+  integer,
   jsonb,
   numeric,
   pgEnum,
@@ -11,7 +12,6 @@ import {
   uuid,
 } from "drizzle-orm/pg-core";
 
-export const entryOperationEnum = pgEnum("entry_operation", ["BUY", "SELL"]);
 export const feedbackReasonEnum = pgEnum("feedback_reason", [
   "tracking_elsewhere",
   "no_longer_needed",
@@ -21,6 +21,13 @@ export const feedbackReasonEnum = pgEnum("feedback_reason", [
   "other",
 ]);
 export const userRoleEnum = pgEnum("user_role", ["user", "admin"]);
+
+export type EncryptedBlob = {
+  version: number;
+  nonce: string;
+  ciphertext: string;
+  tag: string;
+};
 
 export const users = pgTable(
   "users",
@@ -32,19 +39,17 @@ export const users = pgTable(
     firstName: text("first_name").notNull(),
     lastName: text("last_name").notNull(),
     role: userRoleEnum("role").notNull().default("user"),
+    encryptionKeyEncrypted: jsonb("encryption_key_encrypted").$type<EncryptedBlob>(),
+    encryptionVersion: integer("encryption_version").notNull().default(1),
     lastLoginAt: timestamp("last_login_at", { withTimezone: true, mode: "date" }),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
-      .defaultNow()
-      .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
     deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "date" }),
   },
   (table) => ({
     roleIndex: index("users_role_idx").on(table.role),
     lastLoginAtIndex: index("users_last_login_at_idx").on(table.lastLoginAt),
-  }),
+  })
 );
 
 export const entries = pgTable(
@@ -55,37 +60,15 @@ export const entries = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     date: date("date", { mode: "date" }).notNull(),
-    operation: entryOperationEnum("operation").notNull(),
-    baseAsset: text("base_asset").notNull(),
-    quoteCurrency: text("quote_currency").notNull(),
-    quantity: numeric("quantity", { precision: 30, scale: 12 }).notNull(),
-    pricePerUnit: numeric("price_per_unit", { precision: 30, scale: 12 }).notNull(),
-    fullPrice: numeric("full_price", { precision: 30, scale: 12 }).notNull(),
-    commission: numeric("commission", { precision: 30, scale: 12 }),
-    source: text("source"),
-    note: text("note"),
-    nbpRateDate: date("nbp_rate_date", { mode: "date" }).notNull(),
-    nbpRate: numeric("nbp_rate", { precision: 18, scale: 6 }).notNull(),
-    valuePln: numeric("value_pln", { precision: 30, scale: 2 }).notNull(),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
-      .defaultNow()
-      .notNull(),
-    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" })
-      .defaultNow()
-      .notNull(),
+    encryptedPayload: jsonb("encrypted_payload").$type<EncryptedBlob>().notNull(),
+    encryptionVersion: integer("encryption_version").notNull().default(1),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
     deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "date" }),
   },
   (table) => ({
     userDateIndex: index("entries_user_date_idx").on(table.userId, table.date),
-    userAssetIndex: index("entries_user_asset_idx").on(
-      table.userId,
-      table.baseAsset,
-    ),
-    userOperationIndex: index("entries_user_operation_idx").on(
-      table.userId,
-      table.operation,
-    ),
-  }),
+  })
 );
 
 export const fxRatesCache = pgTable(
@@ -97,10 +80,11 @@ export const fxRatesCache = pgTable(
     rate: numeric("rate", { precision: 18, scale: 6 }).notNull(),
   },
   (table) => ({
-    currencyRateDateIndex: uniqueIndex(
-      "fx_rates_cache_currency_rate_date_idx",
-    ).on(table.currency, table.rateDate),
-  }),
+    currencyRateDateIndex: uniqueIndex("fx_rates_cache_currency_rate_date_idx").on(
+      table.currency,
+      table.rateDate
+    ),
+  })
 );
 
 export const feedbacks = pgTable("feedbacks", {
@@ -108,9 +92,7 @@ export const feedbacks = pgTable("feedbacks", {
   userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
   reason: feedbackReasonEnum("reason"),
   notes: text("notes"),
-  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
-    .defaultNow()
-    .notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
 });
 
 export const adminAuditLogs = pgTable(
@@ -125,16 +107,14 @@ export const adminAuditLogs = pgTable(
     }),
     action: text("action").notNull(),
     metadata: jsonb("metadata"),
-    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
-      .defaultNow()
-      .notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
   },
   (table) => ({
     actorIndex: index("admin_audit_actor_idx").on(table.actorUserId),
     targetIndex: index("admin_audit_target_idx").on(table.targetUserId),
     createdAtIndex: index("admin_audit_created_at_idx").on(table.createdAt),
     actionIndex: index("admin_audit_action_idx").on(table.action),
-  }),
+  })
 );
 
 export type User = typeof users.$inferSelect;

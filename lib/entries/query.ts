@@ -133,14 +133,6 @@ export function buildEntryConditions(userId: string, filters: EntryFilters) {
     conditions.push(lte(entries.date, toUtcDate(filters.endDate, true)));
   }
 
-  if (filters.asset) {
-    conditions.push(eq(entries.baseAsset, filters.asset));
-  }
-
-  if (filters.operation) {
-    conditions.push(eq(entries.operation, filters.operation));
-  }
-
   return conditions;
 }
 

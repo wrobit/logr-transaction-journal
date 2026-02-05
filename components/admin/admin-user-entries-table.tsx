@@ -1,12 +1,13 @@
-import type { Entry } from "@/lib/db/schema";
+import type { EntryView } from "@/lib/entries/types";
 import { dayjs } from "@/lib/dayjs";
 import { formatNumber, formatPln } from "@/lib/format/numbers";
 import { Badge } from "@/components/ui/badge";
 
-const formatDate = (value: Date) => dayjs.utc(value).format("YYYY-MM-DD");
+const formatDate = (value: string) =>
+  dayjs.utc(value, "YYYY-MM-DD", true).format("YYYY-MM-DD");
 
 type AdminUserEntriesTableProps = {
-  entries: Entry[];
+  entries: EntryView[];
 };
 
 export function AdminUserEntriesTable({ entries }: AdminUserEntriesTableProps) {

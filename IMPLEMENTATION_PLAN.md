@@ -427,30 +427,41 @@ Auth Pages Implementation Plan:
 
 ### Phase 12 — Data Encryption for Entries
 
-- [ ] Design encryption strategy:
-  - [ ] Determine encryption scope (all entry fields vs sensitive only)
-  - [ ] Choose encryption method (field-level vs row-level)
-  - [ ] Define key management strategy (per-user keys)
+- [ ] Finalize scope and threat model:
+  - [ ] Encrypt all entry fields except `date` (kept plaintext for range filtering)
+  - [ ] Leave profile fields unencrypted
+  - [ ] Confirm server-side filtering only by `userId` + `date`
+- [ ] Define crypto primitives and key hierarchy:
+  - [ ] Use `AES-256-GCM` for authenticated encryption
+  - [ ] Generate per-user DEK and wrap with `ENTRY_KEK` (env var)
+  - [ ] Add encryption versioning for future rotations
 - [ ] Implement encryption layer:
-  - [ ] Add encryption utilities (encrypt/decrypt functions)
-  - [ ] Generate and store user encryption keys securely
-  - [ ] Add key derivation from user credentials or separate key storage
+  - [ ] Add `encryptPayload` / `decryptPayload` utilities
+  - [ ] Store wrapped DEK on user record
+  - [ ] Support nonce + tag storage (packed or structured)
+- [ ] Update schema and data model:
+  - [ ] Add `users.encryptionKeyEncrypted` + `users.encryptionVersion`
+  - [ ] Add `entries.encryptedPayload` + `entries.encryptionVersion`
+  - [ ] Keep `entries.date` plaintext; all other entry fields encrypted
 - [ ] Update entry CRUD operations:
   - [ ] Encrypt entries on creation/update
   - [ ] Decrypt entries on read
-  - [ ] Handle migration of existing unencrypted entries
+  - [ ] Migrate existing unencrypted entries to encrypted payloads
 - [ ] Update query and aggregation logic:
-  - [ ] Adjust filters to work with encrypted data
-  - [ ] Update summary calculations
-  - [ ] Optimize performance for encrypted queries
-- [ ] Add key rotation mechanism:
-  - [ ] Build re-encryption flow for key changes
-  - [ ] Handle key recovery scenarios
+  - [ ] Fetch by `userId` + `date` only
+  - [ ] Perform filters, summaries, and dashboard aggregations post-decrypt
+- [ ] Add key rotation + recovery flows:
+  - [ ] Rewrap DEKs when `ENTRY_KEK` changes
+  - [ ] Re-encrypt user entries when rotating DEK
+  - [ ] Define recovery/lockout behavior if KEK is missing
 - [ ] Update backup and export features:
-  - [ ] Ensure encrypted data in backups
-  - [ ] Provide decrypted exports for user download
-- [ ] Add tests for encryption/decryption correctness
-- [ ] Add tests for key management and rotation
+  - [ ] Ensure backups store only encrypted entry payloads
+  - [ ] Provide decrypted exports on demand
+- [ ] Add tests:
+  - [ ] Encrypt/decrypt roundtrip + tamper detection
+  - [ ] KEK/DEK unwrap failures
+  - [ ] Migration correctness
+  - [ ] Aggregation correctness post-decrypt
 - [ ] Document encryption approach and recovery procedures
 
 ## Phase 13 - Internationalization

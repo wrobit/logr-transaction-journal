@@ -18,6 +18,9 @@ import { logAdminAction, getEntriesCountForUser } from "@/actions/admin-audit";
 import { db } from "@/lib/db";
 import { entries, users } from "@/lib/db/schema";
 import { dayjs } from "@/lib/dayjs";
+import { getUserDek, resolveEntryPayload } from "@/lib/entries/encryption";
+import { serializeEntry } from "@/lib/entries/serialize";
+import type { EntryView } from "@/lib/entries/types";
 
 const ADMIN_USERS_PAGE_SIZE = 50;
 
@@ -176,19 +179,28 @@ export async function getAdminUser(userId: string) {
   return user ?? null;
 }
 
-export async function getAdminUserEntries(userId: string) {
+export async function getAdminUserEntries(userId: string): Promise<EntryView[]> {
   const session = await getAdminSession();
 
   if (!session) {
     return [];
   }
 
-  return db
+  const rows = await db
     .select()
     .from(entries)
     .where(and(eq(entries.userId, userId), isNull(entries.deletedAt)))
     .orderBy(desc(entries.createdAt))
     .limit(50);
+
+  const dek = await getUserDek(userId);
+
+  return Promise.all(
+    rows.map(async (row) => {
+      const payload = await resolveEntryPayload(row, dek);
+      return serializeEntry(row, payload);
+    }),
+  );
 }
 
 export async function softDeleteUser(userId: string): Promise<AdminActionResult> {

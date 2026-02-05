@@ -378,18 +378,6 @@ export async function updateEntry(
       date: resolved.entryDate,
       encryptedPayload,
       encryptionVersion: ENTRY_ENCRYPTION_VERSION,
-      operation: null,
-      baseAsset: null,
-      quoteCurrency: null,
-      quantity: null,
-      pricePerUnit: null,
-      fullPrice: null,
-      commission: null,
-      source: null,
-      note: null,
-      nbpRateDate: null,
-      nbpRate: null,
-      valuePln: null,
       updatedAt: dayjs.utc().toDate(),
     })
     .where(

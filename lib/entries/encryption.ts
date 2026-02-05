@@ -143,18 +143,6 @@ export async function rotateUserDek(
       .set({
         encryptedPayload,
         encryptionVersion: ENTRY_ENCRYPTION_VERSION,
-        operation: null,
-        baseAsset: null,
-        quoteCurrency: null,
-        quantity: null,
-        pricePerUnit: null,
-        fullPrice: null,
-        commission: null,
-        source: null,
-        note: null,
-        nbpRateDate: null,
-        nbpRate: null,
-        valuePln: null,
         updatedAt: dayjs.utc().toDate(),
       })
       .where(eq(entries.id, row.id));
@@ -182,71 +170,10 @@ export function decryptEntryPayload(payload: EncryptedBlob, dek: Buffer): EntryP
   return JSON.parse(decoded) as EntryPayload;
 }
 
-const buildPayloadFromLegacy = (entry: Entry): EntryPayload | null => {
-  if (!entry.operation || !entry.baseAsset || !entry.quoteCurrency) {
-    return null;
-  }
-
-  if (
-    entry.quantity === null ||
-    entry.pricePerUnit === null ||
-    entry.fullPrice === null
-  ) {
-    return null;
-  }
-
-  if (entry.nbpRateDate === null || entry.nbpRate === null || entry.valuePln === null) {
-    return null;
-  }
-
-  return {
-    operation: entry.operation,
-    baseAsset: entry.baseAsset,
-    quoteCurrency: entry.quoteCurrency,
-    quantity: String(entry.quantity),
-    pricePerUnit: String(entry.pricePerUnit),
-    fullPrice: String(entry.fullPrice),
-    commission: entry.commission === null ? null : String(entry.commission),
-    source: entry.source ?? null,
-    note: entry.note ?? null,
-    nbpRateDate: dayjs.utc(entry.nbpRateDate).format("YYYY-MM-DD"),
-    nbpRate: String(entry.nbpRate),
-    valuePln: String(entry.valuePln),
-  };
-};
-
 export async function resolveEntryPayload(entry: Entry, dek: Buffer): Promise<EntryPayload> {
-  if (entry.encryptedPayload) {
-    return decryptEntryPayload(entry.encryptedPayload, dek);
-  }
-
-  const payload = buildPayloadFromLegacy(entry);
-  if (!payload) {
+  if (!entry.encryptedPayload) {
     throw new Error("Entry payload is missing.");
   }
 
-  const encryptedPayload = encryptEntryPayload(payload, dek);
-
-  await db
-    .update(entries)
-    .set({
-      encryptedPayload,
-      encryptionVersion: ENTRY_ENCRYPTION_VERSION,
-      operation: null,
-      baseAsset: null,
-      quoteCurrency: null,
-      quantity: null,
-      pricePerUnit: null,
-      fullPrice: null,
-      commission: null,
-      source: null,
-      note: null,
-      nbpRateDate: null,
-      nbpRate: null,
-      valuePln: null,
-      updatedAt: dayjs.utc().toDate(),
-    })
-    .where(eq(entries.id, entry.id));
-
-  return payload;
+  return decryptEntryPayload(entry.encryptedPayload, dek);
 }

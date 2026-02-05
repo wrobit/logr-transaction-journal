@@ -65,19 +65,7 @@ export const entries = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     date: date("date", { mode: "date" }).notNull(),
-    operation: entryOperationEnum("operation"),
-    baseAsset: text("base_asset"),
-    quoteCurrency: text("quote_currency"),
-    quantity: numeric("quantity", { precision: 30, scale: 12 }),
-    pricePerUnit: numeric("price_per_unit", { precision: 30, scale: 12 }),
-    fullPrice: numeric("full_price", { precision: 30, scale: 12 }),
-    commission: numeric("commission", { precision: 30, scale: 12 }),
-    source: text("source"),
-    note: text("note"),
-    nbpRateDate: date("nbp_rate_date", { mode: "date" }),
-    nbpRate: numeric("nbp_rate", { precision: 18, scale: 6 }),
-    valuePln: numeric("value_pln", { precision: 30, scale: 2 }),
-    encryptedPayload: jsonb("encrypted_payload").$type<EncryptedBlob>(),
+    encryptedPayload: jsonb("encrypted_payload").$type<EncryptedBlob>().notNull(),
     encryptionVersion: integer("encryption_version").notNull().default(1),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
       .defaultNow()
@@ -89,16 +77,9 @@ export const entries = pgTable(
   },
   (table) => ({
     userDateIndex: index("entries_user_date_idx").on(table.userId, table.date),
-    userAssetIndex: index("entries_user_asset_idx").on(
-      table.userId,
-      table.baseAsset,
-    ),
-    userOperationIndex: index("entries_user_operation_idx").on(
-      table.userId,
-      table.operation,
-    ),
   }),
 );
+
 
 export const fxRatesCache = pgTable(
   "fx_rates_cache",

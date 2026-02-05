@@ -481,7 +481,7 @@ Auth Pages Implementation Plan:
 - [x] Create locale message catalogs (`messages/en/*.json`, `messages/pl/*.json`)
 - [x] Define namespaces: `common`, `auth`, `entries`, `dashboard`, `profile`, `admin`, `validation`, `metadata`
 - [x] Add key naming conventions and ownership guidelines
-- [ ] Add checks/scripts for missing and unused translation keys
+- [x] Add checks/scripts for missing and unused translation keys
 
 ### Phase 13.3 - App shell and switching
 
@@ -548,32 +548,32 @@ Auth Pages Implementation Plan:
 
 ### Phase 14.1 - Scope and policy
 
-- [ ] Define country-aware integration policy (`country -> provider`) for FX, tax validation, and bank imports
-- [ ] Keep this phase focused on integrations and auditability (exclude deep local e-filing APIs)
-- [ ] Add feature flags for incremental country rollout
+- [x] Define country-aware integration policy (`country -> provider`) for FX, tax validation, and bank imports
+- [x] Keep this phase focused on integrations and auditability (exclude deep local e-filing APIs)
+- [x] Add feature flags for incremental country rollout
 
 ### Phase 14.2 - Provider adapters (official sources first)
 
-- [ ] Add `RateProvider` adapter interface (`getRate`, `getLatest`, `getMetadata`)
-- [ ] Add `TaxValidationProvider` interface (`validate(id, country)`)
-- [ ] Add `ECB` adapter for Eurozone users
-- [ ] Add `HMRC` adapter for UK tax workflows (monthly rates)
-- [ ] Add IRS-compatible US conversion workflow adapter (store method + source metadata)
-- [ ] Add `BoC` adapter for Canada
-- [ ] Add optional `RBA` adapter for Australia (enable only if AU launch is near-term)
-- [ ] Add EU `VIES` VAT ID validation adapter
+- [x] Add `RateProvider` adapter interface (`getRate`, `getLatest`, `getMetadata`)
+- [x] Add `TaxValidationProvider` interface (`validate(id, country)`)
+- [x] Add `ECB` adapter for Eurozone users
+- [x] Add `HMRC` adapter for UK tax workflows (monthly rates)
+- [x] Add IRS-compatible US conversion workflow adapter (store method + source metadata)
+- [x] Add `BoC` adapter for Canada
+- [x] Add optional `RBA` adapter for Australia (enable only if AU launch is near-term)
+- [x] Add EU `VIES` VAT ID validation adapter
 
 ### Phase 14.3 - Data model and auditability
 
-- [ ] Extend FX persistence with: `rateValue`, `sourceProvider`, `publishedAt`, `retrievedAt`, `rateType`, `method`
-- [ ] Persist provider response snapshot/hash for reproducibility and audit
+- [x] Extend FX persistence with: `rateValue`, `sourceProvider`, `publishedAt`, `retrievedAt`, `rateType`, `method`
+- [x] Persist provider response snapshot/hash for reproducibility and audit
 - [ ] Add effective-date normalization rules (weekend/holiday/business-day fallback)
-- [ ] Keep historical rates immutable once stored
+- [x] Keep historical rates immutable once stored
 
 ### Phase 14.4 - Resilience and fallback behavior
 
-- [ ] Add strict timeouts + retry with exponential backoff for provider calls
-- [ ] Define per-country fallback chain (official -> cached prior valid -> user warning)
+- [x] Add strict timeouts + retry with exponential backoff for provider calls
+- [x] Define per-country fallback chain (official -> cached prior valid -> user warning)
 - [ ] Add cache TTL strategy for latest rates and immutable cache for historical rates
 - [ ] Add stale-rate and provider-downtime alerting
 

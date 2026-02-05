@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useCallback } from "react";
+import { useTranslations } from "next-intl";
 
 import { deleteEntry } from "@/actions/entries";
 import {
@@ -36,6 +37,8 @@ export function DeleteEntryDialog({
   onDeleted,
   action,
 }: DeleteEntryDialogProps) {
+  const t = useTranslations("entries");
+
   const actionHandler = useCallback(
     async (prevState: DeleteEntryState, formData: FormData) => {
       const result = await (action ?? deleteEntry)(prevState, formData);
@@ -65,11 +68,12 @@ export function DeleteEntryDialog({
         <form action={formAction} className="grid gap-4">
           <input type="hidden" name="id" value={entry.id} />
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete entry</AlertDialogTitle>
+            <AlertDialogTitle>{t("deleteDialog.title")}</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently remove the entry for {entry.baseAsset} on
-              {" "}
-              {entry.date}. This action cannot be undone.
+              {t("deleteDialog.description", {
+                asset: entry.baseAsset,
+                date: entry.date,
+              })}
             </AlertDialogDescription>
           </AlertDialogHeader>
 
@@ -78,13 +82,13 @@ export function DeleteEntryDialog({
           ) : null}
 
           <AlertDialogFooter>
-            <AlertDialogCancel type="button">Cancel</AlertDialogCancel>
+            <AlertDialogCancel type="button">{t("deleteDialog.cancel")}</AlertDialogCancel>
             <Button
               type="submit"
               variant="destructive"
               disabled={isPending}
             >
-              {isPending ? "Deleting..." : "Delete entry"}
+              {isPending ? t("deleteDialog.deleting") : t("deleteDialog.confirm")}
             </Button>
           </AlertDialogFooter>
         </form>

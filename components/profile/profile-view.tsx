@@ -2,6 +2,7 @@
 
 import { useActionState, useCallback, useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import { deleteAccount, updateProfile } from "@/actions/profile";
@@ -20,7 +21,12 @@ const labelClassName = "text-xs text-muted-foreground";
 const inputClassName =
   "border-border bg-background text-sm text-foreground placeholder:text-muted-foreground";
 
-const formatDate = (value: string) => dayjs.utc(value).format("YYYY-MM-DD");
+const formatDate = (value: string, locale: string) =>
+  new Intl.DateTimeFormat(locale === "pl" ? "pl-PL" : "en-US", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(dayjs.utc(value).toDate());
 
 type ProfileViewProps = {
   profile: ProfileViewData;
@@ -34,6 +40,8 @@ export function ProfileView({
   deleteAction,
 }: ProfileViewProps) {
   const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations("profile");
   const [isRefreshing, startTransition] = useTransition();
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [profileState, setProfileState] = useState(profile);
@@ -59,7 +67,7 @@ export function ProfileView({
       const result = await (updateAction ?? updateProfile)(prevState, formData);
 
       if (result.status === "success" && result.profile) {
-        toast.success("Profile updated.");
+        toast.success(t("updatedToast"));
         setProfileState(result.profile);
         setFormValues({
           firstName: result.profile.firstName,
@@ -72,7 +80,7 @@ export function ProfileView({
 
       return result;
     },
-    [router, startTransition, updateAction],
+    [router, startTransition, t, updateAction],
   );
 
   const [state, formAction, isPending] = useActionState<
@@ -83,58 +91,54 @@ export function ProfileView({
   return (
     <div className="space-y-8 text-foreground">
       <div className="space-y-2">
-        <h1 className="text-lg font-semibold">Profile</h1>
-        <p className="text-sm text-muted-foreground">
-          Manage your personal details and account preferences.
-        </p>
-      </div>
+          <h1 className="text-lg font-semibold">{t("title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+        </div>
 
       <section className="rounded-sm border border-border bg-muted/40 p-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-semibold">Summary</h2>
-          {isRefreshing ? (
-            <span className="text-xs text-muted-foreground">Refreshing…</span>
-          ) : null}
+            <h2 className="text-sm font-semibold">{t("summary")}</h2>
+            {isRefreshing ? (
+              <span className="text-xs text-muted-foreground">{t("refreshing")}</span>
+            ) : null}
         </div>
         <div className="mt-4 grid gap-4 text-sm md:grid-cols-2">
           <div>
-            <p className="text-xs text-muted-foreground">Name</p>
+              <p className="text-xs text-muted-foreground">{t("name")}</p>
             <p>
               {profileState.firstName} {profileState.lastName}
             </p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Login</p>
+              <p className="text-xs text-muted-foreground">{t("login")}</p>
             <p>{profileState.login}</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Email</p>
+              <p className="text-xs text-muted-foreground">{t("email")}</p>
             <p>{profileState.email}</p>
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Member since</p>
-            <p>{formatDate(profileState.createdAt)}</p>
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground">Last updated</p>
-            <p>{formatDate(profileState.updatedAt)}</p>
-          </div>
+              <p className="text-xs text-muted-foreground">{t("memberSince")}</p>
+              <p>{formatDate(profileState.createdAt, locale)}</p>
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">{t("lastUpdated")}</p>
+              <p>{formatDate(profileState.updatedAt, locale)}</p>
+            </div>
         </div>
       </section>
 
       <section className="rounded-sm border border-border bg-background p-4">
         <div className="space-y-1">
-          <h2 className="text-sm font-semibold">Edit profile</h2>
-          <p className="text-xs text-muted-foreground">
-            Update your core identity details. Changes apply immediately.
-          </p>
-        </div>
+            <h2 className="text-sm font-semibold">{t("editTitle")}</h2>
+            <p className="text-xs text-muted-foreground">{t("editSubtitle")}</p>
+          </div>
 
         <form action={formAction} className="mt-4 grid gap-4">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="firstName" className={labelClassName}>
-                First name
+                {t("firstName")}
               </Label>
               <Input
                 id="firstName"
@@ -155,7 +159,7 @@ export function ProfileView({
             </div>
             <div className="space-y-2">
               <Label htmlFor="lastName" className={labelClassName}>
-                Last name
+                {t("lastName")}
               </Label>
               <Input
                 id="lastName"
@@ -178,7 +182,7 @@ export function ProfileView({
 
           <div className="space-y-2">
             <Label htmlFor="login" className={labelClassName}>
-              Login
+              {t("login")}
             </Label>
             <Input
               id="login"
@@ -201,7 +205,7 @@ export function ProfileView({
 
           <div className="space-y-2">
             <Label htmlFor="email" className={labelClassName}>
-              Email
+              {t("email")}
             </Label>
             <Input
               id="email"
@@ -233,7 +237,7 @@ export function ProfileView({
               className="bg-foreground text-background hover:bg-foreground/90"
               disabled={isPending}
             >
-              {isPending ? "Saving..." : "Save changes"}
+              {isPending ? t("saving") : t("saveChanges")}
             </Button>
           </div>
         </form>
@@ -242,12 +246,9 @@ export function ProfileView({
       <section className="rounded-sm border border-destructive/40 bg-destructive/5 p-4">
         <div className="space-y-2">
           <h2 className="text-sm font-semibold text-destructive">
-            Delete account
+            {t("deleteTitle")}
           </h2>
-          <p className="text-xs text-muted-foreground">
-            Deleting your account removes every entry, valuation, and note. This
-            action is permanent and cannot be undone.
-          </p>
+          <p className="text-xs text-muted-foreground">{t("deleteSubtitle")}</p>
         </div>
         <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-center">
           <Button
@@ -255,10 +256,10 @@ export function ProfileView({
             variant="destructive"
             onClick={() => setDeleteOpen(true)}
           >
-            Delete account
+            {t("deleteButton")}
           </Button>
           <p className="text-xs text-muted-foreground">
-            You&apos;ll share a quick reason, then confirm by typing DELETE.
+            {t("deleteHint")}
           </p>
         </div>
       </section>

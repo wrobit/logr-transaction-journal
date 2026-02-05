@@ -468,33 +468,33 @@ Auth Pages Implementation Plan:
 
 ### Phase 13.1 - Foundation and locale strategy (cookie-based)
 
-- [ ] Confirm initial locales: `en` + `pl`
-- [ ] Adopt cookie-based locale storage for the authenticated app (no locale URL prefixes)
-- [ ] Add i18n library and wiring (recommended: `next-intl`)
-- [ ] Add locale detection order: cookie -> user profile preference (optional) -> default `en`
+- [x] Confirm initial locales: `en` + `pl`
+- [x] Adopt cookie-based locale storage for the authenticated app (no locale URL prefixes)
+- [x] Add i18n library and wiring (recommended: `next-intl`)
+- [x] Add locale detection order: cookie -> user profile preference (optional) -> default `en`
 - [ ] Add fallback behavior for missing translations (warn in non-prod, safe fallback in prod)
 
 ### Phase 13.2 - Message catalog architecture
 
-- [ ] Create locale message catalogs (`messages/en/*.json`, `messages/pl/*.json`)
-- [ ] Define namespaces: `common`, `auth`, `entries`, `dashboard`, `profile`, `admin`, `validation`, `metadata`
+- [x] Create locale message catalogs (`messages/en/*.json`, `messages/pl/*.json`)
+- [x] Define namespaces: `common`, `auth`, `entries`, `dashboard`, `profile`, `admin`, `validation`, `metadata`
 - [ ] Add key naming conventions and ownership guidelines
 - [ ] Add checks/scripts for missing and unused translation keys
 
 ### Phase 13.3 - App shell and switching
 
-- [ ] Wrap root providers/layout with i18n provider and current locale
-- [ ] Add language switcher in app navigation/profile settings
-- [ ] Persist language changes to cookie and apply immediately
-- [ ] Ensure auth redirects and protected routes preserve selected locale from cookie
+- [x] Wrap root providers/layout with i18n provider and current locale
+- [x] Add language switcher in app navigation/profile settings
+- [x] Persist language changes to cookie and apply immediately
+- [x] Ensure auth redirects and protected routes preserve selected locale from cookie
 
 ### Phase 13.4 - User-facing UI translation rollout
 
-- [ ] Translate auth pages and components (`/login`, `/register`, OAuth section)
-- [ ] Translate entries page, filters, dialogs, table labels, toasts, and empty states
-- [ ] Translate dashboard labels, filters, cards, charts, and empty states
-- [ ] Translate profile, delete-account flow, and goodbye screen
-- [ ] Translate shared layout labels (navbar, buttons, generic UI copy)
+- [x] Translate auth pages and components (`/login`, `/register`, OAuth section)
+- [x] Translate entries page, filters, dialogs, table labels, toasts, and empty states
+- [x] Translate dashboard labels, filters, cards, charts, and empty states
+- [x] Translate profile, delete-account flow, and goodbye screen
+- [x] Translate shared layout labels (navbar, buttons, generic UI copy)
 
 ### Phase 13.5 - Admin area translation rollout
 
@@ -505,10 +505,10 @@ Auth Pages Implementation Plan:
 
 ### Phase 13.6 - Locale-aware formatting and metadata
 
-- [ ] Refactor formatting helpers to use active locale (number/currency/date presentation)
-- [ ] Keep accounting precision and backend calculations locale-agnostic
+- [x] Refactor formatting helpers to use active locale (number/currency/date presentation)
+- [x] Keep accounting precision and backend calculations locale-agnostic
 - [ ] Localize per-route metadata titles/descriptions where applicable
-- [ ] Verify `html lang` reflects selected locale
+- [x] Verify `html lang` reflects selected locale
 
 ### Phase 13.7 - Validation and server message localization
 
@@ -518,15 +518,15 @@ Auth Pages Implementation Plan:
 
 ### Phase 13.8 - Testing and QA
 
-- [ ] Update existing tests to avoid brittle hardcoded copy when appropriate
+- [x] Update existing tests to avoid brittle hardcoded copy when appropriate
 - [ ] Add tests for locale switching and cookie persistence
 - [ ] Add tests for translation fallback and missing keys behavior
 - [ ] Add tests for locale-specific formatting output
-- [ ] Run smoke checks for key flows in both `en` and `pl`
+- [x] Run smoke checks for key flows in both `en` and `pl`
 
 ### Phase 13.9 - Rollout and docs
 
-- [ ] Release with `en` default and `pl` enabled
+- [x] Release with `en` default and `pl` enabled
 - [ ] Add migration notes for remaining hardcoded strings
 - [ ] Document translator/developer workflow for future features
 - [ ] Define approach for adding future locales

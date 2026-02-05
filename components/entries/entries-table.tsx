@@ -1,4 +1,5 @@
 import { ArrowDown, ArrowUp, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,18 +14,18 @@ import type { EntryView } from "@/lib/entries/types";
 import { dayjs } from "@/lib/dayjs";
 import { formatNumber, formatPln } from "@/lib/format/numbers";
 
-const sortableColumns: Array<{ label: string; key: EntrySortKey }> = [
-  { label: "Created", key: "createdAt" },
-  { label: "Updated", key: "updatedAt" },
-  { label: "Operation", key: "operation" },
-  { label: "Asset", key: "baseAsset" },
-  { label: "Quantity", key: "quantity" },
-  { label: "Price", key: "pricePerUnit" },
-  { label: "Full", key: "fullPrice" },
-  { label: "Commission", key: "commission" },
-  { label: "Source", key: "source" },
-  { label: "NBP", key: "nbpRate" },
-  { label: "Value PLN", key: "valuePln" },
+const sortableColumns: Array<{ key: EntrySortKey; keyLabel: string }> = [
+  { keyLabel: "created", key: "createdAt" },
+  { keyLabel: "updated", key: "updatedAt" },
+  { keyLabel: "operation", key: "operation" },
+  { keyLabel: "asset", key: "baseAsset" },
+  { keyLabel: "quantity", key: "quantity" },
+  { keyLabel: "price", key: "pricePerUnit" },
+  { keyLabel: "full", key: "fullPrice" },
+  { keyLabel: "commission", key: "commission" },
+  { keyLabel: "source", key: "source" },
+  { keyLabel: "nbp", key: "nbpRate" },
+  { keyLabel: "valuePln", key: "valuePln" },
 ];
 
 type EntriesTableProps = {
@@ -48,10 +49,13 @@ export function EntriesTable({
   onEdit,
   onDelete,
 }: EntriesTableProps) {
+  const locale = useLocale();
+  const t = useTranslations("entries");
+
   if (entries.length === 0) {
     return (
       <div className="rounded-sm border border-border bg-muted/40 p-6 text-center text-sm text-muted-foreground">
-        No entries yet. Add your first transaction to get started.
+        {t("empty")}
       </div>
     );
   }
@@ -63,7 +67,7 @@ export function EntriesTable({
       <table className="w-full border-collapse text-left text-xs text-foreground">
         <thead className="bg-muted/50 text-[11px] uppercase tracking-wide text-muted-foreground">
           <tr>
-            <th className="px-3 py-3 font-medium">#</th>
+            <th className="px-3 py-3 font-medium">{t("table.index")}</th>
             {sortableColumns.map((column) => {
               const isActive = sortBy === column.key;
               return (
@@ -73,7 +77,7 @@ export function EntriesTable({
                     onClick={() => onSort(column.key)}
                     className="inline-flex items-center gap-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground transition hover:text-foreground"
                   >
-                    {column.label}
+                    {t(`table.${column.keyLabel}`)}
                     {isActive ? (
                       sortDir === "asc" ? (
                         <ArrowUp className="size-3" />
@@ -85,8 +89,8 @@ export function EntriesTable({
                 </th>
               );
             })}
-            <th className="px-3 py-3 font-medium">Note</th>
-            {showActions ? <th className="px-3 py-3 font-medium">Actions</th> : null}
+            <th className="px-3 py-3 font-medium">{t("table.note")}</th>
+            {showActions ? <th className="px-3 py-3 font-medium">{t("table.actions")}</th> : null}
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
@@ -117,30 +121,30 @@ export function EntriesTable({
                 {entry.baseAsset} / {entry.quoteCurrency}
               </td>
               <td className="px-3 py-3">
-                {formatNumber(Number(entry.quantity))}
+                  {formatNumber(Number(entry.quantity), undefined, locale)}
               </td>
               <td className="px-3 py-3">
-                {formatNumber(Number(entry.pricePerUnit))}
+                  {formatNumber(Number(entry.pricePerUnit), undefined, locale)}
               </td>
               <td className="px-3 py-3">
-                {formatNumber(Number(entry.fullPrice))}
+                  {formatNumber(Number(entry.fullPrice), undefined, locale)}
               </td>
               <td className="px-3 py-3 text-muted-foreground">
                 {entry.commission
-                  ? formatNumber(Number(entry.commission))
-                  : "—"}
+                    ? formatNumber(Number(entry.commission), undefined, locale)
+                    : "-"}
               </td>
               <td className="px-3 py-3 text-muted-foreground">
-                {entry.source ?? "—"}
+                {entry.source ?? "-"}
               </td>
               <td className="px-3 py-3 text-muted-foreground">
-                {formatNumber(Number(entry.nbpRate))}
+                {formatNumber(Number(entry.nbpRate), undefined, locale)}
               </td>
               <td className="px-3 py-3">
-                {formatPln(Number(entry.valuePln))}
+                {formatPln(Number(entry.valuePln), locale)}
               </td>
               <td className="px-3 py-3 text-muted-foreground">
-                {entry.note ?? "—"}
+                {entry.note ?? "-"}
               </td>
               {showActions ? (
                 <td className="px-3 py-3 text-right">
@@ -150,7 +154,7 @@ export function EntriesTable({
                         type="button"
                         variant="ghost"
                         size="icon"
-                        aria-label="Open entry actions"
+                          aria-label={t("table.openActions")}
                       >
                         <MoreHorizontal />
                       </Button>
@@ -158,14 +162,14 @@ export function EntriesTable({
                     <DropdownMenuContent align="end">
                       <DropdownMenuItem onSelect={() => onEdit?.(entry)}>
                         <Pencil />
-                        Edit entry
+                        {t("table.edit")}
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         variant="destructive"
                         onSelect={() => onDelete?.(entry)}
                       >
                         <Trash2 />
-                        Delete entry
+                        {t("table.delete")}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>

@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import {
   Bar,
   BarChart,
@@ -64,6 +65,8 @@ type DashboardViewProps = {
 
 export function DashboardView({ data, query }: DashboardViewProps) {
   const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations("dashboard");
   const [isPending, startTransition] = useTransition();
 
   const assets = useMemo(() => data.assets, [data.assets]);
@@ -100,7 +103,8 @@ export function DashboardView({ data, query }: DashboardViewProps) {
   const hasSeries = data.series.length > 0;
   const hasHoldings = data.holdings.length > 0;
   const hasHoldingsMix = data.holdingsMix.length > 0;
-  const axisFormatter = (value: number) => formatNumber(value, { maximumFractionDigits: 0 });
+  const axisFormatter = (value: number) =>
+    formatNumber(value, { maximumFractionDigits: 0 }, locale);
   const dateTickFormatter = (value: string | number) =>
     dayjs(value).format("MM-DD");
   const pnlPercent = totals.buyValue ? (totals.pnlValue / totals.buyValue) * 100 : null;
@@ -108,7 +112,7 @@ export function DashboardView({ data, query }: DashboardViewProps) {
     ? "—"
     : `${pnlPercent > 0 ? "+" : ""}${formatNumber(pnlPercent, {
         maximumFractionDigits: 1,
-      })}%`;
+      }, locale)}%`;
   const holdingsMixConfig = useMemo(
     () =>
       data.holdingsMix.reduce<ChartConfig>((config, entry, index) => {
@@ -133,31 +137,29 @@ export function DashboardView({ data, query }: DashboardViewProps) {
     <div className="space-y-6 text-foreground">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-lg font-semibold">Dashboard</h1>
-          <p className="text-sm text-muted-foreground">
-            Realized PnL overview with asset-level breakdowns.
-          </p>
+          <h1 className="text-lg font-semibold">{t("title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {isPending ? <span className="text-xs text-muted-foreground">Refreshing…</span> : null}
+          {isPending ? <span className="text-xs text-muted-foreground">{t("refreshing")}</span> : null}
           <Select value={query.range} onValueChange={handleRangeChange}>
             <SelectTrigger size="sm" className="min-w-[120px]">
-              <SelectValue placeholder="Range" />
+              <SelectValue placeholder={t("range")} />
             </SelectTrigger>
             <SelectContent align="end">
               {DASHBOARD_RANGE_OPTIONS.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
-                  {option.label}
+                  {t(`ranges.${option.value}`)}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
           <Select value={assetValue} onValueChange={handleAssetChange}>
             <SelectTrigger size="sm" className="min-w-[140px]">
-              <SelectValue placeholder="All assets" />
+              <SelectValue placeholder={t("allAssets")} />
             </SelectTrigger>
             <SelectContent align="end">
-              <SelectItem value="all">All assets</SelectItem>
+              <SelectItem value="all">{t("allAssets")}</SelectItem>
               {assets.map((asset) => (
                 <SelectItem key={asset} value={asset}>
                   {asset}
@@ -169,17 +171,21 @@ export function DashboardView({ data, query }: DashboardViewProps) {
       </div>
 
       <div className="grid gap-3 md:grid-cols-3">
-        <KpiCard label="Total buys" value={formatPln(totals.buyValue)} subtitle="Realized cost" />
         <KpiCard
-          label="Total sells"
-          value={formatPln(totals.sellValue)}
-          subtitle="Realized proceeds"
+          label={t("kpi.totalBuys")}
+          value={formatPln(totals.buyValue, locale)}
+          subtitle={t("kpi.realizedCost")}
         />
         <KpiCard
-          label="Realized PnL"
-          value={formatPln(totals.pnlValue)}
+          label={t("kpi.totalSells")}
+          value={formatPln(totals.sellValue, locale)}
+          subtitle={t("kpi.realizedProceeds")}
+        />
+        <KpiCard
+          label={t("kpi.realizedPnl")}
+          value={formatPln(totals.pnlValue, locale)}
           secondaryValue={pnlPercentLabel}
-          subtitle="Buy vs sell difference"
+          subtitle={t("kpi.difference")}
           highlight={totals.pnlValue >= 0 ? "positive" : "negative"}
         />
       </div>
@@ -188,7 +194,7 @@ export function DashboardView({ data, query }: DashboardViewProps) {
         <Card className={cn("md:col-span-8", isPending && "opacity-60")}>
           <CardHeader className="border-b border-border/60">
             <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
-              PnL over time
+              {t("panels.pnlOverTime")}
             </div>
           </CardHeader>
           <CardContent className="h-[260px]">
@@ -221,7 +227,7 @@ export function DashboardView({ data, query }: DashboardViewProps) {
                 </LineChart>
               </ChartContainer>
             ) : (
-              <EmptyPanel message="No PnL data for this range." />
+                <EmptyPanel message={t("empty.pnl")} />
             )}
           </CardContent>
         </Card>
@@ -229,7 +235,7 @@ export function DashboardView({ data, query }: DashboardViewProps) {
         <Card className={cn("md:col-span-4", isPending && "opacity-60")}>
           <CardHeader className="border-b border-border/60">
             <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
-              Holdings mix
+              {t("panels.holdingsMix")}
             </div>
           </CardHeader>
           <CardContent className="h-[260px]">
@@ -253,7 +259,7 @@ export function DashboardView({ data, query }: DashboardViewProps) {
                 </PieChart>
               </ChartContainer>
             ) : (
-              <EmptyPanel message="No holdings mix available." />
+                <EmptyPanel message={t("empty.holdingsMix")} />
             )}
           </CardContent>
         </Card>
@@ -263,7 +269,7 @@ export function DashboardView({ data, query }: DashboardViewProps) {
         <Card className={cn("md:col-span-7", isPending && "opacity-60")}>
           <CardHeader className="border-b border-border/60">
             <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
-              Buy vs sell volume
+              {t("panels.buyVsSellVolume")}
             </div>
           </CardHeader>
           <CardContent className="h-[240px]">
@@ -303,7 +309,7 @@ export function DashboardView({ data, query }: DashboardViewProps) {
                 </BarChart>
               </ChartContainer>
             ) : (
-              <EmptyPanel message="No volume data for this range." />
+                <EmptyPanel message={t("empty.volume")} />
             )}
           </CardContent>
         </Card>
@@ -311,7 +317,7 @@ export function DashboardView({ data, query }: DashboardViewProps) {
         <Card className={cn("md:col-span-5", isPending && "opacity-60")}>
           <CardHeader className="border-b border-border/60">
             <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
-              Holdings by asset
+              {t("panels.holdingsByAsset")}
             </div>
           </CardHeader>
           <CardContent>
@@ -320,10 +326,10 @@ export function DashboardView({ data, query }: DashboardViewProps) {
                 <table className="w-full border-collapse text-left text-xs">
                   <thead className="text-[11px] uppercase tracking-wide text-muted-foreground">
                     <tr>
-                      <th className="py-2 pr-2">Asset</th>
-                      <th className="py-2 pr-2">Net qty</th>
-                      <th className="py-2 pr-2">Buy PLN</th>
-                      <th className="py-2">PnL PLN</th>
+                      <th className="py-2 pr-2">{t("holdingsTable.asset")}</th>
+                      <th className="py-2 pr-2">{t("holdingsTable.netQty")}</th>
+                      <th className="py-2 pr-2">{t("holdingsTable.buyPln")}</th>
+                      <th className="py-2">{t("holdingsTable.pnlPln")}</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border">
@@ -333,16 +339,16 @@ export function DashboardView({ data, query }: DashboardViewProps) {
                         <td className="py-2 pr-2">
                           {formatNumber(holding.netQuantity, {
                             maximumFractionDigits: 6,
-                          })}
+                          }, locale)}
                         </td>
-                        <td className="py-2 pr-2">{formatPln(holding.buyValue)}</td>
+                        <td className="py-2 pr-2">{formatPln(holding.buyValue, locale)}</td>
                         <td
                           className={cn(
                             "py-2",
                             holding.pnlValue >= 0 ? "text-emerald-300" : "text-red-300"
                           )}
                         >
-                          {formatPln(holding.pnlValue)}
+                          {formatPln(holding.pnlValue, locale)}
                         </td>
                       </tr>
                     ))}
@@ -350,7 +356,7 @@ export function DashboardView({ data, query }: DashboardViewProps) {
                 </table>
               </div>
             ) : (
-              <EmptyPanel message="No holdings yet." />
+                <EmptyPanel message={t("empty.holdings")} />
             )}
           </CardContent>
         </Card>
@@ -360,7 +366,7 @@ export function DashboardView({ data, query }: DashboardViewProps) {
         <Card className={cn("md:col-span-12", isPending && "opacity-60")}>
           <CardHeader className="border-b border-border/60">
             <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
-              Buy vs sell by asset
+              {t("panels.buyVsSellByAsset")}
             </div>
           </CardHeader>
           <CardContent className="h-[260px]">
@@ -396,7 +402,7 @@ export function DashboardView({ data, query }: DashboardViewProps) {
                 </BarChart>
               </ChartContainer>
             ) : (
-              <EmptyPanel message="No asset volume data yet." />
+                <EmptyPanel message={t("empty.assetVolume")} />
             )}
           </CardContent>
         </Card>

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { signIn } from "next-auth/react";
 
 import { OauthButtons } from "@/components/auth/oauth-buttons";
@@ -13,6 +14,7 @@ import { Separator } from "@/components/ui/separator";
 
 export function LoginForm() {
   const router = useRouter();
+  const t = useTranslations("auth");
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -37,7 +39,7 @@ export function LoginForm() {
     });
 
     if (result?.error) {
-      setError("Invalid email or password.");
+      setError(t("loginError"));
       setIsSubmitting(false);
       return;
     }
@@ -49,9 +51,9 @@ export function LoginForm() {
   return (
     <div className="space-y-6">
       <div className="space-y-2 text-center">
-        <h1 className="text-xl font-semibold">Welcome to Entry</h1>
+        <h1 className="text-xl font-semibold">{t("loginTitle")}</h1>
         <p className="text-sm text-muted-foreground">
-          Minimal crypto journaling for accurate tracking.
+          {t("loginSubtitle")}
         </p>
       </div>
 
@@ -59,15 +61,15 @@ export function LoginForm() {
 
       <div className="flex items-center gap-3 text-xs text-muted-foreground">
         <Separator className="flex-1 bg-border" />
-        <span>or continue with email</span>
+        <span>{t("orContinueEmail")}</span>
         <Separator className="flex-1 bg-border" />
       </div>
 
       <form className="space-y-4" onSubmit={handleSubmit}>
         <div className="space-y-2">
-          <Label htmlFor="email" className={labelClassName}>
-            Email
-          </Label>
+            <Label htmlFor="email" className={labelClassName}>
+              {t("email")}
+            </Label>
           <Input
             id="email"
             name="email"
@@ -79,9 +81,9 @@ export function LoginForm() {
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="password" className={labelClassName}>
-            Password
-          </Label>
+            <Label htmlFor="password" className={labelClassName}>
+              {t("password")}
+            </Label>
           <Input
             id="password"
             name="password"
@@ -100,14 +102,14 @@ export function LoginForm() {
           className="w-full bg-foreground text-background hover:bg-foreground/90"
           disabled={isSubmitting}
         >
-          {isSubmitting ? "Signing in..." : "Continue"}
+          {isSubmitting ? t("signingIn") : t("continue")}
         </Button>
       </form>
 
       <p className="text-center text-xs text-muted-foreground">
-        Don&apos;t have an account?{" "}
+        {t("noAccount")} {" "}
         <Link href="/register" className="text-foreground hover:text-foreground">
-          Register
+          {t("register")}
         </Link>
       </p>
     </div>

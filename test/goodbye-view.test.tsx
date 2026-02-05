@@ -1,11 +1,12 @@
-import { render, screen } from "@testing-library/react";
+import { screen } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 
 import { GoodbyeView } from "@/components/profile/goodbye-view";
+import { renderWithIntl } from "@/test/utils/render-with-intl";
 
 describe("GoodbyeView", () => {
   it("renders confirmation copy and CTAs", () => {
-    render(<GoodbyeView />);
+    renderWithIntl(<GoodbyeView />);
 
     expect(screen.getByText("Account deleted")).toBeInTheDocument();
     expect(screen.getByText("All set")).toBeInTheDocument();

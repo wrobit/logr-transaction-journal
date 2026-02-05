@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { cookies } from "next/headers";
 import { Geist, Geist_Mono, Figtree } from "next/font/google";
 import { getServerSession } from "next-auth";
 
@@ -6,6 +7,12 @@ import { AppShell } from "@/components/layout/app-shell";
 import { Providers } from "@/components/layout/providers";
 import { FooterTicker } from "@/components/ticker/footer-ticker";
 import { authOptions } from "@/lib/auth/options";
+import {
+  DEFAULT_LOCALE,
+  LOCALE_COOKIE_NAME,
+  isAppLocale,
+} from "@/lib/i18n/config";
+import { getLocaleMessages } from "@/lib/i18n/messages";
 import "./globals.css";
 
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
@@ -74,13 +81,18 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const localeCookie = cookieStore.get(LOCALE_COOKIE_NAME)?.value;
+  const locale = isAppLocale(localeCookie) ? localeCookie : DEFAULT_LOCALE;
+  const messages = await getLocaleMessages(locale);
+
   const session = await getServerSession(authOptions);
   const showTicker = Boolean(session?.user?.id);
 
   return (
-    <html lang="en" className={`${figtree.variable} dark`}>
+    <html lang={locale} className={`${figtree.variable} dark`}>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Providers session={session}>
+        <Providers session={session} locale={locale} messages={messages}>
           <AppShell showTicker={showTicker}>{children}</AppShell>
         </Providers>
         {showTicker ? <FooterTicker /> : null}

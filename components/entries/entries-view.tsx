@@ -2,6 +2,7 @@
 
 import { useCallback, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import { AddEntryDialog } from "@/components/entries/add-entry-dialog";
@@ -30,6 +31,8 @@ export function EntriesView({
   enableActions = true,
 }: EntriesViewProps) {
   const router = useRouter();
+  const locale = useLocale();
+  const t = useTranslations("entries");
   const [isPending, startTransition] = useTransition();
   const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
   const currentPage = Math.min(query.page, totalPages);
@@ -68,25 +71,25 @@ export function EntriesView({
   const [deletingEntry, setDeletingEntry] = useState<EntryView | null>(null);
 
   const handleCreated = useCallback(
-    (_entry: EntryView) => {
-      toast.success("Entry added successfully.");
+    () => {
+      toast.success(t("createdSuccess"));
       startTransition(() => router.refresh());
     },
-    [router, startTransition],
+    [router, startTransition, t],
   );
 
   const handleUpdated = useCallback(
-    (_entry: EntryView) => {
-      toast.success("Entry updated successfully.");
+    () => {
+      toast.success(t("updatedSuccess"));
       startTransition(() => router.refresh());
     },
-    [router, startTransition],
+    [router, startTransition, t],
   );
 
   const handleDeleted = useCallback(() => {
-    toast.success("Entry deleted successfully.");
+    toast.success(t("deletedSuccess"));
     startTransition(() => router.refresh());
-  }, [router, startTransition]);
+  }, [router, startTransition, t]);
 
   const handleEdit = useCallback((entry: EntryView) => {
     setEditingEntry(entry);
@@ -120,14 +123,12 @@ export function EntriesView({
     <div className="space-y-6 text-foreground">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-lg font-semibold">Entries</h1>
-          <p className="text-sm text-muted-foreground">
-            Track every transaction with deterministic PLN valuation.
-          </p>
+          <h1 className="text-lg font-semibold">{t("title")}</h1>
+          <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
         </div>
         <div className="flex items-center gap-3">
           {isPending ? (
-            <span className="text-xs text-muted-foreground">Refreshing…</span>
+            <span className="text-xs text-muted-foreground">{t("refreshing")}</span>
           ) : null}
           {enableActions ? <AddEntryDialog onCreated={handleCreated} /> : null}
         </div>
@@ -139,7 +140,7 @@ export function EntriesView({
             htmlFor="start-date"
             className="text-[11px] uppercase tracking-wide text-muted-foreground"
           >
-            Start date
+            {t("startDate")}
           </label>
           <input
             id="start-date"
@@ -159,7 +160,7 @@ export function EntriesView({
             htmlFor="end-date"
             className="text-[11px] uppercase tracking-wide text-muted-foreground"
           >
-            End date
+            {t("endDate")}
           </label>
           <input
             id="end-date"
@@ -179,7 +180,7 @@ export function EntriesView({
             htmlFor="asset-filter"
             className="text-[11px] uppercase tracking-wide text-muted-foreground"
           >
-            Asset
+            {t("asset")}
           </label>
           <select
             id="asset-filter"
@@ -194,7 +195,7 @@ export function EntriesView({
             }
             className="h-8 w-full rounded-none border border-border bg-background px-2 text-xs text-foreground"
           >
-            <option value="all">All assets</option>
+            <option value="all">{t("allAssets")}</option>
             {assets.map((asset) => (
               <option key={asset} value={asset}>
                 {asset}
@@ -207,7 +208,7 @@ export function EntriesView({
             htmlFor="operation-filter"
             className="text-[11px] uppercase tracking-wide text-muted-foreground"
           >
-            Operation
+            {t("operation")}
           </label>
           <select
             id="operation-filter"
@@ -225,20 +226,18 @@ export function EntriesView({
             }
             className="h-8 w-full rounded-none border border-border bg-background px-2 text-xs text-foreground"
           >
-            <option value="all">All operations</option>
-            <option value="BUY">Buy</option>
-            <option value="SELL">Sell</option>
+            <option value="all">{t("allOperations")}</option>
+            <option value="BUY">{t("buy")}</option>
+            <option value="SELL">{t("sell")}</option>
           </select>
         </div>
       </div>
 
       <div className="flex items-center justify-between text-xs text-muted-foreground">
         <span>
-          Showing {entries.length} of {totalCount} entries
+          {t("showing", { shown: entries.length, total: totalCount })}
         </span>
-        <span>
-          Page {currentPage} of {totalPages}
-        </span>
+        <span>{t("page", { current: currentPage, total: totalPages })}</span>
       </div>
 
       <div aria-busy={isPending} aria-live="polite">
@@ -261,11 +260,11 @@ export function EntriesView({
           disabled={isPending || currentPage === 1}
           className="rounded-none border border-border px-3 py-2 text-xs text-foreground disabled:opacity-40"
         >
-          Previous
+          {t("previous")}
         </button>
         <div className="flex items-center gap-2">
-          <span className="text-muted-foreground">Rows per page:</span>
-          <span>{formatNumber(pageSize)}</span>
+          <span className="text-muted-foreground">{t("rowsPerPage")}</span>
+          <span>{formatNumber(pageSize, undefined, locale)}</span>
         </div>
         <button
           type="button"
@@ -273,7 +272,7 @@ export function EntriesView({
           disabled={isPending || currentPage >= totalPages}
           className="rounded-none border border-border px-3 py-2 text-xs text-foreground disabled:opacity-40"
         >
-          Next
+          {t("next")}
         </button>
       </div>
 

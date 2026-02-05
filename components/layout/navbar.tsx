@@ -3,8 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
+import { useTranslations } from "next-intl";
 import { UserIcon } from "lucide-react";
 
+import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -17,6 +19,7 @@ import {
 export function Navbar() {
   const { data: session } = useSession();
   const isAdmin = session?.user?.role === "admin";
+  const t = useTranslations("nav");
 
   return (
     <header className="border-b border-border bg-background/90 px-6 py-4 text-foreground backdrop-blur">
@@ -34,20 +37,21 @@ export function Navbar() {
           </Link>
           <nav className="flex items-center gap-4 text-xs text-muted-foreground">
             <Link href="/" className="transition hover:text-foreground">
-              Entries
+              {t("entries")}
             </Link>
             <Link href="/dashboard" className="transition hover:text-foreground">
-              Dashboard
+              {t("dashboard")}
             </Link>
             {isAdmin ? (
               <Link href="/admin" className="transition hover:text-foreground">
-                Admin
+                {t("admin")}
               </Link>
             ) : null}
           </nav>
         </div>
 
         <div className="flex items-center gap-3">
+          <LocaleSwitcher />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
@@ -64,7 +68,7 @@ export function Navbar() {
               className="w-44 border border-border bg-popover text-popover-foreground shadow-xl"
             >
               <DropdownMenuItem className="text-muted-foreground" asChild>
-                <Link href="/profile">Profile</Link>
+                <Link href="/profile">{t("profile")}</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator className="bg-border" />
               <DropdownMenuItem
@@ -72,7 +76,7 @@ export function Navbar() {
                 variant="destructive"
                 onClick={() => signOut({ callbackUrl: "/login" })}
               >
-                Logout
+                {t("logout")}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

@@ -1,9 +1,10 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { screen, fireEvent } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { EntriesView } from "@/components/entries/entries-view";
 import type { EntryQuery } from "@/lib/entries/query";
 import type { EntryView } from "@/lib/entries/types";
+import { renderWithIntl } from "@/test/utils/render-with-intl";
 
 const push = vi.fn();
 const refresh = vi.fn();
@@ -67,7 +68,7 @@ describe("EntriesView", () => {
   });
 
   it("updates query params on asset filter", () => {
-    render(
+    renderWithIntl(
       <EntriesView
         entries={entries}
         assets={["SOL", "BTC"]}
@@ -92,7 +93,7 @@ describe("EntriesView", () => {
       baseAsset: `ASSET-${index + 1}`,
     }));
 
-    render(
+    renderWithIntl(
       <EntriesView
         entries={manyEntries}
         assets={["SOL", "BTC"]}

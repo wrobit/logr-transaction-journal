@@ -12,6 +12,7 @@
     "start": "next start",
     "lint": "eslint",
     "type:check": "tsc --noEmit",
+    "i18n:check": "node scripts/check-i18n-keys.mjs",
     "test": "vitest",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",

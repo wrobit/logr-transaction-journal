@@ -9,5 +9,13 @@ const localeMessagesLoaders: Record<AppLocale, () => Promise<AbstractIntlMessage
 
 export async function getLocaleMessages(locale: AppLocale) {
   const loader = localeMessagesLoaders[locale] ?? localeMessagesLoaders[DEFAULT_LOCALE];
-  return loader();
+
+  try {
+    return await loader();
+  } catch (error) {
+    if (process.env.NODE_ENV !== "production") {
+      console.warn(`Failed to load locale messages for \"${locale}\". Falling back to \"${DEFAULT_LOCALE}\".`, error);
+    }
+    return localeMessagesLoaders[DEFAULT_LOCALE]();
+  }
 }

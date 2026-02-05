@@ -1,7 +1,7 @@
 import { dayjs } from "@/lib/dayjs";
 import type { AdminAuditRow } from "@/actions/admin-audit";
-import { getAdminAuditActionLabel } from "@/lib/admin/audit-query";
 import { Badge } from "@/components/ui/badge";
+import { useTranslations } from "next-intl";
 
 const formatDateTime = (value: Date) => dayjs.utc(value).format("YYYY-MM-DD HH:mm");
 
@@ -20,10 +20,25 @@ const formatMetadata = (metadata: Record<string, unknown> | null) => {
 };
 
 export function AdminAuditTable({ rows }: AdminAuditTableProps) {
+  const t = useTranslations("admin.audit");
+
+  const actionLabel = (action: string) => {
+    if (action === "user.deactivated") {
+      return t("actionLabels.userDeactivated");
+    }
+    if (action === "user.restored") {
+      return t("actionLabels.userRestored");
+    }
+    if (action === "entries.purged") {
+      return t("actionLabels.entriesPurged");
+    }
+    return action;
+  };
+
   if (rows.length === 0) {
     return (
       <div className="rounded-sm border border-border bg-muted/40 p-6 text-center text-sm text-muted-foreground">
-        No audit activity for this filter.
+        {t("empty")}
       </div>
     );
   }
@@ -33,11 +48,11 @@ export function AdminAuditTable({ rows }: AdminAuditTableProps) {
       <table className="w-full border-collapse text-left text-xs text-foreground">
         <thead className="bg-muted/50 text-[11px] uppercase tracking-wide text-muted-foreground">
           <tr>
-            <th className="px-3 py-3 font-medium">Timestamp</th>
-            <th className="px-3 py-3 font-medium">Action</th>
-            <th className="px-3 py-3 font-medium">Actor</th>
-            <th className="px-3 py-3 font-medium">Target</th>
-            <th className="px-3 py-3 font-medium">Details</th>
+            <th className="px-3 py-3 font-medium">{t("columns.timestamp")}</th>
+            <th className="px-3 py-3 font-medium">{t("columns.action")}</th>
+            <th className="px-3 py-3 font-medium">{t("columns.actor")}</th>
+            <th className="px-3 py-3 font-medium">{t("columns.target")}</th>
+            <th className="px-3 py-3 font-medium">{t("columns.details")}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
@@ -47,7 +62,7 @@ export function AdminAuditTable({ rows }: AdminAuditTableProps) {
                 {formatDateTime(row.createdAt)}
               </td>
               <td className="px-3 py-3">
-                <Badge variant="secondary">{getAdminAuditActionLabel(row.action)}</Badge>
+                <Badge variant="secondary">{actionLabel(row.action)}</Badge>
               </td>
               <td className="px-3 py-3 text-muted-foreground">
                 <div className="space-y-1">

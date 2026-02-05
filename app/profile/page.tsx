@@ -5,11 +5,15 @@ import { redirect } from "next/navigation";
 import { getProfile } from "@/actions/profile";
 import { ProfileView } from "@/components/profile/profile-view";
 import { authOptions } from "@/lib/auth/options";
+import { getServerTranslator } from "@/lib/i18n/translate";
 
-export const metadata: Metadata = {
-  title: "Profile",
-  description: "Manage your Logr account details and settings.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerTranslator();
+  return {
+    title: t("metadata.profile.title"),
+    description: t("metadata.profile.description"),
+  };
+}
 
 export default async function ProfilePage() {
   const session = await getServerSession(authOptions);

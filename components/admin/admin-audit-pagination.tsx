@@ -2,6 +2,7 @@
 
 import { useCallback, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 
@@ -11,6 +12,7 @@ type AdminAuditPaginationProps = {
 };
 
 export function AdminAuditPagination({ page, totalPages }: AdminAuditPaginationProps) {
+  const t = useTranslations("admin.common");
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
@@ -40,7 +42,7 @@ export function AdminAuditPagination({ page, totalPages }: AdminAuditPaginationP
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
       <span>
-        Page {page} of {totalPages}
+        {t("page", { page, total: totalPages })}
       </span>
       <div className="flex items-center gap-2">
         <Button
@@ -50,7 +52,7 @@ export function AdminAuditPagination({ page, totalPages }: AdminAuditPaginationP
           disabled={page <= 1 || isPending}
           onClick={() => updatePage(page - 1)}
         >
-          Previous
+          {t("previous")}
         </Button>
         <Button
           type="button"
@@ -59,7 +61,7 @@ export function AdminAuditPagination({ page, totalPages }: AdminAuditPaginationP
           disabled={page >= totalPages || isPending}
           onClick={() => updatePage(page + 1)}
         >
-          Next
+          {t("next")}
         </Button>
       </div>
     </div>

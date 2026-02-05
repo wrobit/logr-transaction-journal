@@ -68,8 +68,8 @@ export function EntriesTable({
   const formatDate = (value: string) => dayjs(value).format("YYYY-MM-DD");
 
   return (
-    <div className="overflow-hidden rounded-sm border border-border">
-      <table className="w-full border-collapse text-left text-xs text-foreground">
+    <div className="overflow-x-auto overflow-y-hidden rounded-sm border border-border">
+      <table className="min-w-[1100px] w-full border-collapse text-left text-xs text-foreground">
         <thead className="bg-muted/50 text-[11px] uppercase tracking-wide text-muted-foreground">
           <tr>
             <th className="px-3 py-3 font-medium">{t("table.index")}</th>

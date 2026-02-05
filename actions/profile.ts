@@ -15,6 +15,8 @@ import {
 import { db } from "@/lib/db";
 import { feedbacks, users } from "@/lib/db/schema";
 import { dayjs } from "@/lib/dayjs";
+import { translateValidationMessage } from "@/lib/i18n/errors";
+import { getServerTranslator } from "@/lib/i18n/translate";
 import type { DeleteAccountState, UpdateProfileState } from "@/lib/profile/actions";
 import { serializeProfile } from "@/lib/profile/serialize";
 import type { ProfileView } from "@/lib/profile/types";
@@ -48,12 +50,12 @@ const buildProfileInput = (formData: FormData) => ({
   displayCurrency: String(formData.get("displayCurrency") ?? "PLN"),
 });
 
-const getValidationErrors = (error: z.ZodError) => {
+const getValidationErrors = (error: z.ZodError, t: (key: string) => string) => {
   const errors: Record<string, string> = {};
   for (const issue of error.issues) {
     const field = issue.path[0];
     if (typeof field === "string" && !errors[field]) {
-      errors[field] = issue.message;
+      errors[field] = translateValidationMessage(issue.message, t);
     }
   }
   return errors;
@@ -63,12 +65,13 @@ export async function updateProfile(
   _prevState: UpdateProfileState,
   formData: FormData,
 ): Promise<UpdateProfileState> {
+  const t = await getServerTranslator();
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
     return {
       status: "error",
-      message: "You must be signed in to update your profile.",
+      message: t("errors.authRequiredProfileUpdate"),
     };
   }
 
@@ -77,7 +80,7 @@ export async function updateProfile(
   if (!userId) {
     return {
       status: "error",
-      message: "User record missing. Please sign in again.",
+      message: t("errors.userMissing"),
     };
   }
 
@@ -85,7 +88,7 @@ export async function updateProfile(
   const parsed = profileUpdateSchema.safeParse(rawInput);
 
   if (!parsed.success) {
-    return { status: "error", errors: getValidationErrors(parsed.error) };
+    return { status: "error", errors: getValidationErrors(parsed.error, t) };
   }
 
   const existingUser = await getUserById(userId);
@@ -93,7 +96,7 @@ export async function updateProfile(
   if (!existingUser) {
     return {
       status: "error",
-      message: "User record missing. Please sign in again.",
+      message: t("errors.userMissing"),
     };
   }
 
@@ -109,11 +112,11 @@ export async function updateProfile(
   const uniqueErrors: Record<string, string> = {};
 
   if (emailOwner && emailOwner.id !== userId) {
-    uniqueErrors.email = "Email is already in use.";
+    uniqueErrors.email = t("errors.emailInUse");
   }
 
   if (loginOwner && loginOwner.id !== userId) {
-    uniqueErrors.login = "Login is already in use.";
+    uniqueErrors.login = t("errors.loginInUse");
   }
 
   if (Object.keys(uniqueErrors).length > 0) {
@@ -134,7 +137,7 @@ export async function updateProfile(
     .returning();
 
   if (!updated) {
-    return { status: "error", message: "Profile not found." };
+    return { status: "error", message: t("errors.profileNotFound") };
   }
 
   revalidatePath("/profile");
@@ -149,12 +152,13 @@ export async function deleteAccount(
   _prevState: DeleteAccountState,
   formData: FormData,
 ): Promise<DeleteAccountState> {
+  const t = await getServerTranslator();
   const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
     return {
       status: "error",
-      message: "You must be signed in to delete your account.",
+      message: t("errors.authRequiredProfileUpdate"),
     };
   }
 
@@ -163,7 +167,7 @@ export async function deleteAccount(
   if (!userId) {
     return {
       status: "error",
-      message: "User record missing. Please sign in again.",
+      message: t("errors.userMissing"),
     };
   }
 
@@ -176,7 +180,7 @@ export async function deleteAccount(
   if (!parsed.success) {
     return {
       status: "error",
-      message: "Type DELETE to confirm account deletion.",
+      message: t("validation.typeDelete"),
     };
   }
 
@@ -199,7 +203,7 @@ export async function deleteAccount(
     .returning({ id: users.id });
 
   if (!deleted) {
-    return { status: "error", message: "Account not found." };
+    return { status: "error", message: t("errors.profileNotFound") };
   }
 
   revalidatePath("/");

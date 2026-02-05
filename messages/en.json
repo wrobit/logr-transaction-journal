@@ -214,5 +214,231 @@
       "createNew": "Create new account",
       "signIn": "Sign in"
     }
+  },
+  "admin": {
+    "nav": {
+      "overview": "Overview",
+      "users": "Users",
+      "feedback": "Feedback",
+      "audit": "Audit"
+    },
+    "layout": {
+      "title": "Admin console",
+      "subtitle": "Monitor platform activity, users, and operational signals."
+    },
+    "common": {
+      "dash": "-",
+      "refreshing": "Refreshing...",
+      "page": "Page {page} of {total}",
+      "previous": "Previous",
+      "next": "Next",
+      "resetFilters": "Reset filters"
+    },
+    "users": {
+      "title": "Users",
+      "subtitle": "Review accounts, update status, and purge entries when needed.",
+      "summary": "{count} users · showing page {page}",
+      "searchPlaceholder": "Search by name, email, login",
+      "statusPlaceholder": "Status",
+      "allUsers": "All users",
+      "active": "Active",
+      "deleted": "Deleted",
+      "empty": "No users match this filter.",
+      "columns": {
+        "user": "User",
+        "role": "Role",
+        "entries": "Entries",
+        "created": "Created",
+        "lastLogin": "Last login",
+        "status": "Status",
+        "actions": "Actions"
+      },
+      "roleAdmin": "Admin",
+      "roleUser": "User",
+      "restoreTitle": "Restore account",
+      "restoreDescription": "This restores user access and reactivates the account.",
+      "restore": "Restore",
+      "restored": "User restored.",
+      "deactivateTitle": "Deactivate account",
+      "deactivateDescription": "This disables access for the user until restored.",
+      "deactivate": "Deactivate",
+      "deactivated": "User deactivated.",
+      "purgeTitle": "Purge entries",
+      "purgeDescription": "This permanently removes all entries for this user.",
+      "purge": "Purge entries",
+      "purged": "Entries purged.",
+      "selfGuard": "You cannot change your own status."
+    },
+    "userDetail": {
+      "summaryTitle": "Account summary",
+      "login": "Login",
+      "role": "Role",
+      "created": "Created",
+      "lastLogin": "Last login",
+      "updated": "Updated",
+      "status": "Status",
+      "entriesTitle": "Entries",
+      "entriesSubtitle": "Latest 50 entries associated with this user.",
+      "entriesEmpty": "No entries recorded for this user.",
+      "columns": {
+        "date": "Date",
+        "operation": "Operation",
+        "asset": "Asset",
+        "quantity": "Quantity",
+        "value": "Value {currency}",
+        "source": "Source"
+      },
+      "buy": "Buy",
+      "sell": "Sell"
+    },
+    "feedback": {
+      "title": "Feedback",
+      "subtitle": "Review account deletion feedback and export records.",
+      "exportCsv": "Export CSV",
+      "summary": "{count} feedback submissions · showing page {page}",
+      "reason": "Reason",
+      "reasonPlaceholder": "Reason",
+      "allReasons": "All reasons",
+      "from": "From",
+      "to": "To",
+      "empty": "No feedback matches this filter.",
+      "columns": {
+        "submitted": "Submitted",
+        "reason": "Reason",
+        "notes": "Notes",
+        "user": "User"
+      },
+      "deletedUser": "Deleted user"
+    },
+    "audit": {
+      "title": "Audit log",
+      "subtitle": "Track admin actions across user management workflows.",
+      "summary": "{count} actions · showing page {page}",
+      "searchPlaceholder": "Search actor or target",
+      "actionPlaceholder": "Action",
+      "allActions": "All actions",
+      "empty": "No audit activity for this filter.",
+      "columns": {
+        "timestamp": "Timestamp",
+        "action": "Action",
+        "actor": "Actor",
+        "target": "Target",
+        "details": "Details"
+      },
+      "actionLabels": {
+        "userDeactivated": "User deactivated",
+        "userRestored": "User restored",
+        "entriesPurged": "Entries purged"
+      }
+    },
+    "analytics": {
+      "title": "Overview",
+      "subtitle": "User activity and operational signals by selected range.",
+      "range": "Range",
+      "ranges": {
+        "7d": "7D",
+        "30d": "30D",
+        "90d": "90D",
+        "ytd": "YTD",
+        "all": "All time"
+      },
+      "kpi": {
+        "newUsers": "New users",
+        "activeLogins": "Active logins",
+        "entries": "Entries",
+        "feedback": "Feedback"
+      },
+      "panels": {
+        "registrationsOverTime": "Registrations over time",
+        "feedbackByReason": "Feedback by reason",
+        "activeLogins": "Active logins",
+        "entryCreation": "Entry creation",
+        "feedbackVolume": "Feedback volume"
+      },
+      "empty": {
+        "registrations": "No registration data for this range.",
+        "feedbackReasons": "No feedback captured yet.",
+        "activeLogins": "No login activity for this range.",
+        "entries": "No entries created in this range.",
+        "feedbackVolume": "No feedback submitted in this range."
+      }
+    },
+    "actionDialog": {
+      "cancel": "Cancel",
+      "working": "Working...",
+      "failed": "Action failed."
+    }
+  },
+  "metadata": {
+    "root": {
+      "description": "The best minimalistic encrypted crypto journal with PLN valuation via NBP rates."
+    },
+    "entries": {
+      "title": "Entries",
+      "description": "Review and add crypto transactions with PLN valuation."
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "description": "Track performance and PnL across your crypto entries."
+    },
+    "profile": {
+      "title": "Profile",
+      "description": "Manage your Logr account details and settings."
+    },
+    "goodbye": {
+      "title": "Goodbye",
+      "description": "Account deletion confirmation and feedback for Logr."
+    },
+    "login": {
+      "title": "Login",
+      "description": "Sign in to access your Logr crypto journal."
+    },
+    "register": {
+      "title": "Register",
+      "description": "Create a Logr account to track crypto transactions."
+    },
+    "admin": {
+      "title": "Admin",
+      "description": "Admin overview and system monitoring for Logr."
+    },
+    "adminUsers": {
+      "title": "Admin Users",
+      "description": "Manage Logr user accounts and access."
+    },
+    "adminUser": {
+      "title": "Admin User",
+      "description": "Review and manage a specific user account."
+    },
+    "adminFeedback": {
+      "title": "Admin Feedback",
+      "description": "Review account deletion feedback."
+    },
+    "adminAudit": {
+      "title": "Admin Audit",
+      "description": "Audit log for admin actions."
+    }
+  },
+  "validation": {
+    "firstNameRequired": "First name is required.",
+    "lastNameRequired": "Last name is required.",
+    "loginMin": "Login must be at least 3 characters.",
+    "emailValid": "Email must be valid.",
+    "typeDelete": "Type DELETE to confirm.",
+    "dateRequired": "Date is required.",
+    "assetRequired": "Asset is required.",
+    "quoteCurrencyRequired": "Quote currency is required."
+  },
+  "errors": {
+    "authRequiredProfileUpdate": "You must be signed in to update your profile.",
+    "authRequiredEntryCreate": "You must be signed in to add entries.",
+    "authRequiredEntryUpdate": "You must be signed in to edit entries.",
+    "authRequiredEntryDelete": "You must be signed in to delete entries.",
+    "userMissing": "User record missing. Please sign in again.",
+    "emailInUse": "Email is already in use.",
+    "loginInUse": "Login is already in use.",
+    "profileNotFound": "Profile not found.",
+    "entryIdMissing": "Entry id is missing.",
+    "entryNotFound": "Entry not found.",
+    "entryCreateFailed": "Failed to create entry."
   }
 }

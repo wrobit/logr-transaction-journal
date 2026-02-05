@@ -1,7 +1,7 @@
 import { dayjs } from "@/lib/dayjs";
 import { Badge } from "@/components/ui/badge";
 import type { AdminFeedbackRow } from "@/actions/admin-feedback";
-import { getFeedbackReasonLabel } from "@/lib/admin/feedback-helpers";
+import { useTranslations } from "next-intl";
 
 const formatDateTime = (value: Date) => dayjs.utc(value).format("YYYY-MM-DD HH:mm");
 
@@ -10,10 +10,13 @@ type AdminFeedbackTableProps = {
 };
 
 export function AdminFeedbackTable({ rows }: AdminFeedbackTableProps) {
+  const t = useTranslations("admin.feedback");
+  const tr = useTranslations("profile.deleteDialog.reasons");
+
   if (rows.length === 0) {
     return (
       <div className="rounded-sm border border-border bg-muted/40 p-6 text-center text-sm text-muted-foreground">
-        No feedback matches this filter.
+        {t("empty")}
       </div>
     );
   }
@@ -23,10 +26,10 @@ export function AdminFeedbackTable({ rows }: AdminFeedbackTableProps) {
       <table className="w-full border-collapse text-left text-xs text-foreground">
         <thead className="bg-muted/50 text-[11px] uppercase tracking-wide text-muted-foreground">
           <tr>
-            <th className="px-3 py-3 font-medium">Submitted</th>
-            <th className="px-3 py-3 font-medium">Reason</th>
-            <th className="px-3 py-3 font-medium">Notes</th>
-            <th className="px-3 py-3 font-medium">User</th>
+            <th className="px-3 py-3 font-medium">{t("columns.submitted")}</th>
+            <th className="px-3 py-3 font-medium">{t("columns.reason")}</th>
+            <th className="px-3 py-3 font-medium">{t("columns.notes")}</th>
+            <th className="px-3 py-3 font-medium">{t("columns.user")}</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-border">
@@ -36,7 +39,7 @@ export function AdminFeedbackTable({ rows }: AdminFeedbackTableProps) {
                 {formatDateTime(row.createdAt)}
               </td>
               <td className="px-3 py-3">
-                <Badge variant="secondary">{getFeedbackReasonLabel(row.reason)}</Badge>
+                <Badge variant="secondary">{row.reason ? tr(row.reason) : "-"}</Badge>
               </td>
               <td className="px-3 py-3 text-muted-foreground">
                 {row.notes || "—"}
@@ -50,7 +53,7 @@ export function AdminFeedbackTable({ rows }: AdminFeedbackTableProps) {
                     ) : null}
                   </div>
                 ) : (
-                  "Deleted user"
+                  t("deletedUser")
                 )}
               </td>
             </tr>

@@ -6,13 +6,15 @@ import { listEntries } from "@/actions/entries";
 import { EntriesView } from "@/components/entries/entries-view";
 import { authOptions } from "@/lib/auth/options";
 import { ENTRY_PAGE_SIZE, parseEntryQuery } from "@/lib/entries/query";
+import { getServerTranslator } from "@/lib/i18n/translate";
 
-export const metadata: Metadata = {
-  title: {
-    absolute: "Logr - The best minimalistic encrypted crypto journal",
-  },
-  description: "Review and add crypto transactions with PLN valuation.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerTranslator();
+  return {
+    title: t("metadata.entries.title"),
+    description: t("metadata.entries.description"),
+  };
+}
 
 type PageProps = {
   searchParams?:

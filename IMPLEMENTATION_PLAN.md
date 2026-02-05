@@ -320,6 +320,7 @@ Auth Pages Implementation Plan:
 - [x] Add tests for query param parsing and DB filtering
 - [x] Add rows numbering
 - [x] Add actions column with edit / preview / delete row (destructive)
+- [x] Make entries table horizontally scrollable on smaller viewports
 
 ### Phase 5 — Dashboard
 
@@ -346,6 +347,7 @@ Auth Pages Implementation Plan:
 - [x] Read-only summary section
 - [x] Minimal edit controls for profile fields
 - [x] Validation + inline errors
+- [x] Add display currency selector (`PLN | EUR | USD`) and persist preference
 
 #### Phase 6.3 — Account Deletion Flow
 
@@ -472,13 +474,13 @@ Auth Pages Implementation Plan:
 - [x] Adopt cookie-based locale storage for the authenticated app (no locale URL prefixes)
 - [x] Add i18n library and wiring (recommended: `next-intl`)
 - [x] Add locale detection order: cookie -> user profile preference (optional) -> default `en`
-- [ ] Add fallback behavior for missing translations (warn in non-prod, safe fallback in prod)
+- [x] Add fallback behavior for missing translations (warn in non-prod, safe fallback in prod)
 
 ### Phase 13.2 - Message catalog architecture
 
 - [x] Create locale message catalogs (`messages/en/*.json`, `messages/pl/*.json`)
 - [x] Define namespaces: `common`, `auth`, `entries`, `dashboard`, `profile`, `admin`, `validation`, `metadata`
-- [ ] Add key naming conventions and ownership guidelines
+- [x] Add key naming conventions and ownership guidelines
 - [ ] Add checks/scripts for missing and unused translation keys
 
 ### Phase 13.3 - App shell and switching
@@ -498,38 +500,38 @@ Auth Pages Implementation Plan:
 
 ### Phase 13.5 - Admin area translation rollout
 
-- [ ] Translate admin navigation, users tables, filters, dialogs, and action labels
-- [ ] Translate admin feedback and audit screens
-- [ ] Translate admin analytics labels and empty states
-- [ ] Keep enum/database values stable; translate display labels only
+- [x] Translate admin navigation, users tables, filters, dialogs, and action labels
+- [x] Translate admin feedback and audit screens
+- [x] Translate admin analytics labels and empty states
+- [x] Keep enum/database values stable; translate display labels only
 
 ### Phase 13.6 - Locale-aware formatting and metadata
 
 - [x] Refactor formatting helpers to use active locale (number/currency/date presentation)
 - [x] Keep accounting precision and backend calculations locale-agnostic
-- [ ] Localize per-route metadata titles/descriptions where applicable
+- [x] Localize per-route metadata titles/descriptions where applicable
 - [x] Verify `html lang` reflects selected locale
 
 ### Phase 13.7 - Validation and server message localization
 
-- [ ] Externalize user-facing validation messages (zod/forms)
-- [ ] Standardize server action/API error keys and translate in the UI layer
-- [ ] Ensure toasts, confirmation dialogs, and inline errors are localized consistently
+- [x] Externalize user-facing validation messages (zod/forms)
+- [x] Standardize server action/API error keys and translate in the UI layer
+- [x] Ensure toasts, confirmation dialogs, and inline errors are localized consistently
 
 ### Phase 13.8 - Testing and QA
 
 - [x] Update existing tests to avoid brittle hardcoded copy when appropriate
-- [ ] Add tests for locale switching and cookie persistence
-- [ ] Add tests for translation fallback and missing keys behavior
-- [ ] Add tests for locale-specific formatting output
+- [x] Add tests for locale switching and cookie persistence
+- [x] Add tests for translation fallback and missing keys behavior
+- [x] Add tests for locale-specific formatting output
 - [x] Run smoke checks for key flows in both `en` and `pl`
 
 ### Phase 13.9 - Rollout and docs
 
 - [x] Release with `en` default and `pl` enabled
-- [ ] Add migration notes for remaining hardcoded strings
-- [ ] Document translator/developer workflow for future features
-- [ ] Define approach for adding future locales
+- [x] Add migration notes for remaining hardcoded strings
+- [x] Document translator/developer workflow for future features
+- [x] Define approach for adding future locales
 
 ### Phase 13.10 - Post-domain metadata (later)
 

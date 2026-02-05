@@ -5,11 +5,15 @@ import { AdminUsersFilters } from "@/components/admin/admin-users-filters";
 import { AdminUsersPagination } from "@/components/admin/admin-users-pagination";
 import { AdminUsersTable } from "@/components/admin/admin-users-table";
 import { requireAdminSession } from "@/lib/auth/admin";
+import { getServerTranslator } from "@/lib/i18n/translate";
 
-export const metadata: Metadata = {
-  title: "Admin Users",
-  description: "Manage Logr user accounts and access.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getServerTranslator();
+  return {
+    title: t("metadata.adminUsers.title"),
+    description: t("metadata.adminUsers.description"),
+  };
+}
 
 type PageProps = {
   searchParams?:
@@ -29,6 +33,7 @@ const parsePage = (value?: string) => {
 };
 
 export default async function AdminUsersPage({ searchParams }: PageProps) {
+  const t = await getServerTranslator();
   const session = await requireAdminSession();
   const resolvedParams = await searchParams;
 
@@ -51,14 +56,14 @@ export default async function AdminUsersPage({ searchParams }: PageProps) {
   return (
     <div className="space-y-6">
       <div className="space-y-2">
-        <h2 className="text-base font-semibold">Users</h2>
+        <h2 className="text-base font-semibold">{t("admin.users.title")}</h2>
         <p className="text-sm text-muted-foreground">
-          Review accounts, update status, and purge entries when needed.
+          {t("admin.users.subtitle")}
         </p>
       </div>
       <AdminUsersFilters />
       <div className="text-xs text-muted-foreground">
-        {data.totalCount} users · showing page {data.page}
+        {t("admin.users.summary", { count: data.totalCount, page: data.page })}
       </div>
       <AdminUsersTable users={data.users} currentUserId={session.user.id} />
       <AdminUsersPagination page={data.page} totalPages={totalPages} />

@@ -2,6 +2,7 @@
 
 import { useCallback, useMemo, useTransition } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,11 +13,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { feedbackOptions } from "@/lib/profile/feedback";
-
-const STATUS_OPTIONS = [{ value: "all", label: "All reasons" }, ...feedbackOptions];
+import { feedbackReasons } from "@/lib/profile/feedback";
 
 export function AdminFeedbackFilters() {
+  const t = useTranslations("admin.feedback");
+  const tr = useTranslations("profile.deleteDialog.reasons");
+  const tc = useTranslations("admin.common");
   const router = useRouter();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
@@ -25,9 +27,17 @@ export function AdminFeedbackFilters() {
   const start = searchParams.get("start") ?? "";
   const end = searchParams.get("end") ?? "";
 
+  const statusOptions = useMemo(
+    () => [
+      { value: "all", label: t("allReasons") },
+      ...feedbackReasons.map((value) => ({ value, label: tr(value) })),
+    ],
+    [t, tr],
+  );
+
   const reasonValue = useMemo(
-    () => STATUS_OPTIONS.find((option) => option.value === reason)?.value ?? "all",
-    [reason],
+    () => statusOptions.find((option) => option.value === reason)?.value ?? "all",
+    [reason, statusOptions],
   );
 
   const updateParams = useCallback(
@@ -70,13 +80,13 @@ export function AdminFeedbackFilters() {
     <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
       <div className="flex flex-wrap gap-3">
         <div className="flex flex-col gap-1">
-          <span className="text-xs text-muted-foreground">Reason</span>
+          <span className="text-xs text-muted-foreground">{t("reason")}</span>
           <Select value={reasonValue} onValueChange={(value) => updateParams({ reason: value })}>
             <SelectTrigger size="sm" className="min-w-[160px]">
-              <SelectValue placeholder="Reason" />
+              <SelectValue placeholder={t("reasonPlaceholder")} />
             </SelectTrigger>
             <SelectContent align="start">
-              {STATUS_OPTIONS.map((option) => (
+              {statusOptions.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
                 </SelectItem>
@@ -85,7 +95,7 @@ export function AdminFeedbackFilters() {
           </Select>
         </div>
         <div className="flex flex-col gap-1">
-          <span className="text-xs text-muted-foreground">From</span>
+          <span className="text-xs text-muted-foreground">{t("from")}</span>
           <Input
             type="date"
             defaultValue={start}
@@ -94,7 +104,7 @@ export function AdminFeedbackFilters() {
           />
         </div>
         <div className="flex flex-col gap-1">
-          <span className="text-xs text-muted-foreground">To</span>
+          <span className="text-xs text-muted-foreground">{t("to")}</span>
           <Input
             type="date"
             defaultValue={end}
@@ -111,7 +121,7 @@ export function AdminFeedbackFilters() {
         onClick={() => updateParams({ reason: "all", start: "", end: "" })}
         disabled={isPending}
       >
-        Reset filters
+        {tc("resetFilters")}
       </Button>
     </div>
   );

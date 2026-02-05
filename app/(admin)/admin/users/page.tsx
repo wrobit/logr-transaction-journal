@@ -8,7 +8,7 @@ import { requireAdminSession } from "@/lib/auth/admin";
 
 export const metadata: Metadata = {
   title: "Admin Users",
-  description: "Manage Entry user accounts and access.",
+  description: "Manage Logr user accounts and access.",
 };
 
 type PageProps = {

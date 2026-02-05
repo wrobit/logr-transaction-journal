@@ -9,7 +9,7 @@ import { ENTRY_PAGE_SIZE, parseEntryQuery } from "@/lib/entries/query";
 
 export const metadata: Metadata = {
   title: {
-    absolute: "Entry - The best minimalistic encrypted crypto journal",
+    absolute: "Logr - The best minimalistic encrypted crypto journal",
   },
   description: "Review and add crypto transactions with PLN valuation.",
 };

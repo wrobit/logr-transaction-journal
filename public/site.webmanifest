@@ -1,6 +1,6 @@
 {
-  "name": "Entry",
-  "short_name": "Entry",
+  "name": "Logr",
+  "short_name": "Logr",
   "description": "The best minimalistic encrypted crypto journal with PLN valuation via NBP rates.",
   "start_url": "/",
   "display": "standalone",

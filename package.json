@@ -1,5 +1,5 @@
 {
-  "name": "entry-transaction-journal",
+  "name": "logr-transaction-journal",
   "version": "0.1.0",
   "private": true,
   "engines": {

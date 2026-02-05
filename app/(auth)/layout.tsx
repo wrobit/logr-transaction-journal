@@ -10,7 +10,7 @@ export default function AuthLayout({
       <div className="absolute left-6 top-6">
         <Image
           src="/logo.svg"
-          alt="Entry"
+          alt="Logr"
           width={120}
           height={32}
           className="h-6 w-auto opacity-90 invert"

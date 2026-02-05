@@ -17,9 +17,9 @@
     "oauthGithub": "Continue with GitHub",
     "orContinueEmail": "or continue with email",
     "orSignUpEmail": "or sign up with email",
-    "loginTitle": "Welcome to Entry",
+    "loginTitle": "Welcome to Logr",
     "loginSubtitle": "Minimal crypto journaling for accurate tracking.",
-    "registerTitle": "Create your Entry account",
+    "registerTitle": "Create your Logr account",
     "registerSubtitle": "Start tracking transactions with clarity.",
     "email": "Email",
     "password": "Password",
@@ -179,7 +179,7 @@
     "deleteHint": "You'll share a quick reason, then confirm by typing DELETE.",
     "deleteDialog": {
       "title": "Delete account",
-      "description": "You're about to permanently delete your Entry profile. We'll ask for quick feedback next.",
+      "description": "You're about to permanently delete your Logr profile. We'll ask for quick feedback next.",
       "removeListTitle": "This action will remove:",
       "removeEntries": "All transaction entries and valuations",
       "removeNotes": "Saved notes and sources",
@@ -207,9 +207,9 @@
     },
     "goodbye": {
       "title": "Account deleted",
-      "subtitle": "Your Entry profile and transactions are now removed.",
+      "subtitle": "Your Logr profile and transactions are now removed.",
       "allSet": "All set",
-      "allSetSubtitle": "Thanks for trying Entry. You can start fresh whenever you're ready.",
+      "allSetSubtitle": "Thanks for trying Logr. You can start fresh whenever you're ready.",
       "createNew": "Create new account",
       "signIn": "Sign in"
     }

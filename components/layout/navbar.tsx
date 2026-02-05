@@ -27,7 +27,7 @@ export function Navbar() {
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/logo.svg"
-              alt="Entry"
+              alt="Logr"
               width={120}
               height={32}
               className="h-6 w-auto opacity-90 dark:invert"

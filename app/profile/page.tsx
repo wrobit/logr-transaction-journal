@@ -8,7 +8,7 @@ import { authOptions } from "@/lib/auth/options";
 
 export const metadata: Metadata = {
   title: "Profile",
-  description: "Manage your Entry account details and settings.",
+  description: "Manage your Logr account details and settings.",
 };
 
 export default async function ProfilePage() {

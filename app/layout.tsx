@@ -7,11 +7,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { Providers } from "@/components/layout/providers";
 import { FooterTicker } from "@/components/ticker/footer-ticker";
 import { authOptions } from "@/lib/auth/options";
-import {
-  DEFAULT_LOCALE,
-  LOCALE_COOKIE_NAME,
-  isAppLocale,
-} from "@/lib/i18n/config";
+import { DEFAULT_LOCALE, LOCALE_COOKIE_NAME, isAppLocale } from "@/lib/i18n/config";
 import { getLocaleMessages } from "@/lib/i18n/messages";
 import "./globals.css";
 
@@ -27,7 +23,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const appTitle = "Entry";
+const appTitle = "Logr";
 const appTagline = "The best minimalistic encrypted crypto journal";
 const appDescription =
   "The best minimalistic encrypted crypto journal with PLN valuation via NBP rates.";
@@ -37,8 +33,8 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: {
-    default: `Entry - ${appTagline}`,
-    template: "Entry - %s",
+    default: `Logr - ${appTagline}`,
+    template: "Logr - %s",
   },
   description: appDescription,
   applicationName: appTitle,
@@ -49,7 +45,7 @@ export const metadata: Metadata = {
     follow: isProduction,
   },
   openGraph: {
-    title: `Entry - ${appTagline}`,
+    title: `Logr - ${appTagline}`,
     description: appDescription,
     siteName: appTitle,
     type: "website",
@@ -58,13 +54,13 @@ export const metadata: Metadata = {
         url: "/og-placeholder.svg",
         width: 1200,
         height: 630,
-        alt: "Entry crypto journal",
+        alt: "Logr crypto journal",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: `Entry - ${appTagline}`,
+    title: `Logr - ${appTagline}`,
     description: appDescription,
     images: ["/og-placeholder.svg"],
   },

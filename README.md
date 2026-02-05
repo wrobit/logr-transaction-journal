@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/logo.svg" alt="Entry" width="260" />
+  <img src="public/logo.svg" alt="Logr" width="260" />
 </p>
 
 A minimal, personal crypto transaction journal focused on correctness, transparency, and accounting-style clarity. No hype, no trading features — just structured records, PLN valuation via NBP, and clear profit/loss.
@@ -21,7 +21,7 @@ A minimal, personal crypto transaction journal focused on correctness, transpare
 
 ## Introduction
 
-Entry is a personal crypto journal that treats each transaction as an immutable accounting entry. It emphasizes reproducible calculations, official PLN rates, and a clean UI designed for tracking and tax preparation.
+Logr is a personal crypto journal that treats each transaction as an immutable accounting entry. It emphasizes reproducible calculations, official PLN rates, and a clean UI designed for tracking and tax preparation.
 
 ## Product Goals
 

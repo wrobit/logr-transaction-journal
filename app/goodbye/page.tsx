@@ -4,7 +4,7 @@ import { GoodbyeView } from "@/components/profile/goodbye-view";
 
 export const metadata: Metadata = {
   title: "Goodbye",
-  description: "Account deletion confirmation and feedback for Entry.",
+  description: "Account deletion confirmation and feedback for Logr.",
 };
 
 export default function GoodbyePage() {

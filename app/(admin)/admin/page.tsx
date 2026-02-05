@@ -6,7 +6,7 @@ import { parseAdminAnalyticsQuery } from "@/lib/admin/analytics-query";
 
 export const metadata: Metadata = {
   title: "Admin",
-  description: "Admin overview and system monitoring for Entry.",
+  description: "Admin overview and system monitoring for Logr.",
 };
 
 type PageProps = {

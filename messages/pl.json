@@ -17,9 +17,9 @@
     "oauthGithub": "Kontynuuj z GitHub",
     "orContinueEmail": "lub kontynuuj przez e-mail",
     "orSignUpEmail": "lub zarejestruj sie przez e-mail",
-    "loginTitle": "Witamy w Entry",
+    "loginTitle": "Witamy w Logr",
     "loginSubtitle": "Minimalny dziennik krypto do precyzyjnego sledzenia.",
-    "registerTitle": "Utworz konto Entry",
+    "registerTitle": "Utworz konto Logr",
     "registerSubtitle": "Zacznij sledzic transakcje z pelna przejrzystoscia.",
     "email": "E-mail",
     "password": "Haslo",
@@ -179,7 +179,7 @@
     "deleteHint": "Podasz krotki powod i potwierdzisz wpisujac DELETE.",
     "deleteDialog": {
       "title": "Usun konto",
-      "description": "Za chwile trwale usuniesz profil Entry. Najpierw poprosimy o krotka opinie.",
+      "description": "Za chwile trwale usuniesz profil Logr. Najpierw poprosimy o krotka opinie.",
       "removeListTitle": "Ta operacja usunie:",
       "removeEntries": "Wszystkie wpisy i wyceny transakcji",
       "removeNotes": "Zapisane notatki i zrodla",
@@ -207,9 +207,9 @@
     },
     "goodbye": {
       "title": "Konto usuniete",
-      "subtitle": "Profil Entry i transakcje zostaly usuniete.",
+      "subtitle": "Profil Logr i transakcje zostaly usuniete.",
       "allSet": "Gotowe",
-      "allSetSubtitle": "Dzieki za wyprobowanie Entry. Mozesz zaczac od nowa, kiedy chcesz.",
+      "allSetSubtitle": "Dzieki za wyprobowanie Logr. Mozesz zaczac od nowa, kiedy chcesz.",
       "createNew": "Utworz nowe konto",
       "signIn": "Zaloguj sie"
     }

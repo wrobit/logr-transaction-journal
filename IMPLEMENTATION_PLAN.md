@@ -1,8 +1,8 @@
-# Entry — Crypto Journal
+# Logr — Crypto Journal
 
 Implementation Plan (Next.js App Router + TypeScript + Drizzle + Neon + shadcn/ui)
 
-**Entry** is a minimal, personal crypto transaction journal focused on correctness, transparency, and accounting-style clarity. No hype, no trading features — just structured records, PLN valuation via NBP, and clear profit/loss.
+**Logr** is a minimal, personal crypto transaction journal focused on correctness, transparency, and accounting-style clarity. No hype, no trading features — just structured records, PLN valuation via NBP, and clear profit/loss.
 
 ---
 
@@ -277,7 +277,7 @@ Live preview:
 
 Auth Pages Implementation Plan:
 
-- Define Cursor-style layout (ENTRY top-left, centered content, dark canvas)
+- Define Cursor-style layout (LOGR top-left, centered content, dark canvas)
 - Set up NextAuth with Credentials + Google + GitHub providers
 - Configure env vars: `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, `GOOGLE_CLIENT_ID/SECRET`, `GITHUB_ID/SECRET`
 - Build `/login` and `/register` pages with shadcn/ui, OAuth buttons first
@@ -378,7 +378,7 @@ Auth Pages Implementation Plan:
 - [x] Add per-route metadata for auth and protected pages:
   - [x] `/login`, `/register`
   - [x] `/`, `/dashboard`, `/profile`, `/goodbye`
-  - [x] Use “Entry — {Page}” titles + concise descriptions
+  - [x] Use “Logr — {Page}” titles + concise descriptions
 - [x] Add app icons + manifest placeholders:
   - [x] `favicon.ico`, `icon.svg`, `apple-touch-icon.svg`
   - [x] `site.webmanifest` with name, theme colors, icons
@@ -563,4 +563,4 @@ Auth Pages Implementation Plan:
 
 ---
 
-**Entry** is intentionally simple: every transaction is just an entry — precise, traceable, and complete.
+**Logr** is intentionally simple: every transaction is just an entry — precise, traceable, and complete.

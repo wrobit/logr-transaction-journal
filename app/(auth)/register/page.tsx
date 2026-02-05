@@ -4,7 +4,7 @@ import { RegisterForm } from "@/components/auth/register-form";
 
 export const metadata: Metadata = {
   title: "Register",
-  description: "Create an Entry account to track crypto transactions.",
+  description: "Create a Logr account to track crypto transactions.",
 };
 
 export default function RegisterPage() {

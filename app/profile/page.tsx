@@ -26,7 +26,7 @@ export default async function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-black px-6 py-10">
-      <div className="mx-auto w-full max-w-4xl">
+      <div className="mx-auto w-full max-w-6xl">
         <ProfileView profile={profile} />
       </div>
     </div>

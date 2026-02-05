@@ -6,6 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import { deleteAccount, updateProfile } from "@/actions/profile";
+import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 import { DeleteAccountDialog } from "@/components/profile/delete-account-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -90,10 +91,15 @@ export function ProfileView({
 
   return (
     <div className="space-y-8 text-foreground">
-      <div className="space-y-2">
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div className="space-y-2">
           <h1 className="text-lg font-semibold">{t("title")}</h1>
           <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
         </div>
+        <div className="flex items-center gap-2">
+          <LocaleSwitcher />
+        </div>
+      </div>
 
       <section className="rounded-sm border border-border bg-muted/40 p-4">
         <div className="flex items-center justify-between">

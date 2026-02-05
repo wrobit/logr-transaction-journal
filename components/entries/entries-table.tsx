@@ -114,7 +114,7 @@ export function EntriesTable({
                       : "bg-red-500/10 text-red-300"
                   }
                 >
-                  {entry.operation}
+                  {entry.operation === "BUY" ? t("buy") : t("sell")}
                 </Badge>
               </td>
               <td className="px-3 py-3">

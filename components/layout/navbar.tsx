@@ -6,7 +6,6 @@ import { signOut, useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { UserIcon } from "lucide-react";
 
-import { LocaleSwitcher } from "@/components/layout/locale-switcher";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -51,7 +50,6 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-3">
-          <LocaleSwitcher />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button

@@ -1,4 +1,5 @@
 import type {
+  BankImportProviderName,
   NormalizedBankTransaction,
   NormalizedRateResult,
   NormalizedTaxValidationResult,
@@ -33,6 +34,7 @@ export interface TaxValidationProvider {
 }
 
 export interface BankImportProvider {
+  readonly name: BankImportProviderName;
   listAccounts(userId: string): Promise<Array<{ accountRef: string; displayName: string }>>;
   listTransactions(accountRef: string): Promise<NormalizedBankTransaction[]>;
   refreshConsent(userId: string): Promise<{ status: "ok" | "reconsent_required" }>;

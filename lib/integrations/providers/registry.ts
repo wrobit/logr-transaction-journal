@@ -4,12 +4,14 @@ import { BocRateProvider } from "@/lib/integrations/providers/boc-rate-provider"
 import { EcbRateProvider } from "@/lib/integrations/providers/ecb-rate-provider";
 import { HmrcRateProvider } from "@/lib/integrations/providers/hmrc-rate-provider";
 import { IrsCompatibleRateProvider } from "@/lib/integrations/providers/irs-compatible-rate-provider";
+import { NbpRateProvider } from "@/lib/integrations/providers/nbp-rate-provider";
 import type { RateProvider, TaxValidationProvider } from "@/lib/integrations/providers/interfaces";
 import { RbaRateProvider } from "@/lib/integrations/providers/rba-rate-provider";
 import { ViesTaxValidationProvider } from "@/lib/integrations/providers/vies-tax-validation-provider";
 import type { RateProviderName, TaxValidationProviderName } from "@/lib/integrations/types";
 
 const rateProviders: Record<RateProviderName, RateProvider> = {
+  nbp: new NbpRateProvider(),
   ecb: new EcbRateProvider(),
   hmrc: new HmrcRateProvider(),
   boc: new BocRateProvider(),

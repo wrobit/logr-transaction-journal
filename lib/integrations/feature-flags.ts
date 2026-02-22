@@ -12,7 +12,7 @@ function parseCsvValues(value: string | undefined) {
 }
 
 export function isInternationalIntegrationsEnabled() {
-  return process.env.INTL_INTEGRATIONS_ENABLED === "true";
+  return process.env.INTL_INTEGRATIONS_ENABLED !== "false";
 }
 
 export function getEnabledCountries() {
@@ -20,7 +20,7 @@ export function getEnabledCountries() {
 }
 
 export function isBankImportEnabled() {
-  return process.env.INTL_BANK_IMPORT_ENABLED === "true";
+  return process.env.INTL_BANK_IMPORT_ENABLED !== "false";
 }
 
 export function isRateProviderEnabled(provider: (typeof RATE_PROVIDERS)[number]) {

@@ -680,11 +680,12 @@ Initial providers:
 - [ ] Verify rendered metadata for key routes
 - [ ] Validate Open Graph/Twitter tags
 
-## Phase 14 - International Integrations (later phase)
+## Phase 14 - Polish Integrations (later phase)
 
-### Phase 14.1 - Scope and policy
+### Phase 14.1 - Scope and policy (PL-only)
 
 - [x] Define country-aware integration policy (`country -> provider`) for FX, tax validation, and bank imports
+- [x] Limit rollout scope to Polish residents (`PL`) only
 - [x] Keep this phase focused on integrations and auditability (exclude deep local e-filing APIs)
 - [x] Add feature flags for incremental country rollout
 
@@ -692,11 +693,7 @@ Initial providers:
 
 - [x] Add `RateProvider` adapter interface (`getRate`, `getLatest`, `getMetadata`)
 - [x] Add `TaxValidationProvider` interface (`validate(id, country)`)
-- [x] Add `ECB` adapter for Eurozone users
-- [x] Add `HMRC` adapter for UK tax workflows (monthly rates)
-- [x] Add IRS-compatible US conversion workflow adapter (store method + source metadata)
-- [x] Add `BoC` adapter for Canada
-- [x] Add optional `RBA` adapter for Australia (enable only if AU launch is near-term)
+- [x] Add `NBP` adapter for Polish FX workflows
 - [x] Add EU `VIES` VAT ID validation adapter
 
 ### Phase 14.3 - Data model and auditability
@@ -710,14 +707,14 @@ Initial providers:
 
 - [x] Add strict timeouts + retry with exponential backoff for provider calls
 - [x] Define per-country fallback chain (official -> cached prior valid -> user warning)
-- [ ] Add cache TTL strategy for latest rates and immutable cache for historical rates
-- [ ] Add stale-rate and provider-downtime alerting
+- [x] Add cache TTL strategy for latest rates and immutable cache for historical rates
+- [x] Add stale-rate and provider-downtime alerting
 
 ### Phase 14.5 - Banking integrations
 
-- [ ] Integrate one open-banking aggregator (`TrueLayer` or `Tink` or `GoCardless Bank Account Data`)
-- [ ] Build normalized transaction ingestion pipeline for aggregator data
-- [ ] Maintain robust CSV import fallback for unsupported banks/countries
+- [x] Integrate one open-banking aggregator (`GoCardless Bank Account Data`) for Polish users
+- [x] Build normalized transaction ingestion pipeline for aggregator data
+- [x] Maintain robust CSV import fallback when aggregator is unavailable
 
 ### Phase 14.6 - Product and UX updates
 
@@ -727,10 +724,9 @@ Initial providers:
 
 ### Phase 14.7 - Rollout order
 
-- [ ] Step 1: `ECB + HMRC + VIES`
+- [ ] Step 1: `NBP + VIES`
 - [ ] Step 2: Banking aggregator + CSV fallback
-- [ ] Step 3: `US + CA` adapters with compliance metadata
-- [ ] Step 4: `AU` and additional markets based on telemetry
+- [ ] Step 3: Harden telemetry, alert thresholds, and operational runbooks
 
 ### Phase 14.8 - Acceptance criteria
 

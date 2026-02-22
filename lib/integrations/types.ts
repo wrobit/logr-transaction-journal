@@ -1,10 +1,10 @@
-export const RATE_PROVIDERS = ["ecb", "hmrc", "boc", "irs_compatible", "rba"] as const;
+export const RATE_PROVIDERS = ["nbp", "ecb", "hmrc", "boc", "irs_compatible", "rba"] as const;
 export type RateProviderName = (typeof RATE_PROVIDERS)[number];
 
 export const TAX_VALIDATION_PROVIDERS = ["vies"] as const;
 export type TaxValidationProviderName = (typeof TAX_VALIDATION_PROVIDERS)[number];
 
-export const BANK_IMPORT_PROVIDERS = ["truelayer", "tink", "gocardless_bad"] as const;
+export const BANK_IMPORT_PROVIDERS = ["gocardless_bad"] as const;
 export type BankImportProviderName = (typeof BANK_IMPORT_PROVIDERS)[number];
 
 export type ProviderType = "rate" | "tax_validation" | "bank_import";
@@ -24,6 +24,7 @@ export type NormalizedRateResult = {
   rateType: RateType;
   method: RateMethod;
   rawSnapshot: unknown;
+  warnings?: string[];
 };
 
 export type TaxValidationStatus = "valid" | "invalid" | "unavailable" | "timeout";

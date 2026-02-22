@@ -4,20 +4,27 @@ import { db } from "@/lib/db";
 import { countryIntegrationPolicies } from "@/lib/db/schema";
 import { isEurozoneCountry } from "@/lib/integrations/countries";
 import { getEnabledCountries, isInternationalIntegrationsEnabled } from "@/lib/integrations/feature-flags";
-import type { ProviderType, RateProviderName, TaxValidationProviderName } from "@/lib/integrations/types";
+import type {
+  BankImportProviderName,
+  ProviderType,
+  RateProviderName,
+  TaxValidationProviderName,
+} from "@/lib/integrations/types";
 
-type PolicyProviderName = RateProviderName | TaxValidationProviderName;
+type PolicyProviderName = RateProviderName | TaxValidationProviderName | BankImportProviderName;
 
 const DEFAULT_RATE_POLICY: Record<string, RateProviderName[]> = {
-  GB: ["hmrc", "ecb"],
-  CA: ["boc", "ecb"],
-  US: ["irs_compatible", "ecb"],
-  AU: ["rba", "ecb"],
-  default: ["ecb"],
+  PL: ["nbp"],
+  default: ["nbp"],
 };
 
 const DEFAULT_TAX_POLICY: Record<string, TaxValidationProviderName[]> = {
   default: ["vies"],
+};
+
+const DEFAULT_BANK_IMPORT_POLICY: Record<string, BankImportProviderName[]> = {
+  PL: ["gocardless_bad"],
+  default: ["gocardless_bad"],
 };
 
 export async function resolveProviderPolicy(
@@ -61,6 +68,10 @@ export async function resolveProviderPolicy(
 
   if (providerType === "tax_validation") {
     return DEFAULT_TAX_POLICY[normalizedCountry] ?? DEFAULT_TAX_POLICY.default;
+  }
+
+  if (providerType === "bank_import") {
+    return DEFAULT_BANK_IMPORT_POLICY[normalizedCountry] ?? DEFAULT_BANK_IMPORT_POLICY.default;
   }
 
   return [];

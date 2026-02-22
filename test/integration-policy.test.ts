@@ -37,14 +37,19 @@ describe("integration provider policy", () => {
     }
   });
 
-  it("returns default country policy when database has no overrides", async () => {
-    const policy = await resolveProviderPolicy("GB", "rate");
-    expect(policy).toEqual(["hmrc", "ecb"]);
+  it("returns Polish default policy when database has no overrides", async () => {
+    const policy = await resolveProviderPolicy("PL", "rate");
+    expect(policy).toEqual(["nbp"]);
   });
 
   it("returns empty when country is not enabled", async () => {
     process.env.INTL_COUNTRIES_ENABLED = "US,CA";
-    const policy = await resolveProviderPolicy("GB", "rate");
+    const policy = await resolveProviderPolicy("PL", "rate");
     expect(policy).toEqual([]);
+  });
+
+  it("returns Polish bank import provider", async () => {
+    const policy = await resolveProviderPolicy("PL", "bank_import");
+    expect(policy).toEqual(["gocardless_bad"]);
   });
 });

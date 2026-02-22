@@ -100,28 +100,14 @@ export async function runAdminIntegrationSmokeTests(): Promise<{
 
   const tests: Array<{ key: string; run: () => Promise<string> }> = [
     {
-      key: "ecb-eur-pln",
+      key: "nbp-eur-pln",
       run: async () => {
         const rate = await getInternationalRate({
-          countryCode: "DE",
+          countryCode: "PL",
           baseCurrency: "EUR",
           quoteCurrency: "PLN",
           effectiveDate: stableDate,
           rateType: "historical",
-        });
-
-        return `${rate.provider} ${rate.baseCurrency}/${rate.quoteCurrency}=${rate.rateValue.toFixed(6)}`;
-      },
-    },
-    {
-      key: "hmrc-usd-gbp",
-      run: async () => {
-        const rate = await getInternationalRate({
-          countryCode: "GB",
-          baseCurrency: "USD",
-          quoteCurrency: "GBP",
-          effectiveDate: stableDate,
-          rateType: "monthly",
         });
 
         return `${rate.provider} ${rate.baseCurrency}/${rate.quoteCurrency}=${rate.rateValue.toFixed(6)}`;

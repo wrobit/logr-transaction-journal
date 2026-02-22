@@ -56,6 +56,11 @@
     "previous": "Previous",
     "next": "Next",
     "rowsPerPage": "Rows per page:",
+    "taxReport": {
+      "year": "Tax year",
+      "allYears": "All years",
+      "button": "Generate PIT PDF"
+    },
     "createdSuccess": "Entry added successfully.",
     "updatedSuccess": "Entry updated successfully.",
     "deletedSuccess": "Entry deleted successfully.",

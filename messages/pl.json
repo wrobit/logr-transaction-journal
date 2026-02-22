@@ -56,6 +56,11 @@
     "previous": "Poprzednia",
     "next": "Nastepna",
     "rowsPerPage": "Wiersze na strone:",
+    "taxReport": {
+      "year": "Rok podatkowy",
+      "allYears": "Wszystkie lata",
+      "button": "Generuj PIT PDF"
+    },
     "createdSuccess": "Wpis zostal dodany.",
     "updatedSuccess": "Wpis zostal zaktualizowany.",
     "deletedSuccess": "Wpis zostal usuniety.",

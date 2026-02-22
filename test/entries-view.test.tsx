@@ -112,4 +112,31 @@ describe("EntriesView", () => {
 
     expect(push).toHaveBeenCalledWith("/?page=2");
   });
+
+  it("builds tax report export link from selected year", () => {
+    renderWithIntl(
+      <EntriesView
+        entries={entries}
+        assets={["SOL", "BTC"]}
+        totalCount={entries.length}
+        pageSize={10}
+        query={baseQuery}
+        displayCurrency="PLN"
+        displayRatesByEntryId={{ "1": 1, "2": 1 }}
+        enableActions={false}
+      />,
+    );
+
+    const exportLink = screen.getByRole("link", { name: /generate pit pdf/i });
+    expect(exportLink).toHaveAttribute(
+      "href",
+      expect.stringContaining("/api/tax-report/export/pdf?year="),
+    );
+
+    fireEvent.change(screen.getByLabelText(/tax year/i), {
+      target: { value: "all" },
+    });
+
+    expect(exportLink).toHaveAttribute("href", "/api/tax-report/export/pdf");
+  });
 });

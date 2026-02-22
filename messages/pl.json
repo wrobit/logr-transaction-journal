@@ -121,6 +121,34 @@
       "cancel": "Anuluj",
       "deleting": "Usuwanie...",
       "confirm": "Usun wpis"
+    },
+    "importExport": {
+      "title": "Import / Eksport",
+      "subtitle": "Wgraj CSV z gieldy, sprawdz podglad wierszy i potwierdz bezpieczny import.",
+      "expandButton": "Rozwin import",
+      "collapseButton": "Zwin import",
+      "provider": "Dostawca",
+      "csvFile": "Plik CSV",
+      "previewButton": "Podglad importu",
+      "previewing": "Przetwarzanie...",
+      "confirmButton": "Potwierdz import",
+      "importing": "Importowanie...",
+      "downloadFailedRows": "Pobierz CSV z blednymi wierszami",
+      "confirmSuccess": "Import zakonczony: {imported} zaimportowano, {failed} blednych, {duplicates} duplikatow.",
+      "confirmError": "Import nie powiodl sie.",
+      "exportButton": "Eksport wpisow CSV",
+      "totalRows": "Lacznie: {count}",
+      "validRows": "Poprawne: {count}",
+      "invalidRows": "Niepoprawne: {count}",
+      "unsupportedRows": "Nieobslugiwane: {count}",
+      "status": "Status",
+      "market": "Rynek",
+      "operation": "Operacja",
+      "amount": "Ilosc",
+      "issues": "Problemy",
+      "noIssues": "Brak",
+      "historyTitle": "Ostatnie importy",
+      "historyEmpty": "Brak historii importu."
     }
   },
   "dashboard": {
@@ -154,6 +182,9 @@
       "holdingsMix": "Struktura aktywow",
       "buyVsSellVolume": "Wolumen kupno vs sprzedaz",
       "holdingsByAsset": "Aktywa",
+      "closedPositionsByAsset": "Zamkniete pozycje per aktywo",
+      "openCount": "Otwarte: {count}",
+      "closedCount": "Zamkniete: {count}",
       "buyVsSellByAsset": "Kupno vs sprzedaz per aktywo"
     },
     "holdingsTable": {
@@ -162,11 +193,18 @@
       "buyPln": "Kupno {currency}",
       "pnlPln": "PnL {currency}"
     },
+    "closedPositionsTable": {
+      "asset": "Aktywum",
+      "buy": "Kupno {currency}",
+      "sell": "Sprzedaz {currency}",
+      "pnl": "PnL {currency}"
+    },
     "empty": {
       "pnl": "Brak danych PnL dla tego zakresu.",
       "holdingsMix": "Brak danych o strukturze aktywow.",
       "volume": "Brak danych wolumenu dla tego zakresu.",
       "holdings": "Brak aktywow.",
+      "closedPositions": "Brak zamknietych pozycji.",
       "assetVolume": "Brak danych wolumenu per aktywo."
     }
   },

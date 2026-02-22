@@ -70,6 +70,7 @@ export const entries = pgTable(
     date: date("date", { mode: "date" }).notNull(),
     encryptedPayload: jsonb("encrypted_payload").$type<EncryptedBlob>().notNull(),
     encryptionVersion: integer("encryption_version").notNull().default(1),
+    importBatchId: uuid("import_batch_id"),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
     deletedAt: timestamp("deleted_at", { withTimezone: true, mode: "date" }),
@@ -197,6 +198,51 @@ export const bankImportAuditBatches = pgTable(
   }),
 );
 
+export const exchangeImportBatches = pgTable(
+  "exchange_import_batches",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    provider: text("provider").notNull(),
+    filename: text("filename"),
+    status: text("status").notNull().default("completed"),
+    totalRows: integer("total_rows").notNull().default(0),
+    validRows: integer("valid_rows").notNull().default(0),
+    importedRows: integer("imported_rows").notNull().default(0),
+    failedRows: integer("failed_rows").notNull().default(0),
+    metadata: jsonb("metadata"),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+    updatedAt: timestamp("updated_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => ({
+    userCreatedIndex: index("exchange_import_batches_user_created_idx").on(table.userId, table.createdAt),
+  }),
+);
+
+export const exchangeImportRows = pgTable(
+  "exchange_import_rows",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    batchId: uuid("batch_id")
+      .notNull()
+      .references(() => exchangeImportBatches.id, { onDelete: "cascade" }),
+    rowNumber: integer("row_number").notNull(),
+    rowHash: text("row_hash").notNull(),
+    status: text("status").notNull(),
+    issues: jsonb("issues"),
+    rawRow: jsonb("raw_row"),
+    transaction: jsonb("transaction"),
+    entryId: uuid("entry_id").references(() => entries.id, { onDelete: "set null" }),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
+  },
+  (table) => ({
+    batchRowUnique: uniqueIndex("exchange_import_rows_batch_row_hash_idx").on(table.batchId, table.rowHash),
+    batchStatusIndex: index("exchange_import_rows_batch_status_idx").on(table.batchId, table.status),
+  }),
+);
+
 export const feedbacks = pgTable("feedbacks", {
   id: uuid("id").defaultRandom().primaryKey(),
   userId: uuid("user_id").references(() => users.id, { onDelete: "set null" }),
@@ -247,6 +293,12 @@ export type NewTaxValidationLog = typeof taxValidationLogs.$inferInsert;
 
 export type BankImportAuditBatch = typeof bankImportAuditBatches.$inferSelect;
 export type NewBankImportAuditBatch = typeof bankImportAuditBatches.$inferInsert;
+
+export type ExchangeImportBatch = typeof exchangeImportBatches.$inferSelect;
+export type NewExchangeImportBatch = typeof exchangeImportBatches.$inferInsert;
+
+export type ExchangeImportRow = typeof exchangeImportRows.$inferSelect;
+export type NewExchangeImportRow = typeof exchangeImportRows.$inferInsert;
 
 export type Feedback = typeof feedbacks.$inferSelect;
 export type NewFeedback = typeof feedbacks.$inferInsert;

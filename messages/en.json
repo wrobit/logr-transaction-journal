@@ -121,6 +121,34 @@
       "cancel": "Cancel",
       "deleting": "Deleting...",
       "confirm": "Delete entry"
+    },
+    "importExport": {
+      "title": "Import / Export",
+      "subtitle": "Upload exchange CSV files, preview rows, and confirm safe import.",
+      "expandButton": "Expand import",
+      "collapseButton": "Collapse import",
+      "provider": "Provider",
+      "csvFile": "CSV file",
+      "previewButton": "Preview import",
+      "previewing": "Previewing...",
+      "confirmButton": "Confirm import",
+      "importing": "Importing...",
+      "downloadFailedRows": "Download failed rows CSV",
+      "confirmSuccess": "Import completed: {imported} imported, {failed} failed, {duplicates} duplicates.",
+      "confirmError": "Import failed.",
+      "exportButton": "Export entries CSV",
+      "totalRows": "Total: {count}",
+      "validRows": "Valid: {count}",
+      "invalidRows": "Invalid: {count}",
+      "unsupportedRows": "Unsupported: {count}",
+      "status": "Status",
+      "market": "Market",
+      "operation": "Operation",
+      "amount": "Amount",
+      "issues": "Issues",
+      "noIssues": "None",
+      "historyTitle": "Recent imports",
+      "historyEmpty": "No import history yet."
     }
   },
   "dashboard": {
@@ -154,6 +182,9 @@
       "holdingsMix": "Holdings mix",
       "buyVsSellVolume": "Buy vs sell volume",
       "holdingsByAsset": "Holdings by asset",
+      "closedPositionsByAsset": "Closed positions by asset",
+      "openCount": "Open: {count}",
+      "closedCount": "Closed: {count}",
       "buyVsSellByAsset": "Buy vs sell by asset"
     },
     "holdingsTable": {
@@ -162,11 +193,18 @@
       "buyPln": "Buy {currency}",
       "pnlPln": "PnL {currency}"
     },
+    "closedPositionsTable": {
+      "asset": "Asset",
+      "buy": "Buy {currency}",
+      "sell": "Sell {currency}",
+      "pnl": "PnL {currency}"
+    },
     "empty": {
       "pnl": "No PnL data for this range.",
       "holdingsMix": "No holdings mix available.",
       "volume": "No volume data for this range.",
       "holdings": "No holdings yet.",
+      "closedPositions": "No closed positions yet.",
       "assetVolume": "No asset volume data yet."
     }
   },

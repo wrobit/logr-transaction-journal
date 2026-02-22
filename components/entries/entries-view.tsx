@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { AddEntryDialog } from "@/components/entries/add-entry-dialog";
 import { DeleteEntryDialog } from "@/components/entries/delete-entry-dialog";
 import { EditEntryDialog } from "@/components/entries/edit-entry-dialog";
+import { ImportExportPanel } from "@/components/entries/import-export-panel";
 import { EntriesTable } from "@/components/entries/entries-table";
 import type { DisplayCurrency } from "@/lib/currency/display";
 import { buildEntryQueryParams, type EntryQuery } from "@/lib/entries/query";
@@ -22,6 +23,14 @@ export type EntriesViewProps = {
   query: EntryQuery;
   displayCurrency: DisplayCurrency;
   displayRatesByEntryId: Record<string, number>;
+  importHistory: Array<{
+    id: string;
+    provider: string;
+    filename: string | null;
+    importedRows: number;
+    failedRows: number;
+    createdAt: Date;
+  }>;
   enableActions?: boolean;
 };
 
@@ -33,6 +42,7 @@ export function EntriesView({
   query,
   displayCurrency,
   displayRatesByEntryId,
+  importHistory,
   enableActions = true,
 }: EntriesViewProps) {
   const router = useRouter();
@@ -171,6 +181,8 @@ export function EntriesView({
           {enableActions ? <AddEntryDialog onCreated={handleCreated} /> : null}
         </div>
       </div>
+
+      {enableActions ? <ImportExportPanel history={importHistory} query={query} /> : null}
 
       <div className="grid gap-3 rounded-sm border border-border bg-muted/40 p-4 text-xs text-muted-foreground md:grid-cols-4">
         <div className="space-y-2">

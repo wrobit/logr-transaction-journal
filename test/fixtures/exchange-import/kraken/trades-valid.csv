@@ -1,0 +1,3 @@
+txid,ordertxid,pair,time,type,ordertype,price,cost,fee,vol
+tx-k-1,ord-k-1,XXBTZUSD,2026-01-02 10:00:00,buy,limit,42000,42,0.12,0.001
+tx-k-2,ord-k-2,XETHZEUR,2026-01-03 10:00:00,sell,market,3000,300,0.90,0.1

@@ -31,6 +31,13 @@ export type DashboardHolding = {
   netValue: number;
 };
 
+export type DashboardClosedPosition = {
+  asset: string;
+  buyValue: number;
+  sellValue: number;
+  pnlValue: number;
+};
+
 export type DashboardData = {
   displayCurrency: DisplayCurrency;
   totals: {
@@ -40,6 +47,7 @@ export type DashboardData = {
   };
   series: DashboardSeriesPoint[];
   holdings: DashboardHolding[];
+  closedPositions: DashboardClosedPosition[];
   holdingsMix: Array<{ asset: string; value: number }>;
   assets: string[];
   rateAttribution: {
@@ -50,6 +58,10 @@ export type DashboardData = {
 };
 
 const toNumber = (value: unknown) => Number(value ?? 0);
+const ZERO_EPSILON = 1e-9;
+
+const normalizeZero = (value: number) => (Math.abs(value) < ZERO_EPSILON ? 0 : value);
+const hasOpenQuantity = (value: number) => Math.abs(value) >= ZERO_EPSILON;
 
 export async function getDashboardData(
   user: { id?: string | null; email?: string | null; name?: string | null },
@@ -63,6 +75,7 @@ export async function getDashboardData(
       totals: { buyValue: 0, sellValue: 0, pnlValue: 0 },
       series: [],
       holdings: [],
+      closedPositions: [],
       holdingsMix: [],
       assets: [],
       rateAttribution: {
@@ -194,13 +207,14 @@ export async function getDashboardData(
       };
     });
 
-  const holdings = Array.from(holdingsMap.entries())
+  const allHoldings = Array.from(holdingsMap.entries())
     .map(([asset, values]) => {
+      const netQuantity = normalizeZero(values.netQuantity);
       const pnlValue = values.sellValue - values.buyValue;
       const netValue = values.buyValue - values.sellValue;
       return {
         asset,
-        netQuantity: values.netQuantity,
+        netQuantity,
         buyValue: values.buyValue,
         sellValue: values.sellValue,
         pnlValue,
@@ -208,6 +222,19 @@ export async function getDashboardData(
       };
     })
     .sort((left, right) => left.asset.localeCompare(right.asset));
+
+  const holdings = allHoldings
+    .filter((holding) => hasOpenQuantity(holding.netQuantity))
+    .sort((left, right) => left.asset.localeCompare(right.asset));
+
+  const closedPositions = allHoldings
+    .filter((holding) => !hasOpenQuantity(holding.netQuantity))
+    .map((holding) => ({
+      asset: holding.asset,
+      buyValue: holding.buyValue,
+      sellValue: holding.sellValue,
+      pnlValue: holding.pnlValue,
+    }));
 
   const holdingsMix = holdings
     .map((holding) => ({
@@ -225,6 +252,7 @@ export async function getDashboardData(
     totals,
     series,
     holdings,
+    closedPositions,
     holdingsMix,
     assets,
     rateAttribution: {

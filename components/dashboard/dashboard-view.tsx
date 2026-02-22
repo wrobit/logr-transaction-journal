@@ -16,6 +16,7 @@ import {
 } from "recharts";
 
 import type { DashboardData } from "@/actions/dashboard";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   ChartContainer,
@@ -102,7 +103,13 @@ export function DashboardView({ data, query }: DashboardViewProps) {
   const totals = data.totals;
   const hasSeries = data.series.length > 0;
   const hasHoldings = data.holdings.length > 0;
+  const hasClosedPositions = data.closedPositions.length > 0;
   const hasHoldingsMix = data.holdingsMix.length > 0;
+  const assetVolumeData = useMemo(
+    () => [...data.holdings, ...data.closedPositions],
+    [data.holdings, data.closedPositions]
+  );
+  const hasAssetVolume = assetVolumeData.length > 0;
   const axisFormatter = (value: number) =>
     formatNumber(value, { maximumFractionDigits: 0 }, locale);
   const dateTickFormatter = (value: string | number) =>
@@ -359,8 +366,16 @@ export function DashboardView({ data, query }: DashboardViewProps) {
 
         <Card className={cn("md:col-span-5", isPending && "opacity-60")}>
           <CardHeader className="border-b border-border/60">
-            <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
-              {t("panels.holdingsByAsset")}
+            <div className="flex items-center justify-between gap-2">
+              <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                {t("panels.holdingsByAsset")}
+              </div>
+              <Badge
+                variant="secondary"
+                className="border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+              >
+                {t("panels.openCount", { count: data.holdings.length })}
+              </Badge>
             </div>
           </CardHeader>
           <CardContent>
@@ -411,6 +426,64 @@ export function DashboardView({ data, query }: DashboardViewProps) {
         </Card>
       </div>
 
+      <Card className={cn(isPending && "opacity-60")}>
+        <CardHeader className="border-b border-border/60">
+          <div className="flex items-center justify-between gap-2">
+            <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
+              {t("panels.closedPositionsByAsset")}
+            </div>
+            <Badge variant="outline" className="border-border/70 bg-muted/40 text-muted-foreground">
+              {t("panels.closedCount", { count: data.closedPositions.length })}
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {hasClosedPositions ? (
+            <div className="max-h-[220px] overflow-y-auto">
+              <table className="w-full border-collapse text-left text-xs">
+                <thead className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                  <tr>
+                    <th className="py-2 pr-2">{t("closedPositionsTable.asset")}</th>
+                    <th className="py-2 pr-2">
+                      {t("closedPositionsTable.buy", { currency: data.displayCurrency })}
+                    </th>
+                    <th className="py-2 pr-2">
+                      {t("closedPositionsTable.sell", { currency: data.displayCurrency })}
+                    </th>
+                    <th className="py-2">
+                      {t("closedPositionsTable.pnl", { currency: data.displayCurrency })}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {data.closedPositions.map((position) => (
+                    <tr key={position.asset}>
+                      <td className="py-2 pr-2 text-muted-foreground">{position.asset}</td>
+                      <td className="py-2 pr-2">
+                        {formatCurrency(position.buyValue, data.displayCurrency, locale)}
+                      </td>
+                      <td className="py-2 pr-2">
+                        {formatCurrency(position.sellValue, data.displayCurrency, locale)}
+                      </td>
+                      <td
+                        className={cn(
+                          "py-2",
+                          position.pnlValue >= 0 ? "text-emerald-300" : "text-red-300"
+                        )}
+                      >
+                        {formatCurrency(position.pnlValue, data.displayCurrency, locale)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+              <EmptyPanel message={t("empty.closedPositions")} />
+          )}
+        </CardContent>
+      </Card>
+
       <div className="grid gap-3 md:grid-cols-12">
         <Card className={cn("md:col-span-12", isPending && "opacity-60")}>
           <CardHeader className="border-b border-border/60">
@@ -419,10 +492,10 @@ export function DashboardView({ data, query }: DashboardViewProps) {
             </div>
           </CardHeader>
           <CardContent className="h-[260px]">
-            {hasHoldings ? (
+            {hasAssetVolume ? (
               <ChartContainer config={volumeChartConfig} className="h-full w-full min-h-[200px]">
                 <BarChart
-                  data={data.holdings}
+                  data={assetVolumeData}
                   margin={{ left: 8, right: 12 }}
                   accessibilityLayer
                 >

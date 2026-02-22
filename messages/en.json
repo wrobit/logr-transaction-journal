@@ -71,6 +71,7 @@
       "updated": "Updated",
       "operation": "Operation",
       "asset": "Asset",
+      "quoteCurrency": "Quote",
       "quantity": "Quantity",
       "price": "Price",
       "full": "Full",

@@ -71,6 +71,7 @@
       "updated": "Zaktualizowano",
       "operation": "Operacja",
       "asset": "Aktywum",
+      "quoteCurrency": "Waluta",
       "quantity": "Ilosc",
       "price": "Cena",
       "full": "Wartosc",

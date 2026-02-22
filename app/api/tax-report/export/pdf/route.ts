@@ -38,7 +38,7 @@ export async function GET(request: Request) {
 
   const locale = await getRequestLocale();
   const pdfBuffer = await renderTaxReportPdf(report, locale);
-  const filename = `pit-helper-${report.year ?? "all"}.pdf`;
+  const filename = `logr-report-${report.year ?? "all"}.pdf`;
 
   return new NextResponse(new Uint8Array(pdfBuffer), {
     status: 200,

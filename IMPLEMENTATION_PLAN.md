@@ -396,71 +396,12 @@ Auth Pages Implementation Plan:
 - [x] Respect `prefers-reduced-motion` and pause on hover
 - [x] Hide ticker on empty or failed API response
 
-### Phase 9 — Subscriptions and payments with Polar.sh
+### Phase 9 — Open-source support (no subscriptions)
 
-Plan tiers (initial):
-
-- `Free`: max `25` total entries, max `1` CSV import/month, max `25` rows/import
-- `Pro`: max `5,000` total entries, max `30` CSV imports/month, max `2,000` rows/import
-- `Scale`: max `100,000` total entries, max `300` CSV imports/month, max `10,000` rows/import
-
-### Phase 9.1 - Pricing model and entitlements
-
-- [ ] Finalize plan catalog: `free | pro | scale`
-- [ ] Define entitlement matrix (entry cap, imports/month, rows/import, export access)
-- [ ] Store entitlement config in code as versioned constants (not hardcoded in UI)
-- [ ] Define enforcement policy (`hard block` on limit reached + clear upgrade CTA)
-
-### Phase 9.2 - Billing data model
-
-- [ ] Add `users.plan` enum (`free | pro | scale`) with default `free`
-- [ ] Add billing fields on `users`: `billingCustomerId`, `billingSubscriptionId`, `billingStatus`, `billingCurrentPeriodEnd`
-- [ ] Add usage table (monthly buckets): `usage_counters` (`userId`, `period`, `metric`, `count`)
-- [ ] Add billing event audit table for webhook traceability and replay safety
-
-### Phase 9.3 - Polar.sh integration
-
-- [ ] Create Polar products/prices for `Pro` and `Scale`
-- [ ] Implement checkout session action for upgrades
-- [ ] Implement customer portal action for manage/cancel
-- [ ] Implement webhook endpoint (subscription created/updated/canceled/payment failed)
-- [ ] Add webhook signature verification + idempotent event processing
-
-### Phase 9.4 - Entitlement enforcement
-
-- [ ] Enforce entry limit in create entry server action
-- [ ] Enforce import limits in CSV import pipeline (count + rows/import)
-- [ ] Enforce export limits/features by plan
-- [ ] Add centralized `assertEntitlement(userId, action)` helper for consistency
-
-### Phase 9.5 - Billing UI
-
-- [ ] Add `/billing` page with current plan, usage bars, renewal date, status
-- [ ] Add upgrade/downgrade controls and `Manage billing` button
-- [ ] Show in-context paywall cards when limits are reached
-- [ ] Localize all billing copy and errors (`en` + `pl`)
-
-### Phase 9.6 - Testing and ops
-
-- [ ] Add tests for entitlement checks across entry create/import/export
-- [ ] Add webhook tests (signature, idempotency, lifecycle transitions)
-- [ ] Add metrics/logging for limit-block events and billing failures
-- [ ] Add admin visibility for user plan + billing status (read-only)
-
-### Phase 9.7 - Acceptance criteria
-
-- [ ] User can upgrade/downgrade via Polar checkout/portal
-- [ ] Plan changes sync correctly via webhooks
-- [ ] Limits are enforced server-side (not bypassable from client)
-- [ ] Reached-limit UX is clear and includes upgrade path
-
-### Phase 9.8 - Strict implementation order
-
-- [ ] Milestone 9-M1: `9.1 -> 9.2` (plan model and persistence first)
-- [ ] Milestone 9-M2: `9.3` (checkout/portal/webhooks with idempotency)
-- [ ] Milestone 9-M3: `9.4` (server-side entitlement guards)
-- [ ] Milestone 9-M4: `9.5` (billing UX, limits, and upgrade paths)
-- [ ] Milestone 9-M5: `9.6 -> 9.7` (tests/ops hardening and acceptance sign-off)
+- [x] Add a small support/donate CTA button (e.g., GitHub Sponsors / Buy Me a Coffee)
+- [x] Place CTA in non-intrusive locations (footer and/or profile page)
+- [x] Keep all product features free and available to all users
+- [x] Add short transparency copy: project is open source and community-supported
 
 ### Phase 10 — Import & Export with exchange CSV providers
 
@@ -472,17 +413,17 @@ Initial providers:
 
 ### Phase 10.1 - Scope and canonical import model
 
-- [ ] Define canonical transaction DTO for import normalization
-- [ ] Define operation mapping rules to app model (`BUY/SELL`; unsupported rows flagged)
-- [ ] Define required/optional fields and strict validation behavior
-- [ ] Lock provider support scope for v1: `Kraken`, `ZondaCrypto`, `Binance`
+- [x] Define canonical transaction DTO for import normalization
+- [x] Define operation mapping rules to app model (`BUY/SELL`; unsupported rows flagged)
+- [x] Define required/optional fields and strict validation behavior
+- [x] Lock provider support scope for v1: `Kraken`, `ZondaCrypto`, `Binance`
 
 ### Phase 10.2 - CSV parser adapters
 
-- [ ] Implement `KrakenCsvAdapter` (column map, date/amount parsing, symbol normalization)
-- [ ] Implement `ZondaCryptoCsvAdapter` (column map + operation mapping)
-- [ ] Implement `BinanceCsvAdapter` (spot trade history + fee handling)
-- [ ] Add delimiter/encoding detection (`comma/semicolon`, UTF-8 BOM-safe)
+- [x] Implement `KrakenCsvAdapter` (column map, date/amount parsing, symbol normalization)
+- [x] Implement `ZondaCryptoCsvAdapter` (column map + operation mapping)
+- [x] Implement `BinanceCsvAdapter` (spot trade history + fee handling)
+- [x] Add delimiter/encoding detection (`comma/semicolon`, UTF-8 BOM-safe)
 
 ### Phase 10.3 - Import pipeline
 
@@ -517,24 +458,22 @@ Initial providers:
 - [ ] Add fixture-based parser tests for Kraken/ZondaCrypto/Binance samples
 - [ ] Add pipeline tests for preview, confirm, dedup, and partial failure
 - [ ] Add export snapshot tests for deterministic output
-- [ ] Validate plan-limit integration with Phase 9 entitlement checks
+- [ ] Validate import/export limits and behavior remain fully free for all users
 
 ### Phase 10.8 - Strict implementation order
 
-- [ ] Milestone 10-M1: `10.1` (canonical model and mapping contracts)
-- [ ] Milestone 10-M2: `10.2` (provider parsers and file decoding)
+- [x] Milestone 10-M1: `10.1` (canonical model and mapping contracts)
+- [x] Milestone 10-M2: `10.2` (provider parsers and file decoding)
 - [ ] Milestone 10-M3: `10.3 -> 10.4` (import execution + auditability)
 - [ ] Milestone 10-M4: `10.5` (deterministic export capability)
 - [ ] Milestone 10-M5: `10.6 -> 10.7` (UX localization, test coverage, and sign-off)
 
-### Cross-phase strict order (Phase 9 + 10)
+### Cross-phase strict order
 
-- [ ] Step 1: Complete Phase 9 Milestones `9-M1` and `9-M2`
+- [ ] Step 1: Complete Phase 9 (support CTA)
 - [ ] Step 2: Complete Phase 10 Milestones `10-M1` and `10-M2`
-- [ ] Step 3: Complete Phase 9 Milestone `9-M3` (entitlement guards before import rollout)
-- [ ] Step 4: Complete Phase 10 Milestones `10-M3` and `10-M4`
-- [ ] Step 5: Complete Phase 9 Milestone `9-M4` and Phase 10 Milestone `10-M5`
-- [ ] Step 6: Complete Phase 9 Milestone `9-M5` and run final acceptance checks
+- [ ] Step 3: Complete Phase 10 Milestones `10-M3` and `10-M4`
+- [ ] Step 4: Complete Phase 10 Milestone `10-M5` and run final acceptance checks
 
 ### Phase 11 — Administration Panel
 

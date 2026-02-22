@@ -35,7 +35,7 @@ export default async function DashboardPage({ searchParams }: PageProps) {
 
   return (
     <div className="min-h-screen bg-black px-3 py-10 md:px-4">
-      <div className="mx-auto w-full max-w-6xl">
+      <div className="mx-auto w-full max-w-7xl">
         <DashboardView data={data} query={query} />
       </div>
     </div>

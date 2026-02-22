@@ -12,7 +12,7 @@ export default async function AdminLayout({
 
   return (
     <div className="min-h-screen bg-black px-3 py-10 md:px-4">
-      <div className="mx-auto w-full max-w-6xl space-y-6">
+      <div className="mx-auto w-full max-w-7xl space-y-6">
         <div className="space-y-2">
           <h1 className="text-lg font-semibold">{t("admin.layout.title")}</h1>
           <p className="text-sm text-muted-foreground">

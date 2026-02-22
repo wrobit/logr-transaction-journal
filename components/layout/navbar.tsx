@@ -33,7 +33,7 @@ export function Navbar() {
         />
       </Link>
 
-      <div className="mx-auto flex w-full max-w-6xl items-center justify-between">
+      <div className="mx-auto flex w-full max-w-7xl items-center justify-between">
         <div className="flex items-center gap-6">
           <nav className="flex items-center gap-4 text-xs text-muted-foreground">
             <Link href="/" className="transition hover:text-foreground">

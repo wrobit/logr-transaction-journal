@@ -35,7 +35,7 @@ export default async function Page({ searchParams }: PageProps) {
 
   return (
     <div className="min-h-screen bg-black px-3 py-10 md:px-4">
-      <div className="mx-auto w-full max-w-6xl">
+      <div className="mx-auto w-full max-w-7xl">
         <EntriesView
           entries={entriesResult.entries}
           assets={entriesResult.assets}

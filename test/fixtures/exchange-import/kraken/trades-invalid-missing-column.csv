@@ -1,0 +1,2 @@
+txid,ordertxid,pair,time,type,ordertype,price,cost,vol
+tx-k-3,ord-k-3,XXBTZUSD,2026-01-04 10:00:00,buy,limit,43000,43,0.001

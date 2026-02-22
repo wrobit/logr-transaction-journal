@@ -1,4 +1,7 @@
 // @vitest-environment node
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
+
 import { describe, expect, it } from "vitest";
 
 import { parseBinanceCsv } from "@/lib/exchange-import/adapters/binance";
@@ -6,6 +9,8 @@ import { parseKrakenCsv } from "@/lib/exchange-import/adapters/kraken";
 import { parseExchangeCsv } from "@/lib/exchange-import/adapters";
 import { parseZondaCryptoCsv } from "@/lib/exchange-import/adapters/zondacrypto";
 import { decodeCsvInput } from "@/lib/exchange-import/csv";
+
+const fixturePath = (path: string) => resolve(process.cwd(), "test/fixtures/exchange-import", path);
 
 describe("exchange CSV adapters", () => {
   it("parses Kraken trades CSV into canonical row", () => {
@@ -85,5 +90,29 @@ describe("exchange CSV adapters", () => {
     const decoded = decodeCsvInput(bytes);
     expect(decoded.encoding).toBe("utf-8-bom");
     expect(decoded.text.startsWith("Date(UTC)")).toBe(true);
+  });
+
+  it("parses Kraken fixture CSV", () => {
+    const content = readFileSync(fixturePath("kraken/trades-valid.csv"), "utf8");
+    const result = parseKrakenCsv({ content });
+
+    expect(result.rows.length).toBe(2);
+    expect(result.rows.every((row) => row.status === "valid")).toBe(true);
+  });
+
+  it("parses Binance fixture CSV", () => {
+    const content = readFileSync(fixturePath("binance/spot-valid.csv"), "utf8");
+    const result = parseBinanceCsv({ content });
+
+    expect(result.rows.length).toBe(2);
+    expect(result.rows.every((row) => row.status === "valid")).toBe(true);
+  });
+
+  it("parses Zonda fixture CSV", () => {
+    const content = readFileSync(fixturePath("zondacrypto/transactions-valid.csv"), "utf8");
+    const result = parseZondaCryptoCsv({ content });
+
+    expect(result.rows.length).toBe(2);
+    expect(result.rows.every((row) => row.status === "valid")).toBe(true);
   });
 });

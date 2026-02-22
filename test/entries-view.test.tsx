@@ -77,6 +77,7 @@ describe("EntriesView", () => {
         query={baseQuery}
         displayCurrency="PLN"
         displayRatesByEntryId={{ "1": 1, "2": 1 }}
+        importHistory={[]}
         enableActions={false}
       />,
     );
@@ -104,6 +105,7 @@ describe("EntriesView", () => {
         query={baseQuery}
         displayCurrency="PLN"
         displayRatesByEntryId={Object.fromEntries(manyEntries.map((entry) => [entry.id, 1]))}
+        importHistory={[]}
         enableActions={false}
       />,
     );
@@ -123,6 +125,7 @@ describe("EntriesView", () => {
         query={baseQuery}
         displayCurrency="PLN"
         displayRatesByEntryId={{ "1": 1, "2": 1 }}
+        importHistory={[]}
         enableActions={false}
       />,
     );

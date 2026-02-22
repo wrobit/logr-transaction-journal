@@ -1,0 +1,3 @@
+market;time;userAction;amount;rate;commissionValue;id
+ETH-PLN;1704110400000;Buy;0,5;10400,10;12,00;z-1
+BTC-USD;1704196800000;Sell;0,01;45000,00;1,20;z-2

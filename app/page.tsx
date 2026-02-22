@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
+import { listExchangeImportHistoryAction } from "@/actions/exchange-import";
 import { listEntries } from "@/actions/entries";
 import { EntriesView } from "@/components/entries/entries-view";
 import { authOptions } from "@/lib/auth/options";
@@ -31,7 +32,10 @@ export default async function Page({ searchParams }: PageProps) {
 
   const resolvedSearchParams = await searchParams;
   const query = parseEntryQuery(resolvedSearchParams ?? {});
-  const entriesResult = await listEntries(session.user, query);
+  const [entriesResult, importHistory] = await Promise.all([
+    listEntries(session.user, query),
+    listExchangeImportHistoryAction(),
+  ]);
 
   return (
     <div className="min-h-screen bg-black px-3 py-10 md:px-4">
@@ -44,6 +48,7 @@ export default async function Page({ searchParams }: PageProps) {
           query={query}
           displayCurrency={entriesResult.displayCurrency}
           displayRatesByEntryId={entriesResult.displayRatesByEntryId}
+          importHistory={importHistory}
         />
       </div>
     </div>

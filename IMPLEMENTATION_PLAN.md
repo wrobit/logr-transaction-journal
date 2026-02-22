@@ -427,24 +427,24 @@ Initial providers:
 
 ### Phase 10.3 - Import pipeline
 
-- [ ] Build upload -> parse -> preview -> confirm flow
-- [ ] Add row-level validation with error categories (schema, mapping, business rule)
-- [ ] Add deduplication fingerprint per normalized row to prevent duplicates
+- [x] Build upload -> parse -> preview -> confirm flow
+- [x] Add row-level validation with error categories (schema, mapping, business rule)
+- [x] Add deduplication fingerprint per normalized row to prevent duplicates
 - [ ] Support partial-success imports with downloadable error report
 
 ### Phase 10.4 - Persistence and auditing
 
-- [ ] Persist import batch metadata (provider, filename, totals, failures, actor, timestamp)
-- [ ] Link imported entries to batch id for traceability
-- [ ] Store original row hash for reproducibility and dedup checks
+- [x] Persist import batch metadata (provider, filename, totals, failures, actor, timestamp)
+- [x] Link imported entries to batch id for traceability
+- [x] Store original row hash for reproducibility and dedup checks
 - [ ] Add import history page with batch status and details
 
 ### Phase 10.5 - Export features
 
-- [ ] Add unified entries export to normalized CSV
+- [x] Add unified entries export to normalized CSV
 - [ ] Add optional provider-shaped export format (future-proof adapter interface)
-- [ ] Include deterministic formatting (locale-safe numeric/date export)
-- [ ] Add export filtering by date range/asset/operation
+- [x] Include deterministic formatting (locale-safe numeric/date export)
+- [x] Add export filtering by date range/asset/operation
 
 ### Phase 10.6 - UX and localization
 
@@ -465,13 +465,13 @@ Initial providers:
 - [x] Milestone 10-M1: `10.1` (canonical model and mapping contracts)
 - [x] Milestone 10-M2: `10.2` (provider parsers and file decoding)
 - [ ] Milestone 10-M3: `10.3 -> 10.4` (import execution + auditability)
-- [ ] Milestone 10-M4: `10.5` (deterministic export capability)
+- [x] Milestone 10-M4: `10.5` (deterministic export capability)
 - [ ] Milestone 10-M5: `10.6 -> 10.7` (UX localization, test coverage, and sign-off)
 
 ### Cross-phase strict order
 
 - [ ] Step 1: Complete Phase 9 (support CTA)
-- [ ] Step 2: Complete Phase 10 Milestones `10-M1` and `10-M2`
+- [x] Step 2: Complete Phase 10 Milestones `10-M1` and `10-M2`
 - [ ] Step 3: Complete Phase 10 Milestones `10-M3` and `10-M4`
 - [ ] Step 4: Complete Phase 10 Milestone `10-M5` and run final acceptance checks
 

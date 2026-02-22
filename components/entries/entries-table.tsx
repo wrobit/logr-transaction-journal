@@ -69,7 +69,7 @@ export function EntriesTable({
 
   return (
     <div className="overflow-x-auto overflow-y-hidden rounded-sm border border-border">
-      <table className="min-w-[1100px] w-full border-collapse text-left text-xs text-foreground">
+      <table className="min-w-[1180px] w-full border-collapse text-left text-xs text-foreground">
         <thead className="bg-muted/50 text-[11px] uppercase tracking-wide text-muted-foreground">
           <tr>
             <th className="px-3 py-3 font-medium">{t("table.index")}</th>
@@ -98,6 +98,7 @@ export function EntriesTable({
                 </th>
               );
             })}
+            <th className="px-3 py-3 font-medium">{t("table.attribution")}</th>
             <th className="px-3 py-3 font-medium">{t("table.note")}</th>
             {showActions ? <th className="px-3 py-3 font-medium">{t("table.actions")}</th> : null}
           </tr>
@@ -170,6 +171,21 @@ export function EntriesTable({
                   displayCurrency,
                   locale,
                 )}
+              </td>
+              <td className="px-3 py-3">
+                <div className="space-y-1">
+                  <div className="text-muted-foreground">
+                    {(entry.rateAttribution?.provider ?? "nbp").toUpperCase()} · {entry.rateAttribution?.method ?? "official_publication"}
+                  </div>
+                  <div className="text-[11px] text-muted-foreground">
+                    {entry.rateAttribution?.effectiveDate ?? entry.nbpRateDate}
+                  </div>
+                  {entry.rateAttribution?.warnings?.length ? (
+                    <Badge variant="outline" className="border-amber-500/40 bg-amber-500/10 text-amber-300">
+                      {t("table.fallbackWarning")}
+                    </Badge>
+                  ) : null}
+                </div>
               </td>
               <td className="px-3 py-3 text-muted-foreground">
                 {entry.note ?? "-"}

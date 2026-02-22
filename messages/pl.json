@@ -73,6 +73,8 @@
       "source": "Zrodlo",
       "nbp": "NBP",
       "valuePln": "Wartosc {currency}",
+      "attribution": "Atrybucja",
+      "fallbackWarning": "Uzyto fallback",
       "note": "Notatka",
       "actions": "Akcje",
       "openActions": "Otworz akcje wpisu",
@@ -134,6 +136,11 @@
       "realizedCost": "Koszt zrealizowany",
       "realizedProceeds": "Przychod zrealizowany",
       "difference": "Roznica kupno vs sprzedaz"
+    },
+    "attribution": {
+      "providers": "Dostawcy kursow: {providers}",
+      "effectiveDate": "Najnowsza data efektywna: {date}",
+      "warnings": "Ostrzezenia fallback: {count}"
     },
     "panels": {
       "pnlOverTime": "PnL w czasie",

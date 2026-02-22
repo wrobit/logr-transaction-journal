@@ -772,21 +772,21 @@ Initial providers:
 
 ### Phase 16.1 - Tax report integration
 
-- [ ] Use Phase 14 rate service in tax report generation flows
-- [ ] Include provider/method/effective date/source metadata in tax exports
-- [ ] Ensure report output remains deterministic and reproducible from persisted snapshots
+- [x] Use Phase 14 rate service in tax report generation flows
+- [x] Include provider/method/effective date/source metadata in tax exports
+- [x] Ensure report output remains deterministic and reproducible from persisted snapshots
 
 ### Phase 16.2 - Import pipeline enrichment
 
-- [ ] Apply country/provider policy resolution during import normalization
-- [ ] Attach integration metadata to imported transaction records
-- [ ] Add fallback and warning markers for import-time rate gaps
+- [x] Apply country/provider policy resolution during import normalization
+- [x] Attach integration metadata to imported transaction records
+- [x] Add fallback and warning markers for import-time rate gaps
 
 ### Phase 16.3 - Optional live UI attribution
 
-- [ ] Add source attribution badges (provider + method + date) on key financial surfaces
-- [ ] Show explicit warnings when fallback rates are used
-- [ ] Keep attribution concise and aligned with existing dashboard/entries visual language
+- [x] Add source attribution badges (provider + method + date) on key financial surfaces
+- [x] Show explicit warnings when fallback rates are used
+- [x] Keep attribution concise and aligned with existing dashboard/entries visual language
 
 ---
 

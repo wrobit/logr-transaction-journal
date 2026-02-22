@@ -3,8 +3,10 @@ import { bankImportAuditBatches } from "@/lib/db/schema";
 import { emitIntegrationAlert } from "@/lib/integrations/alerts";
 import { parsePolishBankCsvFallback } from "@/lib/integrations/bank-import/csv-fallback";
 import { resolveBankImportProvidersForCountry } from "@/lib/integrations/bank-import/registry";
+import { getInternationalRate } from "@/lib/integrations/rates-service";
+import { resolveProviderPolicy } from "@/lib/integrations/policy";
 import type { NormalizedBankTransaction } from "@/lib/integrations/types";
-import { hashSnapshot } from "@/lib/integrations/utils";
+import { hashSnapshot, normalizeCurrency, normalizeIsoDate } from "@/lib/integrations/utils";
 
 type BankImportInput = {
   userId: string;
@@ -22,6 +24,19 @@ type BankImportResult = {
   failedCount: number;
   warnings: string[];
   transactions: NormalizedBankTransaction[];
+};
+
+type ImportNormalizationMetadata = {
+  countryCode: string;
+  policyProviders: string[];
+  selectedRateProvider: string | null;
+  rateAttribution: {
+    provider: string;
+    method: string;
+    effectiveDate: string;
+    warnings: string[];
+  } | null;
+  warnings: string[];
 };
 
 export async function importBankTransactions(input: BankImportInput): Promise<BankImportResult> {
@@ -45,16 +60,21 @@ export async function importBankTransactions(input: BankImportInput): Promise<Ba
 
       const transactions = await provider.listTransactions(accountRef);
       const deduplicated = deduplicateTransactions(transactions);
+      const enriched = await enrichImportedTransactions({
+        countryCode,
+        transactions: deduplicated,
+        sourceProvider: provider.name,
+      });
       const failedCount = Math.max(0, transactions.length - deduplicated.length);
 
       const result: BankImportResult = {
         source: "aggregator",
         provider: provider.name,
         accountRef,
-        importedCount: deduplicated.length,
+        importedCount: enriched.transactions.length,
         failedCount,
-        warnings,
-        transactions: deduplicated,
+        warnings: [...warnings, ...enriched.warnings],
+        transactions: enriched.transactions,
       };
 
       await persistBankImportAudit(result, {
@@ -92,16 +112,21 @@ export async function importBankTransactions(input: BankImportInput): Promise<Ba
     csvContent: input.csvContent,
   });
   const deduplicated = deduplicateTransactions(parsed);
+  const enriched = await enrichImportedTransactions({
+    countryCode,
+    transactions: deduplicated,
+    sourceProvider: "gocardless_bad",
+  });
   const failedCount = Math.max(0, parsed.length - deduplicated.length);
 
   const result: BankImportResult = {
     source: "csv_fallback",
     provider: "gocardless_bad",
     accountRef,
-    importedCount: deduplicated.length,
+    importedCount: enriched.transactions.length,
     failedCount,
-    warnings,
-    transactions: deduplicated,
+    warnings: [...warnings, ...enriched.warnings],
+    transactions: enriched.transactions,
   };
 
   await persistBankImportAudit(result, {
@@ -150,4 +175,91 @@ function deduplicateTransactions(transactions: NormalizedBankTransaction[]) {
   }
 
   return unique;
+}
+
+async function enrichImportedTransactions(input: {
+  countryCode: string;
+  transactions: NormalizedBankTransaction[];
+  sourceProvider: string;
+}) {
+  const warnings: string[] = [];
+  let policyProviders: string[] = [];
+
+  try {
+    policyProviders = await resolveProviderPolicy(input.countryCode, "rate");
+  } catch {
+    warnings.push("Rate provider policy unavailable during import normalization.");
+  }
+
+  const selectedRateProvider = policyProviders[0] ?? null;
+
+  const transactions = await Promise.all(
+    input.transactions.map(async (transaction) => {
+      const normalizedCurrency = normalizeCurrency(transaction.currency);
+      let rateAttribution: ImportNormalizationMetadata["rateAttribution"] = null;
+      const localWarnings: string[] = [];
+
+      if (normalizedCurrency !== "PLN") {
+        try {
+          const rate = await getInternationalRate({
+            countryCode: input.countryCode,
+            baseCurrency: normalizedCurrency,
+            quoteCurrency: "PLN",
+            effectiveDate: normalizeIsoDate(transaction.bookedAt),
+            rateType: "historical",
+          });
+
+          rateAttribution = {
+            provider: rate.provider,
+            method: rate.method,
+            effectiveDate: rate.effectiveDate,
+            warnings: rate.warnings ?? [],
+          };
+
+          if (rate.warnings?.length) {
+            localWarnings.push(...rate.warnings);
+          }
+        } catch {
+          localWarnings.push(
+            `Rate gap for ${normalizedCurrency}/PLN on ${normalizeIsoDate(transaction.bookedAt)} during import normalization.`,
+          );
+        }
+      }
+
+      const metadata: ImportNormalizationMetadata = {
+        countryCode: input.countryCode,
+        policyProviders,
+        selectedRateProvider,
+        rateAttribution,
+        warnings: localWarnings,
+      };
+
+      if (localWarnings.length) {
+        warnings.push(
+          ...localWarnings.map((warning) => `${transaction.providerTransactionId}: ${warning}`),
+        );
+      }
+
+      const snapshotBase =
+        transaction.rawSnapshot && typeof transaction.rawSnapshot === "object"
+          ? (transaction.rawSnapshot as Record<string, unknown>)
+          : { raw: transaction.rawSnapshot };
+
+      return {
+        ...transaction,
+        rawSnapshot: {
+          ...snapshotBase,
+          normalization: {
+            ...metadata,
+            sourceProvider: input.sourceProvider,
+          },
+        },
+      } satisfies NormalizedBankTransaction;
+    }),
+  );
+
+  return {
+    transactions,
+    warnings,
+  };
 }

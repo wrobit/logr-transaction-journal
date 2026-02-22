@@ -183,6 +183,8 @@
       "buyVsSellVolume": "Buy vs sell volume",
       "holdingsByAsset": "Holdings by asset",
       "closedPositionsByAsset": "Closed positions by asset",
+      "openCount": "Open: {count}",
+      "closedCount": "Closed: {count}",
       "buyVsSellByAsset": "Buy vs sell by asset"
     },
     "holdingsTable": {

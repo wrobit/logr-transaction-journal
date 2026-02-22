@@ -16,6 +16,7 @@ import {
 } from "recharts";
 
 import type { DashboardData } from "@/actions/dashboard";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   ChartContainer,
@@ -365,8 +366,16 @@ export function DashboardView({ data, query }: DashboardViewProps) {
 
         <Card className={cn("md:col-span-5", isPending && "opacity-60")}>
           <CardHeader className="border-b border-border/60">
-            <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
-              {t("panels.holdingsByAsset")}
+            <div className="flex items-center justify-between gap-2">
+              <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                {t("panels.holdingsByAsset")}
+              </div>
+              <Badge
+                variant="secondary"
+                className="border-emerald-500/40 bg-emerald-500/10 text-emerald-300"
+              >
+                {t("panels.openCount", { count: data.holdings.length })}
+              </Badge>
             </div>
           </CardHeader>
           <CardContent>
@@ -419,8 +428,13 @@ export function DashboardView({ data, query }: DashboardViewProps) {
 
       <Card className={cn(isPending && "opacity-60")}>
         <CardHeader className="border-b border-border/60">
-          <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
-            {t("panels.closedPositionsByAsset")}
+          <div className="flex items-center justify-between gap-2">
+            <div className="text-[11px] uppercase tracking-wide text-muted-foreground">
+              {t("panels.closedPositionsByAsset")}
+            </div>
+            <Badge variant="outline" className="border-border/70 bg-muted/40 text-muted-foreground">
+              {t("panels.closedCount", { count: data.closedPositions.length })}
+            </Badge>
           </div>
         </CardHeader>
         <CardContent>

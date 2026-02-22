@@ -183,6 +183,8 @@
       "buyVsSellVolume": "Wolumen kupno vs sprzedaz",
       "holdingsByAsset": "Aktywa",
       "closedPositionsByAsset": "Zamkniete pozycje per aktywo",
+      "openCount": "Otwarte: {count}",
+      "closedCount": "Zamkniete: {count}",
       "buyVsSellByAsset": "Kupno vs sprzedaz per aktywo"
     },
     "holdingsTable": {

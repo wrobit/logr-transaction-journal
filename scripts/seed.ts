@@ -42,9 +42,11 @@ const TEST_USER = {
   lastName: "Admin",
 } as const;
 
-const HOLD_DAYS = [8, 11, 14, 18, 21, 9, 13, 17, 10, 15] as const;
-const ASSETS = ["BTC", "SOL", "ETH", "BTC", "ETH", "SOL", "BTC", "SOL", "ETH", "BTC"] as const;
-const QUOTES = ["USD", "EUR", "PLN", "USD", "EUR", "PLN", "EUR", "USD", "PLN", "USD"] as const;
+const CLOSED_HOLD_DAYS = [8, 11, 14, 18, 21, 9, 13, 17] as const;
+const CLOSED_ASSETS = ["BTC", "ETH", "BTC", "ETH", "BTC", "ETH", "BTC", "ETH"] as const;
+const CLOSED_QUOTES = ["USD", "EUR", "PLN", "USD", "EUR", "PLN", "EUR", "USD"] as const;
+const OPEN_ASSETS = ["SOL", "SOL", "SOL", "SOL"] as const;
+const OPEN_QUOTES = ["USD", "EUR", "PLN", "USD"] as const;
 
 const BUY_PRICES_BY_ASSET: Record<string, number[]> = {
   BTC: [61200, 62850, 60320, 64600],
@@ -58,7 +60,7 @@ const QUANTITY_BY_ASSET: Record<string, number[]> = {
   SOL: [12.5, 16.2, 14.8, 18.1],
 };
 
-const PROFIT_PCT = [5.2, 8.6, 4.4, 10.8, 6.1, 9.4, 7.3, 11.2, 5.7, 12.4] as const;
+const PROFIT_PCT = [5.2, 8.6, 4.4, 10.8, 6.1, 9.4, 7.3, 11.2] as const;
 const COMMISSION_RATE = 0.0015;
 
 const NBP_RATE_BY_QUOTE: Record<string, number[]> = {
@@ -162,10 +164,10 @@ async function seedTransactions(userId: string, deps: SeedDeps) {
 
   const rows: Array<typeof deps.entries.$inferInsert> = [];
 
-  for (let index = 0; index < 10; index += 1) {
-    const asset = ASSETS[index] ?? "BTC";
-    const quote = QUOTES[index] ?? "USD";
-    const holdDays = HOLD_DAYS[index] ?? 10;
+  for (let index = 0; index < 8; index += 1) {
+    const asset = CLOSED_ASSETS[index] ?? "BTC";
+    const quote = CLOSED_QUOTES[index] ?? "USD";
+    const holdDays = CLOSED_HOLD_DAYS[index] ?? 10;
     const profitPct = PROFIT_PCT[index] ?? 6;
 
     const buyDate = now.subtract(75 - index * 5, "day").toDate();
@@ -217,6 +219,35 @@ async function seedTransactions(userId: string, deps: SeedDeps) {
     });
   }
 
+  for (let index = 0; index < 4; index += 1) {
+    const asset = OPEN_ASSETS[index] ?? "SOL";
+    const quote = OPEN_QUOTES[index] ?? "USD";
+    const buyDate = now.subtract(12 - index * 3, "day").toDate();
+    const buyPricePool = BUY_PRICES_BY_ASSET[asset] ?? [100];
+    const quantityPool = QUANTITY_BY_ASSET[asset] ?? [1];
+    const buyPrice = buyPricePool[index % buyPricePool.length] ?? 100;
+    const quantity = quantityPool[(index + 1) % quantityPool.length] ?? 1;
+    const buyCommission = buyPrice * quantity * COMMISSION_RATE;
+
+    const buyPayload = buildPayload({
+      operation: "BUY",
+      baseAsset: asset,
+      quoteCurrency: quote,
+      quantity,
+      pricePerUnit: buyPrice,
+      commission: buyCommission,
+      tradeDate: buyDate,
+      source: "Seeded swing position",
+      note: `Open ${asset} position (${quote})`,
+    });
+
+    rows.push({
+      userId,
+      date: buyDate,
+      encryptedPayload: deps.encryptEntryPayload(buyPayload, dek),
+    });
+  }
+
   await deps.db.insert(deps.entries).values(rows);
 }
 
@@ -228,7 +259,9 @@ async function main() {
   console.log("Seed complete:");
   console.log(`- user: ${TEST_USER.email}`);
   console.log("- role: admin");
-  console.log("- entries: 20 (10 BUY + 10 SELL)");
+  console.log("- entries: 20 (12 BUY + 8 SELL)");
+  console.log("- open assets: SOL");
+  console.log("- closed assets: BTC, ETH");
 }
 
 main().catch((error: unknown) => {

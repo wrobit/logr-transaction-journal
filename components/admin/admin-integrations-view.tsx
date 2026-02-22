@@ -6,8 +6,10 @@ import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
 
 import {
+  resetAdminIntegrationPolicyToDefaults,
   runAdminIntegrationSmokeTests,
   setAdminIntegrationPolicyLock,
+  unlockAdminIntegrationPolicy,
   type AdminIntegrationOverview,
   type IntegrationSmokeResult,
 } from "@/actions/admin-integrations";
@@ -69,6 +71,40 @@ export function AdminIntegrationsView({ overview }: AdminIntegrationsViewProps) 
 
       if (response.status === "success") {
         toast.success(t("policy.updated"));
+      } else {
+        toast.error(response.message || t("policy.error"));
+      }
+
+      router.refresh();
+    });
+  };
+
+  const unlockPolicy = () => {
+    startPolicyTransition(async () => {
+      const response = await unlockAdminIntegrationPolicy({
+        countryCode: "PL",
+        providerType: policyType,
+      });
+
+      if (response.status === "success") {
+        toast.success(t("policy.unlockSuccess"));
+      } else {
+        toast.error(response.message || t("policy.error"));
+      }
+
+      router.refresh();
+    });
+  };
+
+  const resetPolicy = () => {
+    startPolicyTransition(async () => {
+      const response = await resetAdminIntegrationPolicyToDefaults({
+        countryCode: "PL",
+        providerType: policyType,
+      });
+
+      if (response.status === "success") {
+        toast.success(t("policy.resetSuccess"));
       } else {
         toast.error(response.message || t("policy.error"));
       }
@@ -158,6 +194,28 @@ export function AdminIntegrationsView({ overview }: AdminIntegrationsViewProps) 
             className="border-border text-muted-foreground"
           >
             {isPolicyPending ? tc("refreshing") : t("policy.apply")}
+          </Button>
+        </div>
+        <div className="flex flex-col gap-2 md:flex-row md:justify-end">
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            disabled={isPolicyPending}
+            onClick={unlockPolicy}
+            className="border-border text-muted-foreground"
+          >
+            {isPolicyPending ? tc("refreshing") : t("policy.unlock")}
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            disabled={isPolicyPending}
+            onClick={resetPolicy}
+            className="border-border text-muted-foreground"
+          >
+            {isPolicyPending ? tc("refreshing") : t("policy.reset")}
           </Button>
         </div>
         <div className="grid gap-2">

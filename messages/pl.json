@@ -377,7 +377,11 @@
         "subtitle": "Blokuj wybor dostawcy per kraj/typ, aby uniknac nieoczekiwanych lancuchow fallback.",
         "locked": "Zablokuj polityke",
         "apply": "Zastosuj polityke",
+        "unlock": "Odblokuj polityke",
+        "reset": "Resetuj do domyslnych",
         "updated": "Polityka integracji zostala zaktualizowana.",
+        "unlockSuccess": "Blokada polityki zostala usunieta.",
+        "resetSuccess": "Polityka zostala zresetowana do domyslnej.",
         "error": "Nie udalo sie zaktualizowac polityki integracji.",
         "lockOn": "Zablokowana",
         "lockOff": "Odblokowana"

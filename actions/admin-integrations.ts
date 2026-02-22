@@ -212,6 +212,67 @@ export async function setAdminIntegrationPolicyLock(input: {
   return { status: "success" as const };
 }
 
+export async function unlockAdminIntegrationPolicy(input: {
+  countryCode: string;
+  providerType: ProviderType;
+}) {
+  const session = await getAdminSession();
+
+  if (!session) {
+    return { status: "error" as const, message: "Unauthorized." };
+  }
+
+  const countryCode = input.countryCode.toUpperCase();
+  if (countryCode !== "PL") {
+    return { status: "error" as const, message: "Only PL policy controls are supported." };
+  }
+
+  await db
+    .update(countryIntegrationPolicies)
+    .set({ isActive: false })
+    .where(
+      and(
+        eq(countryIntegrationPolicies.countryCode, countryCode),
+        eq(countryIntegrationPolicies.providerType, input.providerType),
+        eq(countryIntegrationPolicies.providerName, POLICY_LOCK_PROVIDER),
+      ),
+    );
+
+  revalidatePath("/admin/integrations");
+
+  return { status: "success" as const };
+}
+
+export async function resetAdminIntegrationPolicyToDefaults(input: {
+  countryCode: string;
+  providerType: ProviderType;
+}) {
+  const session = await getAdminSession();
+
+  if (!session) {
+    return { status: "error" as const, message: "Unauthorized." };
+  }
+
+  const countryCode = input.countryCode.toUpperCase();
+  if (countryCode !== "PL") {
+    return { status: "error" as const, message: "Only PL policy controls are supported." };
+  }
+
+  await db
+    .update(countryIntegrationPolicies)
+    .set({ isActive: false })
+    .where(
+      and(
+        eq(countryIntegrationPolicies.countryCode, countryCode),
+        eq(countryIntegrationPolicies.providerType, input.providerType),
+      ),
+    );
+
+  revalidatePath("/admin/integrations");
+
+  return { status: "success" as const };
+}
+
 export async function runAdminIntegrationSmokeTests(): Promise<{
   status: "success" | "error";
   results: IntegrationSmokeResult[];

@@ -220,7 +220,8 @@
       "overview": "Overview",
       "users": "Users",
       "feedback": "Feedback",
-      "audit": "Audit"
+      "audit": "Audit",
+      "integrations": "Integrations"
     },
     "layout": {
       "title": "Admin console",
@@ -367,6 +368,62 @@
       "cancel": "Cancel",
       "working": "Working...",
       "failed": "Action failed."
+    },
+    "integrations": {
+      "title": "Integrations",
+      "subtitle": "Run provider smoke checks and inspect integration audit logs.",
+      "policy": {
+        "title": "Provider policy lock",
+        "subtitle": "Lock provider selection per country/type to avoid unexpected fallback chains.",
+        "locked": "Lock policy",
+        "apply": "Apply policy",
+        "unlock": "Unlock policy",
+        "reset": "Reset to defaults",
+        "updated": "Integration policy updated.",
+        "unlockSuccess": "Policy lock removed.",
+        "resetSuccess": "Policy reset to defaults.",
+        "error": "Failed to update integration policy.",
+        "lockOn": "Locked",
+        "lockOff": "Unlocked"
+      },
+      "summary": {
+        "fxRates": "Stored FX rates",
+        "taxChecks": "Tax validation logs"
+      },
+      "smoke": {
+        "run": "Run smoke tests",
+        "resultsTitle": "Latest smoke run",
+        "ok": "OK",
+        "warning": "Warning",
+        "failed": "Failed",
+        "success": "Integration smoke tests completed.",
+        "error": "Some integration smoke tests failed."
+      },
+      "tables": {
+        "ratesTitle": "FX provider rates",
+        "taxTitle": "Tax validation logs",
+        "emptyRates": "No provider rates logged yet.",
+        "emptyTax": "No tax validation logs yet.",
+        "rateColumns": {
+          "pair": "Pair",
+          "value": "Rate",
+          "provider": "Provider",
+          "attribution": "Attribution",
+          "effectiveDate": "Effective date",
+          "published": "Published",
+          "type": "Type",
+          "method": "Method",
+          "retrieved": "Retrieved"
+        },
+        "taxColumns": {
+          "country": "Country",
+          "idType": "ID type",
+          "masked": "Masked value",
+          "result": "Result",
+          "provider": "Provider",
+          "checked": "Checked"
+        }
+      }
     }
   },
   "metadata": {
@@ -416,6 +473,10 @@
     "adminAudit": {
       "title": "Admin Audit",
       "description": "Audit log for admin actions."
+    },
+    "adminIntegrations": {
+      "title": "Admin Integrations",
+      "description": "Integration provider smoke tests and audit logs."
     }
   },
   "validation": {

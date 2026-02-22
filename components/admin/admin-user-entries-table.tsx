@@ -1,3 +1,5 @@
+"use client";
+
 import type { EntryView } from "@/lib/entries/types";
 import { dayjs } from "@/lib/dayjs";
 import { formatCurrency, formatNumber } from "@/lib/format/numbers";

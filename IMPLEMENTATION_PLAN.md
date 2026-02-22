@@ -396,9 +396,145 @@ Auth Pages Implementation Plan:
 - [x] Respect `prefers-reduced-motion` and pause on hover
 - [x] Hide ticker on empty or failed API response
 
-### Phase 9 — Subscriptions and payments with polarr
+### Phase 9 — Subscriptions and payments with Polar.sh
 
-### Phase 10 — Import & Export with various providers
+Plan tiers (initial):
+
+- `Free`: max `25` total entries, max `1` CSV import/month, max `25` rows/import
+- `Pro`: max `5,000` total entries, max `30` CSV imports/month, max `2,000` rows/import
+- `Scale`: max `100,000` total entries, max `300` CSV imports/month, max `10,000` rows/import
+
+### Phase 9.1 - Pricing model and entitlements
+
+- [ ] Finalize plan catalog: `free | pro | scale`
+- [ ] Define entitlement matrix (entry cap, imports/month, rows/import, export access)
+- [ ] Store entitlement config in code as versioned constants (not hardcoded in UI)
+- [ ] Define enforcement policy (`hard block` on limit reached + clear upgrade CTA)
+
+### Phase 9.2 - Billing data model
+
+- [ ] Add `users.plan` enum (`free | pro | scale`) with default `free`
+- [ ] Add billing fields on `users`: `billingCustomerId`, `billingSubscriptionId`, `billingStatus`, `billingCurrentPeriodEnd`
+- [ ] Add usage table (monthly buckets): `usage_counters` (`userId`, `period`, `metric`, `count`)
+- [ ] Add billing event audit table for webhook traceability and replay safety
+
+### Phase 9.3 - Polar.sh integration
+
+- [ ] Create Polar products/prices for `Pro` and `Scale`
+- [ ] Implement checkout session action for upgrades
+- [ ] Implement customer portal action for manage/cancel
+- [ ] Implement webhook endpoint (subscription created/updated/canceled/payment failed)
+- [ ] Add webhook signature verification + idempotent event processing
+
+### Phase 9.4 - Entitlement enforcement
+
+- [ ] Enforce entry limit in create entry server action
+- [ ] Enforce import limits in CSV import pipeline (count + rows/import)
+- [ ] Enforce export limits/features by plan
+- [ ] Add centralized `assertEntitlement(userId, action)` helper for consistency
+
+### Phase 9.5 - Billing UI
+
+- [ ] Add `/billing` page with current plan, usage bars, renewal date, status
+- [ ] Add upgrade/downgrade controls and `Manage billing` button
+- [ ] Show in-context paywall cards when limits are reached
+- [ ] Localize all billing copy and errors (`en` + `pl`)
+
+### Phase 9.6 - Testing and ops
+
+- [ ] Add tests for entitlement checks across entry create/import/export
+- [ ] Add webhook tests (signature, idempotency, lifecycle transitions)
+- [ ] Add metrics/logging for limit-block events and billing failures
+- [ ] Add admin visibility for user plan + billing status (read-only)
+
+### Phase 9.7 - Acceptance criteria
+
+- [ ] User can upgrade/downgrade via Polar checkout/portal
+- [ ] Plan changes sync correctly via webhooks
+- [ ] Limits are enforced server-side (not bypassable from client)
+- [ ] Reached-limit UX is clear and includes upgrade path
+
+### Phase 9.8 - Strict implementation order
+
+- [ ] Milestone 9-M1: `9.1 -> 9.2` (plan model and persistence first)
+- [ ] Milestone 9-M2: `9.3` (checkout/portal/webhooks with idempotency)
+- [ ] Milestone 9-M3: `9.4` (server-side entitlement guards)
+- [ ] Milestone 9-M4: `9.5` (billing UX, limits, and upgrade paths)
+- [ ] Milestone 9-M5: `9.6 -> 9.7` (tests/ops hardening and acceptance sign-off)
+
+### Phase 10 — Import & Export with exchange CSV providers
+
+Initial providers:
+
+- `Kraken`
+- `ZondaCrypto`
+- `Binance`
+
+### Phase 10.1 - Scope and canonical import model
+
+- [ ] Define canonical transaction DTO for import normalization
+- [ ] Define operation mapping rules to app model (`BUY/SELL`; unsupported rows flagged)
+- [ ] Define required/optional fields and strict validation behavior
+- [ ] Lock provider support scope for v1: `Kraken`, `ZondaCrypto`, `Binance`
+
+### Phase 10.2 - CSV parser adapters
+
+- [ ] Implement `KrakenCsvAdapter` (column map, date/amount parsing, symbol normalization)
+- [ ] Implement `ZondaCryptoCsvAdapter` (column map + operation mapping)
+- [ ] Implement `BinanceCsvAdapter` (spot trade history + fee handling)
+- [ ] Add delimiter/encoding detection (`comma/semicolon`, UTF-8 BOM-safe)
+
+### Phase 10.3 - Import pipeline
+
+- [ ] Build upload -> parse -> preview -> confirm flow
+- [ ] Add row-level validation with error categories (schema, mapping, business rule)
+- [ ] Add deduplication fingerprint per normalized row to prevent duplicates
+- [ ] Support partial-success imports with downloadable error report
+
+### Phase 10.4 - Persistence and auditing
+
+- [ ] Persist import batch metadata (provider, filename, totals, failures, actor, timestamp)
+- [ ] Link imported entries to batch id for traceability
+- [ ] Store original row hash for reproducibility and dedup checks
+- [ ] Add import history page with batch status and details
+
+### Phase 10.5 - Export features
+
+- [ ] Add unified entries export to normalized CSV
+- [ ] Add optional provider-shaped export format (future-proof adapter interface)
+- [ ] Include deterministic formatting (locale-safe numeric/date export)
+- [ ] Add export filtering by date range/asset/operation
+
+### Phase 10.6 - UX and localization
+
+- [ ] Add Import/Export section in entries workspace
+- [ ] Show provider templates/instructions and sample files
+- [ ] Show clear warning for unsupported provider files
+- [ ] Localize import/export flows, errors, and status toasts (`en` + `pl`)
+
+### Phase 10.7 - Testing and acceptance
+
+- [ ] Add fixture-based parser tests for Kraken/ZondaCrypto/Binance samples
+- [ ] Add pipeline tests for preview, confirm, dedup, and partial failure
+- [ ] Add export snapshot tests for deterministic output
+- [ ] Validate plan-limit integration with Phase 9 entitlement checks
+
+### Phase 10.8 - Strict implementation order
+
+- [ ] Milestone 10-M1: `10.1` (canonical model and mapping contracts)
+- [ ] Milestone 10-M2: `10.2` (provider parsers and file decoding)
+- [ ] Milestone 10-M3: `10.3 -> 10.4` (import execution + auditability)
+- [ ] Milestone 10-M4: `10.5` (deterministic export capability)
+- [ ] Milestone 10-M5: `10.6 -> 10.7` (UX localization, test coverage, and sign-off)
+
+### Cross-phase strict order (Phase 9 + 10)
+
+- [ ] Step 1: Complete Phase 9 Milestones `9-M1` and `9-M2`
+- [ ] Step 2: Complete Phase 10 Milestones `10-M1` and `10-M2`
+- [ ] Step 3: Complete Phase 9 Milestone `9-M3` (entitlement guards before import rollout)
+- [ ] Step 4: Complete Phase 10 Milestones `10-M3` and `10-M4`
+- [ ] Step 5: Complete Phase 9 Milestone `9-M4` and Phase 10 Milestone `10-M5`
+- [ ] Step 6: Complete Phase 9 Milestone `9-M5` and run final acceptance checks
 
 ### Phase 11 — Administration Panel
 
@@ -481,7 +617,7 @@ Auth Pages Implementation Plan:
 - [x] Create locale message catalogs (`messages/en/*.json`, `messages/pl/*.json`)
 - [x] Define namespaces: `common`, `auth`, `entries`, `dashboard`, `profile`, `admin`, `validation`, `metadata`
 - [x] Add key naming conventions and ownership guidelines
-- [ ] Add checks/scripts for missing and unused translation keys
+- [x] Add checks/scripts for missing and unused translation keys
 
 ### Phase 13.3 - App shell and switching
 
@@ -544,65 +680,61 @@ Auth Pages Implementation Plan:
 - [ ] Verify rendered metadata for key routes
 - [ ] Validate Open Graph/Twitter tags
 
-## Phase 14 - International Integrations (later phase)
+## Phase 14 - Polish Integrations (later phase)
 
-### Phase 14.1 - Scope and policy
+### Phase 14.1 - Scope and policy (PL-only)
 
-- [ ] Define country-aware integration policy (`country -> provider`) for FX, tax validation, and bank imports
-- [ ] Keep this phase focused on integrations and auditability (exclude deep local e-filing APIs)
-- [ ] Add feature flags for incremental country rollout
+- [x] Define country-aware integration policy (`country -> provider`) for FX, tax validation, and bank imports
+- [x] Limit rollout scope to Polish residents (`PL`) only
+- [x] Keep this phase focused on integrations and auditability (exclude deep local e-filing APIs)
+- [x] Add feature flags for incremental country rollout
 
 ### Phase 14.2 - Provider adapters (official sources first)
 
-- [ ] Add `RateProvider` adapter interface (`getRate`, `getLatest`, `getMetadata`)
-- [ ] Add `TaxValidationProvider` interface (`validate(id, country)`)
-- [ ] Add `ECB` adapter for Eurozone users
-- [ ] Add `HMRC` adapter for UK tax workflows (monthly rates)
-- [ ] Add IRS-compatible US conversion workflow adapter (store method + source metadata)
-- [ ] Add `BoC` adapter for Canada
-- [ ] Add optional `RBA` adapter for Australia (enable only if AU launch is near-term)
-- [ ] Add EU `VIES` VAT ID validation adapter
+- [x] Add `RateProvider` adapter interface (`getRate`, `getLatest`, `getMetadata`)
+- [x] Add `TaxValidationProvider` interface (`validate(id, country)`)
+- [x] Add `NBP` adapter for Polish FX workflows
+- [x] Add EU `VIES` VAT ID validation adapter
 
 ### Phase 14.3 - Data model and auditability
 
-- [ ] Extend FX persistence with: `rateValue`, `sourceProvider`, `publishedAt`, `retrievedAt`, `rateType`, `method`
-- [ ] Persist provider response snapshot/hash for reproducibility and audit
+- [x] Extend FX persistence with: `rateValue`, `sourceProvider`, `publishedAt`, `retrievedAt`, `rateType`, `method`
+- [x] Persist provider response snapshot/hash for reproducibility and audit
 - [ ] Add effective-date normalization rules (weekend/holiday/business-day fallback)
-- [ ] Keep historical rates immutable once stored
+- [x] Keep historical rates immutable once stored
 
 ### Phase 14.4 - Resilience and fallback behavior
 
-- [ ] Add strict timeouts + retry with exponential backoff for provider calls
-- [ ] Define per-country fallback chain (official -> cached prior valid -> user warning)
-- [ ] Add cache TTL strategy for latest rates and immutable cache for historical rates
-- [ ] Add stale-rate and provider-downtime alerting
+- [x] Add strict timeouts + retry with exponential backoff for provider calls
+- [x] Define per-country fallback chain (official -> cached prior valid -> user warning)
+- [x] Add cache TTL strategy for latest rates and immutable cache for historical rates
+- [x] Add stale-rate and provider-downtime alerting
 
 ### Phase 14.5 - Banking integrations
 
-- [ ] Integrate one open-banking aggregator (`TrueLayer` or `Tink` or `GoCardless Bank Account Data`)
-- [ ] Build normalized transaction ingestion pipeline for aggregator data
-- [ ] Maintain robust CSV import fallback for unsupported banks/countries
+- [x] Integrate one open-banking aggregator (`GoCardless Bank Account Data`) for Polish users
+- [x] Build normalized transaction ingestion pipeline for aggregator data
+- [x] Maintain robust CSV import fallback when aggregator is unavailable
 
 ### Phase 14.6 - Product and UX updates
 
-- [ ] Show FX source attribution in UI (provider + publication period/date)
-- [ ] Surface explicit warnings when fallback rates are used
-- [ ] Add admin control to lock provider policy per entity/country
+- [x] Show FX source attribution in UI (provider + publication period/date)
+- [x] Surface explicit warnings when fallback rates are used
+- [x] Add admin control to lock provider policy per entity/country
 
 ### Phase 14.7 - Rollout order
 
-- [ ] Step 1: `ECB + HMRC + VIES`
-- [ ] Step 2: Banking aggregator + CSV fallback
-- [ ] Step 3: `US + CA` adapters with compliance metadata
-- [ ] Step 4: `AU` and additional markets based on telemetry
+- [x] Step 1: `NBP + VIES`
+- [x] Step 2: Banking aggregator + CSV fallback
+- [x] Step 3: Harden telemetry, alert thresholds, and operational runbooks
 
 ### Phase 14.8 - Acceptance criteria
 
-- [ ] Every FX conversion is reproducible and includes source metadata
-- [ ] Country policy auto-selects expected provider
-- [ ] EU VAT ID validation is available and logged
-- [ ] Bank import works via one aggregator and CSV fallback
-- [ ] Monitoring reports fallback usage spikes and stale-rate conditions
+- [x] Every FX conversion is reproducible and includes source metadata
+- [x] Country policy auto-selects expected provider
+- [x] EU VAT ID validation is available and logged
+- [x] Bank import works via one aggregator and CSV fallback
+- [x] Monitoring reports fallback usage spikes and stale-rate conditions
 
 ## Phase 15 - Domain and deployment topology (landing + app)
 
@@ -635,6 +767,26 @@ Auth Pages Implementation Plan:
 - [ ] Smoke test login/register/session flows on production host
 - [ ] Verify metadata/canonical URLs use final public hosts
 - [ ] Add rollback plan for DNS cutover window
+
+## Phase 16 - Integration Consumption (post-foundation)
+
+### Phase 16.1 - Tax report integration
+
+- [ ] Use Phase 14 rate service in tax report generation flows
+- [ ] Include provider/method/effective date/source metadata in tax exports
+- [ ] Ensure report output remains deterministic and reproducible from persisted snapshots
+
+### Phase 16.2 - Import pipeline enrichment
+
+- [ ] Apply country/provider policy resolution during import normalization
+- [ ] Attach integration metadata to imported transaction records
+- [ ] Add fallback and warning markers for import-time rate gaps
+
+### Phase 16.3 - Optional live UI attribution
+
+- [ ] Add source attribution badges (provider + method + date) on key financial surfaces
+- [ ] Show explicit warnings when fallback rates are used
+- [ ] Keep attribution concise and aligned with existing dashboard/entries visual language
 
 ---
 

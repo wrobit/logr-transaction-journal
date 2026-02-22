@@ -76,20 +76,20 @@ const sampleData: DashboardData = {
   ],
   holdings: [
     {
-      asset: "BTC",
-      netQuantity: 0,
-      buyValue: 200,
-      sellValue: 500,
-      pnlValue: 300,
-      netValue: -300,
-    },
-    {
       asset: "SOL",
       netQuantity: 1,
       buyValue: 100,
       sellValue: 60,
       pnlValue: -40,
       netValue: 40,
+    },
+  ],
+  closedPositions: [
+    {
+      asset: "BTC",
+      buyValue: 200,
+      sellValue: 500,
+      pnlValue: 300,
     },
   ],
   holdingsMix: [{ asset: "SOL", value: 40 }],
@@ -110,6 +110,7 @@ describe("DashboardView", () => {
     expect(screen.getByText("Total sells")).toBeInTheDocument();
     expect(screen.getByText("Realized PnL")).toBeInTheDocument();
     expect(screen.getByText("Holdings by asset")).toBeInTheDocument();
+    expect(screen.getByText("Closed positions by asset")).toBeInTheDocument();
     expect(screen.getAllByText("SOL")).not.toHaveLength(0);
   });
 
@@ -119,6 +120,7 @@ describe("DashboardView", () => {
       totals: { buyValue: 0, sellValue: 0, pnlValue: 0 },
       series: [],
       holdings: [],
+      closedPositions: [],
       holdingsMix: [],
       assets: [],
       rateAttribution: {

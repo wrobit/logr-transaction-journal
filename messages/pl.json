@@ -182,6 +182,7 @@
       "holdingsMix": "Struktura aktywow",
       "buyVsSellVolume": "Wolumen kupno vs sprzedaz",
       "holdingsByAsset": "Aktywa",
+      "closedPositionsByAsset": "Zamkniete pozycje per aktywo",
       "buyVsSellByAsset": "Kupno vs sprzedaz per aktywo"
     },
     "holdingsTable": {
@@ -190,11 +191,18 @@
       "buyPln": "Kupno {currency}",
       "pnlPln": "PnL {currency}"
     },
+    "closedPositionsTable": {
+      "asset": "Aktywum",
+      "buy": "Kupno {currency}",
+      "sell": "Sprzedaz {currency}",
+      "pnl": "PnL {currency}"
+    },
     "empty": {
       "pnl": "Brak danych PnL dla tego zakresu.",
       "holdingsMix": "Brak danych o strukturze aktywow.",
       "volume": "Brak danych wolumenu dla tego zakresu.",
       "holdings": "Brak aktywow.",
+      "closedPositions": "Brak zamknietych pozycji.",
       "assetVolume": "Brak danych wolumenu per aktywo."
     }
   },

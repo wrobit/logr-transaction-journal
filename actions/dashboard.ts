@@ -31,6 +31,13 @@ export type DashboardHolding = {
   netValue: number;
 };
 
+export type DashboardClosedPosition = {
+  asset: string;
+  buyValue: number;
+  sellValue: number;
+  pnlValue: number;
+};
+
 export type DashboardData = {
   displayCurrency: DisplayCurrency;
   totals: {
@@ -40,6 +47,7 @@ export type DashboardData = {
   };
   series: DashboardSeriesPoint[];
   holdings: DashboardHolding[];
+  closedPositions: DashboardClosedPosition[];
   holdingsMix: Array<{ asset: string; value: number }>;
   assets: string[];
   rateAttribution: {
@@ -67,6 +75,7 @@ export async function getDashboardData(
       totals: { buyValue: 0, sellValue: 0, pnlValue: 0 },
       series: [],
       holdings: [],
+      closedPositions: [],
       holdingsMix: [],
       assets: [],
       rateAttribution: {
@@ -198,7 +207,7 @@ export async function getDashboardData(
       };
     });
 
-  const holdings = Array.from(holdingsMap.entries())
+  const allHoldings = Array.from(holdingsMap.entries())
     .map(([asset, values]) => {
       const netQuantity = normalizeZero(values.netQuantity);
       const pnlValue = values.sellValue - values.buyValue;
@@ -212,8 +221,20 @@ export async function getDashboardData(
         netValue,
       };
     })
+    .sort((left, right) => left.asset.localeCompare(right.asset));
+
+  const holdings = allHoldings
     .filter((holding) => hasOpenQuantity(holding.netQuantity))
     .sort((left, right) => left.asset.localeCompare(right.asset));
+
+  const closedPositions = allHoldings
+    .filter((holding) => !hasOpenQuantity(holding.netQuantity))
+    .map((holding) => ({
+      asset: holding.asset,
+      buyValue: holding.buyValue,
+      sellValue: holding.sellValue,
+      pnlValue: holding.pnlValue,
+    }));
 
   const holdingsMix = holdings
     .map((holding) => ({
@@ -231,6 +252,7 @@ export async function getDashboardData(
     totals,
     series,
     holdings,
+    closedPositions,
     holdingsMix,
     assets,
     rateAttribution: {

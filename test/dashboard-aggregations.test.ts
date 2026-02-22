@@ -88,6 +88,7 @@ describe("dashboard aggregations", () => {
       totals: { buyValue: 0, sellValue: 0, pnlValue: 0 },
       series: [],
       holdings: [],
+      closedPositions: [],
       holdingsMix: [],
       assets: [],
       rateAttribution: {
@@ -167,6 +168,14 @@ describe("dashboard aggregations", () => {
         sellValue: 60,
         pnlValue: -40,
         netValue: 40,
+      },
+    ]);
+    expect(result.closedPositions).toEqual([
+      {
+        asset: "BTC",
+        buyValue: 200,
+        sellValue: 500,
+        pnlValue: 300,
       },
     ]);
     expect(result.holdingsMix).toEqual([{ asset: "SOL", value: 40 }]);

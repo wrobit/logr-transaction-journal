@@ -182,6 +182,7 @@
       "holdingsMix": "Holdings mix",
       "buyVsSellVolume": "Buy vs sell volume",
       "holdingsByAsset": "Holdings by asset",
+      "closedPositionsByAsset": "Closed positions by asset",
       "buyVsSellByAsset": "Buy vs sell by asset"
     },
     "holdingsTable": {
@@ -190,11 +191,18 @@
       "buyPln": "Buy {currency}",
       "pnlPln": "PnL {currency}"
     },
+    "closedPositionsTable": {
+      "asset": "Asset",
+      "buy": "Buy {currency}",
+      "sell": "Sell {currency}",
+      "pnl": "PnL {currency}"
+    },
     "empty": {
       "pnl": "No PnL data for this range.",
       "holdingsMix": "No holdings mix available.",
       "volume": "No volume data for this range.",
       "holdings": "No holdings yet.",
+      "closedPositions": "No closed positions yet.",
       "assetVolume": "No asset volume data yet."
     }
   },

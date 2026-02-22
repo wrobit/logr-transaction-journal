@@ -11,7 +11,7 @@ import { getServerTranslator } from "@/lib/i18n/translate";
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getServerTranslator();
   return {
-    title: t("metadata.entries.title"),
+    title: `Logr - ${t("metadata.entries.title")}`,
     description: t("metadata.entries.description"),
   };
 }
@@ -35,7 +35,7 @@ export default async function Page({ searchParams }: PageProps) {
 
   return (
     <div className="min-h-screen bg-black px-3 py-10 md:px-4">
-      <div className="mx-auto w-full max-w-6xl">
+      <div className="mx-auto w-full max-w-7xl">
         <EntriesView
           entries={entriesResult.entries}
           assets={entriesResult.assets}

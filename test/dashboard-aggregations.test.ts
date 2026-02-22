@@ -90,6 +90,11 @@ describe("dashboard aggregations", () => {
       holdings: [],
       holdingsMix: [],
       assets: [],
+      rateAttribution: {
+        providers: [],
+        warningCount: 0,
+        latestEffectiveDate: null,
+      },
     });
   });
 
@@ -174,5 +179,10 @@ describe("dashboard aggregations", () => {
     ]);
     expect(result.holdingsMix).toEqual([{ asset: "SOL", value: 40 }]);
     expect(result.assets).toEqual(["BTC", "SOL"]);
+    expect(result.rateAttribution).toEqual({
+      providers: ["nbp"],
+      warningCount: 0,
+      latestEffectiveDate: "2025-01-01",
+    });
   });
 });

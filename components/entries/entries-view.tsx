@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState, useTransition } from "react";
+import { useCallback, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -74,6 +74,15 @@ export function EntriesView({
 
   const [editingEntry, setEditingEntry] = useState<EntryView | null>(null);
   const [deletingEntry, setDeletingEntry] = useState<EntryView | null>(null);
+  const [taxReportYear, setTaxReportYear] = useState<string>(String(new Date().getUTCFullYear()));
+  const taxReportYearOptions = useMemo(() => {
+    const currentYear = new Date().getUTCFullYear();
+    return Array.from({ length: 6 }, (_, index) => String(currentYear - index));
+  }, []);
+  const taxReportHref =
+    taxReportYear === "all"
+      ? "/api/tax-report/export/pdf"
+      : `/api/tax-report/export/pdf?year=${encodeURIComponent(taxReportYear)}`;
 
   const handleCreated = useCallback(
     () => {
@@ -135,6 +144,30 @@ export function EntriesView({
           {isPending ? (
             <span className="text-xs text-muted-foreground">{t("refreshing")}</span>
           ) : null}
+          <div className="flex items-center gap-2">
+            <label htmlFor="tax-report-year" className="sr-only">
+              {t("taxReport.year")}
+            </label>
+            <select
+              id="tax-report-year"
+              value={taxReportYear}
+              onChange={(event) => setTaxReportYear(event.target.value)}
+              className="h-9 rounded-none border border-border bg-background px-2 text-xs text-foreground"
+            >
+              <option value="all">{t("taxReport.allYears")}</option>
+              {taxReportYearOptions.map((yearOption) => (
+                <option key={yearOption} value={yearOption}>
+                  {yearOption}
+                </option>
+              ))}
+            </select>
+            <a
+              href={taxReportHref}
+              className="inline-flex h-9 items-center rounded-none border border-border px-3 text-xs text-foreground transition hover:bg-muted"
+            >
+              {t("taxReport.button")}
+            </a>
+          </div>
           {enableActions ? <AddEntryDialog onCreated={handleCreated} /> : null}
         </div>
       </div>

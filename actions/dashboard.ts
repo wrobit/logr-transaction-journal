@@ -42,6 +42,11 @@ export type DashboardData = {
   holdings: DashboardHolding[];
   holdingsMix: Array<{ asset: string; value: number }>;
   assets: string[];
+  rateAttribution: {
+    providers: string[];
+    warningCount: number;
+    latestEffectiveDate: string | null;
+  };
 };
 
 const toNumber = (value: unknown) => Number(value ?? 0);
@@ -60,6 +65,11 @@ export async function getDashboardData(
       holdings: [],
       holdingsMix: [],
       assets: [],
+      rateAttribution: {
+        providers: [],
+        warningCount: 0,
+        latestEffectiveDate: null,
+      },
     };
   }
 
@@ -119,6 +129,9 @@ export async function getDashboardData(
   }
 
   const totals = { buyValue: 0, sellValue: 0, pnlValue: 0 };
+  const attributionProviders = new Set<string>();
+  let attributionWarningCount = 0;
+  let latestAttributionEffectiveDate: string | null = null;
   const seriesMap = new Map<string, { buyValue: number; sellValue: number }>();
   const holdingsMap = new Map<
     string,
@@ -132,6 +145,15 @@ export async function getDashboardData(
     const value = valuePln / displayRate;
     const quantity = toNumber(entry.payload.quantity);
     const dateKey = dayjs.utc(entry.row.date).format("YYYY-MM-DD");
+    const rateAttribution = entry.payload.rateAttribution;
+
+    attributionProviders.add(rateAttribution?.provider ?? "nbp");
+    attributionWarningCount += rateAttribution?.warnings?.length ?? 0;
+    const attributionDate = rateAttribution?.effectiveDate ?? entry.payload.nbpRateDate;
+    if (!latestAttributionEffectiveDate || attributionDate > latestAttributionEffectiveDate) {
+      latestAttributionEffectiveDate = attributionDate;
+    }
+
     const seriesEntry =
       seriesMap.get(dateKey) ?? { buyValue: 0, sellValue: 0 };
     const holdingsEntry = holdingsMap.get(entry.payload.baseAsset) ?? {
@@ -205,5 +227,10 @@ export async function getDashboardData(
     holdings,
     holdingsMix,
     assets,
+    rateAttribution: {
+      providers: Array.from(attributionProviders).sort((left, right) => left.localeCompare(right)),
+      warningCount: attributionWarningCount,
+      latestEffectiveDate: latestAttributionEffectiveDate,
+    },
   };
 }

@@ -14,7 +14,7 @@ import {
   isDisplayCurrency,
   type DisplayCurrency,
 } from "@/lib/currency/display";
-import type { EntryPayload, EntryView } from "@/lib/entries/types";
+import type { EntryPayload, EntryRateAttribution, EntryView } from "@/lib/entries/types";
 import {
   buildEntryWhere,
   ENTRY_PAGE_SIZE,
@@ -45,6 +45,8 @@ import { entryInputSchema } from "@/lib/entries/validation";
 import { dayjs } from "@/lib/dayjs";
 import { translateValidationMessage } from "@/lib/i18n/errors";
 import { getServerTranslator } from "@/lib/i18n/translate";
+import { getInternationalRate } from "@/lib/integrations/rates-service";
+import { hashSnapshot } from "@/lib/integrations/utils";
 import { getNbpRate } from "@/lib/nbp";
 
 export type EntryListResult = {
@@ -56,6 +58,75 @@ export type EntryListResult = {
   displayCurrency: DisplayCurrency;
   displayRatesByEntryId: Record<string, number>;
 };
+
+const DEFAULT_ENTRY_COUNTRY_CODE = "PL";
+
+async function resolvePlnRateWithAttribution(input: {
+  quoteCurrency: string;
+  entryDate: Date;
+}): Promise<{ rate: number; rateDate: Date; attribution: EntryRateAttribution }> {
+  const quoteCurrency = input.quoteCurrency.trim().toUpperCase();
+  const effectiveDate = dayjs.utc(input.entryDate).format("YYYY-MM-DD");
+
+  if (quoteCurrency === "PLN") {
+    return {
+      rate: 1,
+      rateDate: input.entryDate,
+      attribution: {
+        source: "direct",
+        provider: "nbp",
+        method: "official_publication",
+        effectiveDate,
+        retrievedAt: dayjs.utc().toISOString(),
+        publishedAt: `${effectiveDate}T00:00:00.000Z`,
+        snapshotHash: null,
+        warnings: [],
+      },
+    };
+  }
+
+  try {
+    const result = await getInternationalRate({
+      countryCode: DEFAULT_ENTRY_COUNTRY_CODE,
+      baseCurrency: quoteCurrency,
+      quoteCurrency: "PLN",
+      effectiveDate,
+      rateType: "historical",
+    });
+
+    return {
+      rate: result.rateValue,
+      rateDate: dayjs.utc(result.effectiveDate, "YYYY-MM-DD", true).toDate(),
+      attribution: {
+        source: "integration_service",
+        provider: result.provider,
+        method: result.method,
+        effectiveDate: result.effectiveDate,
+        retrievedAt: result.retrievedAt,
+        publishedAt: result.publishedAt,
+        snapshotHash: result.rawSnapshot ? hashSnapshot(result.rawSnapshot) : null,
+        warnings: result.warnings ?? [],
+      },
+    };
+  } catch {
+    const legacyRate = await getNbpRate(quoteCurrency, input.entryDate);
+
+    return {
+      rate: legacyRate.rate,
+      rateDate: legacyRate.rateDate,
+      attribution: {
+        source: "legacy_nbp",
+        provider: "nbp",
+        method: "official_publication",
+        effectiveDate: dayjs.utc(legacyRate.rateDate).format("YYYY-MM-DD"),
+        retrievedAt: dayjs.utc().toISOString(),
+        publishedAt: dayjs.utc(legacyRate.rateDate).toISOString(),
+        snapshotHash: null,
+        warnings: ["Fallback to legacy NBP resolver used for this entry."],
+      },
+    };
+  }
+}
 
 async function resolveDisplayRatesByEntryId(
   entriesList: EntryView[],
@@ -264,15 +335,22 @@ const resolveEntryFields = async (parsed: {
     operation: parsed.data.operation,
   });
 
-  const nbp = await getNbpRate(parsed.data.quoteCurrency, entryDate);
-  const valuePln = calculateValuePln(fullPrice, nbp.rate);
+  const rateResolution = await resolvePlnRateWithAttribution({
+    quoteCurrency: parsed.data.quoteCurrency,
+    entryDate,
+  });
+  const valuePln = calculateValuePln(fullPrice, rateResolution.rate);
 
   return {
     entryDate,
     fullPrice,
     valuePln,
     commission,
-    nbp,
+    nbp: {
+      rate: rateResolution.rate,
+      rateDate: rateResolution.rateDate,
+    },
+    rateAttribution: rateResolution.attribution,
   };
 };
 
@@ -294,6 +372,7 @@ const buildEntryPayload = (
     valuePln: number;
     commission: number | null;
     nbp: { rate: number; rateDate: Date };
+    rateAttribution: EntryRateAttribution;
   },
 ): EntryPayload => ({
   operation: parsed.data.operation,
@@ -323,6 +402,7 @@ const buildEntryPayload = (
     toFixedNumber(resolved.valuePln, NUMERIC_SCALES.valuePln),
     NUMERIC_SCALES.valuePln,
   ),
+  rateAttribution: resolved.rateAttribution,
 });
 
 export async function createEntry(

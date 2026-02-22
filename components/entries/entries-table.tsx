@@ -29,6 +29,23 @@ const sortableColumns: Array<{ key: EntrySortKey; keyLabel: string }> = [
   { keyLabel: "valuePln", key: "valuePln" },
 ];
 
+const providerLabelMap: Record<string, string> = {
+  nbp: "NBP",
+  ecb: "ECB",
+  hmrc: "HMRC",
+  boc: "BOC",
+  irs_compatible: "IRS",
+  rba: "RBA",
+  gocardless_bad: "GCB",
+};
+
+const methodLabelMap: Record<string, string> = {
+  official_publication: "OFF",
+  reference: "REF",
+  spot: "SPT",
+  irs_compatible: "IRS",
+};
+
 type EntriesTableProps = {
   entries: EntryView[];
   displayCurrency: DisplayCurrency;
@@ -56,6 +73,14 @@ export function EntriesTable({
 }: EntriesTableProps) {
   const locale = useLocale();
   const t = useTranslations("entries");
+  const getProviderLabel = (provider?: string) => {
+    const normalized = provider?.toLowerCase() ?? "nbp";
+    return providerLabelMap[normalized] ?? normalized.toUpperCase().slice(0, 4);
+  };
+  const getMethodLabel = (method?: string) => {
+    const normalized = method?.toLowerCase() ?? "official_publication";
+    return methodLabelMap[normalized] ?? normalized.toUpperCase().slice(0, 4);
+  };
 
   if (entries.length === 0) {
     return (
@@ -69,7 +94,7 @@ export function EntriesTable({
 
   return (
     <div className="overflow-x-auto overflow-y-hidden rounded-sm border border-border">
-      <table className="min-w-[1100px] w-full border-collapse text-left text-xs text-foreground">
+      <table className="min-w-[1260px] w-full border-collapse text-left text-xs text-foreground">
         <thead className="bg-muted/50 text-[11px] uppercase tracking-wide text-muted-foreground">
           <tr>
             <th className="px-3 py-3 font-medium">{t("table.index")}</th>
@@ -98,6 +123,8 @@ export function EntriesTable({
                 </th>
               );
             })}
+            <th className="px-3 py-3 font-medium">{t("table.quoteCurrency")}</th>
+            <th className="px-3 py-3 font-medium">{t("table.attribution")}</th>
             <th className="px-3 py-3 font-medium">{t("table.note")}</th>
             {showActions ? <th className="px-3 py-3 font-medium">{t("table.actions")}</th> : null}
           </tr>
@@ -127,49 +154,52 @@ export function EntriesTable({
                 </Badge>
               </td>
               <td className="px-3 py-3">
-                {entry.baseAsset} / {displayCurrency}
+                {entry.baseAsset}
               </td>
               <td className="px-3 py-3">
-                {formatNumber(Number(entry.quantity), undefined, locale)}
+                {formatNumber(Number(entry.quantity), undefined, locale)} {entry.baseAsset}
               </td>
               <td className="px-3 py-3">
-                {formatNumber(
-                  (Number(entry.pricePerUnit) * Number(entry.nbpRate)) /
-                    (displayRatesByEntryId[entry.id] ?? 1),
-                  undefined,
-                  locale,
-                )}
+                {formatNumber(Number(entry.pricePerUnit), undefined, locale)} {entry.quoteCurrency}
               </td>
               <td className="px-3 py-3">
-                {formatNumber(
-                  (Number(entry.fullPrice) * Number(entry.nbpRate)) /
-                    (displayRatesByEntryId[entry.id] ?? 1),
-                  undefined,
-                  locale,
-                )}
+                {formatNumber(Number(entry.fullPrice), undefined, locale)} {entry.quoteCurrency}
               </td>
               <td className="px-3 py-3 text-muted-foreground">
                 {entry.commission
                     ? formatNumber(
-                        (Number(entry.commission) * Number(entry.nbpRate)) /
-                          (displayRatesByEntryId[entry.id] ?? 1),
+                        Number(entry.commission),
                         undefined,
                         locale,
-                      )
+                      ) + ` ${entry.quoteCurrency}`
                     : "-"}
               </td>
               <td className="px-3 py-3 text-muted-foreground">
                 {entry.source ?? "-"}
               </td>
               <td className="px-3 py-3 text-muted-foreground">
-                {formatNumber(displayRatesByEntryId[entry.id] ?? 1, undefined, locale)}
+                {formatNumber(Number(entry.nbpRate), undefined, locale)} {entry.quoteCurrency}/PLN
               </td>
               <td className="px-3 py-3">
-                {formatCurrency(
-                  Number(entry.valuePln) / (displayRatesByEntryId[entry.id] ?? 1),
-                  displayCurrency,
-                  locale,
-                )}
+                {formatCurrency(Number(entry.valuePln) / (displayRatesByEntryId[entry.id] ?? 1), displayCurrency, locale)} {displayCurrency}
+              </td>
+              <td className="px-3 py-3 text-muted-foreground">
+                {entry.quoteCurrency}
+              </td>
+              <td className="px-3 py-3">
+                <div className="space-y-1">
+                  <div className="text-muted-foreground" title={`${entry.rateAttribution?.provider ?? "nbp"} · ${entry.rateAttribution?.method ?? "official_publication"}`}>
+                    {getProviderLabel(entry.rateAttribution?.provider)} · {getMethodLabel(entry.rateAttribution?.method)}
+                  </div>
+                  <div className="text-[11px] text-muted-foreground">
+                    {entry.rateAttribution?.effectiveDate ?? entry.nbpRateDate}
+                  </div>
+                  {entry.rateAttribution?.warnings?.length ? (
+                    <Badge variant="outline" className="border-amber-500/40 bg-amber-500/10 text-amber-300">
+                      FB
+                    </Badge>
+                  ) : null}
+                </div>
               </td>
               <td className="px-3 py-3 text-muted-foreground">
                 {entry.note ?? "-"}

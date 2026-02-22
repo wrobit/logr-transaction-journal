@@ -114,7 +114,7 @@ Logr is a personal crypto journal that treats each transaction as an immutable a
 ## Encryption
 
 - Uses AES-256-GCM with per-user data keys (DEKs)
-- `ENTRY_KEK` (32-byte base64) wraps each user DEK
+- `LOGR_KEK` (32-byte base64) wraps each user DEK
 - All entry fields are encrypted except `date`
 - Missing/rotated KEK without rewrap makes data unrecoverable
 - DEK rotation re-encrypts all entries for a user

@@ -56,6 +56,11 @@
     "previous": "Previous",
     "next": "Next",
     "rowsPerPage": "Rows per page:",
+    "taxReport": {
+      "year": "Tax year",
+      "allYears": "All years",
+      "button": "Generate PIT PDF"
+    },
     "createdSuccess": "Entry added successfully.",
     "updatedSuccess": "Entry updated successfully.",
     "deletedSuccess": "Entry deleted successfully.",
@@ -66,6 +71,7 @@
       "updated": "Updated",
       "operation": "Operation",
       "asset": "Asset",
+      "quoteCurrency": "Quote",
       "quantity": "Quantity",
       "price": "Price",
       "full": "Full",
@@ -73,6 +79,8 @@
       "source": "Source",
       "nbp": "NBP",
       "valuePln": "Value {currency}",
+      "attribution": "Attribution",
+      "fallbackWarning": "Fallback used",
       "note": "Note",
       "actions": "Actions",
       "openActions": "Open entry actions",
@@ -134,6 +142,11 @@
       "realizedCost": "Realized cost",
       "realizedProceeds": "Realized proceeds",
       "difference": "Buy vs sell difference"
+    },
+    "attribution": {
+      "providers": "Rate providers: {providers}",
+      "effectiveDate": "Latest effective date: {date}",
+      "warnings": "Fallback warnings: {count}"
     },
     "panels": {
       "pnlOverTime": "PnL over time",

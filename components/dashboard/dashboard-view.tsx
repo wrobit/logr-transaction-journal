@@ -132,6 +132,9 @@ export function DashboardView({ data, query }: DashboardViewProps) {
       })),
     [data.holdingsMix]
   );
+  const attributionProviders = data.rateAttribution.providers.length
+    ? data.rateAttribution.providers.join(", ").toUpperCase()
+    : "NBP";
 
   return (
     <div className="space-y-6 text-foreground">
@@ -189,6 +192,24 @@ export function DashboardView({ data, query }: DashboardViewProps) {
           highlight={totals.pnlValue >= 0 ? "positive" : "negative"}
         />
       </div>
+
+      <Card className="bg-muted/20">
+        <CardContent className="flex flex-col gap-2 py-4 text-xs text-muted-foreground md:flex-row md:items-center md:justify-between">
+          <span>
+            {t("attribution.providers", { providers: attributionProviders })}
+          </span>
+          <span>
+            {t("attribution.effectiveDate", {
+              date: data.rateAttribution.latestEffectiveDate ?? "-",
+            })}
+          </span>
+          {data.rateAttribution.warningCount > 0 ? (
+            <span className="text-amber-300">
+              {t("attribution.warnings", { count: data.rateAttribution.warningCount })}
+            </span>
+          ) : null}
+        </CardContent>
+      </Card>
 
       <div className="grid gap-3 md:grid-cols-12">
         <Card className={cn("md:col-span-8", isPending && "opacity-60")}>

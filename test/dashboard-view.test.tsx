@@ -94,6 +94,11 @@ const sampleData: DashboardData = {
   ],
   holdingsMix: [{ asset: "SOL", value: 40 }],
   assets: ["BTC", "SOL"],
+  rateAttribution: {
+    providers: ["nbp"],
+    warningCount: 0,
+    latestEffectiveDate: "2025-01-02",
+  },
 };
 
 describe("DashboardView", () => {
@@ -116,6 +121,11 @@ describe("DashboardView", () => {
       holdings: [],
       holdingsMix: [],
       assets: [],
+      rateAttribution: {
+        providers: [],
+        warningCount: 0,
+        latestEffectiveDate: null,
+      },
     };
 
     renderWithIntl(<DashboardView data={emptyData} query={baseQuery} />);

@@ -182,6 +182,8 @@ export function EntriesView({
         </div>
       </div>
 
+      {enableActions ? <ImportExportPanel history={importHistory} query={query} /> : null}
+
       <div className="grid gap-3 rounded-sm border border-border bg-muted/40 p-4 text-xs text-muted-foreground md:grid-cols-4">
         <div className="space-y-2">
           <label
@@ -287,8 +289,6 @@ export function EntriesView({
         </span>
         <span>{t("page", { current: currentPage, total: totalPages })}</span>
       </div>
-
-      {enableActions ? <ImportExportPanel history={importHistory} query={query} /> : null}
 
       <div aria-busy={isPending} aria-live="polite">
         <EntriesTable

@@ -571,7 +571,7 @@ Initial providers:
   - [x] Confirm server-side filtering only by `userId` + `date`
 - [x] Define crypto primitives and key hierarchy:
   - [x] Use `AES-256-GCM` for authenticated encryption
-  - [x] Generate per-user DEK and wrap with `ENTRY_KEK` (env var)
+  - [x] Generate per-user DEK and wrap with `LOGR_KEK` (env var)
   - [x] Add encryption versioning for future rotations
 - [x] Implement encryption layer:
   - [x] Add `encryptPayload` / `decryptPayload` utilities
@@ -589,7 +589,7 @@ Initial providers:
   - [x] Fetch by `userId` + `date` only
   - [x] Perform filters, summaries, and dashboard aggregations post-decrypt
 - [x] Add key rotation + recovery flows:
-  - [x] Rewrap DEKs when `ENTRY_KEK` changes
+  - [x] Rewrap DEKs when `LOGR_KEK` changes
   - [x] Re-encrypt user entries when rotating DEK
   - [x] Define recovery/lockout behavior if KEK is missing
 - [x] Update backup and export features:

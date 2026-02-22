@@ -11,7 +11,7 @@ import { getServerTranslator } from "@/lib/i18n/translate";
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getServerTranslator();
   return {
-    title: t("metadata.entries.title"),
+    title: `Logr - ${t("metadata.entries.title")}`,
     description: t("metadata.entries.description"),
   };
 }

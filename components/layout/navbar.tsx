@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
-import { UserIcon } from "lucide-react";
+import { Coffee, UserIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -19,6 +19,7 @@ export function Navbar() {
   const { data: session } = useSession();
   const isAdmin = session?.user?.role === "admin";
   const t = useTranslations("nav");
+  const buyMeACoffeeUrl = process.env.NEXT_PUBLIC_BUYMEACOFFEE_URL?.trim();
 
   return (
     <header className="sticky top-0 z-50 relative border-b border-border bg-background/90 px-4 py-4 text-foreground backdrop-blur md:px-5">
@@ -51,6 +52,20 @@ export function Navbar() {
         </div>
 
         <div className="flex items-center gap-3">
+          {buyMeACoffeeUrl ? (
+            <Button
+              asChild
+              type="button"
+              variant="outline"
+              size="sm"
+              className="border-primary/60 bg-primary/15 text-primary ring-1 ring-primary/30 hover:bg-primary/25 dark:border-primary/50 dark:bg-primary/20 dark:text-primary dark:hover:bg-primary/30"
+            >
+              <a href={buyMeACoffeeUrl} target="_blank" rel="noreferrer noopener" aria-label={t("support")}>
+                <Coffee className="size-4" aria-hidden="true" />
+                <span className="hidden sm:inline">{t("support")}</span>
+              </a>
+            </Button>
+          ) : null}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button

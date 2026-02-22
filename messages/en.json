@@ -372,6 +372,16 @@
     "integrations": {
       "title": "Integrations",
       "subtitle": "Run provider smoke checks and inspect integration audit logs.",
+      "policy": {
+        "title": "Provider policy lock",
+        "subtitle": "Lock provider selection per country/type to avoid unexpected fallback chains.",
+        "locked": "Lock policy",
+        "apply": "Apply policy",
+        "updated": "Integration policy updated.",
+        "error": "Failed to update integration policy.",
+        "lockOn": "Locked",
+        "lockOff": "Unlocked"
+      },
       "summary": {
         "fxRates": "Stored FX rates",
         "taxChecks": "Tax validation logs"
@@ -380,6 +390,7 @@
         "run": "Run smoke tests",
         "resultsTitle": "Latest smoke run",
         "ok": "OK",
+        "warning": "Warning",
         "failed": "Failed",
         "success": "Integration smoke tests completed.",
         "error": "Some integration smoke tests failed."
@@ -393,7 +404,9 @@
           "pair": "Pair",
           "value": "Rate",
           "provider": "Provider",
+          "attribution": "Attribution",
           "effectiveDate": "Effective date",
+          "published": "Published",
           "type": "Type",
           "method": "Method",
           "retrieved": "Retrieved"

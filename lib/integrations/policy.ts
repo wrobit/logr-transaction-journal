@@ -12,6 +12,7 @@ import type {
 } from "@/lib/integrations/types";
 
 type PolicyProviderName = RateProviderName | TaxValidationProviderName | BankImportProviderName;
+export const POLICY_LOCK_PROVIDER = "__LOCKED__";
 
 const DEFAULT_RATE_POLICY: Record<string, RateProviderName[]> = {
   PL: ["nbp"],
@@ -55,7 +56,9 @@ export async function resolveProviderPolicy(
     .orderBy(asc(countryIntegrationPolicies.priority));
 
   if (policies.length > 0) {
-    return policies.map((policy) => policy.providerName as PolicyProviderName);
+    return policies
+      .map((policy) => policy.providerName)
+      .filter((providerName): providerName is PolicyProviderName => providerName !== POLICY_LOCK_PROVIDER);
   }
 
   if (providerType === "rate") {

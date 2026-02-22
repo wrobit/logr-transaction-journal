@@ -372,6 +372,16 @@
     "integrations": {
       "title": "Integracje",
       "subtitle": "Uruchamiaj testy smoke dostawcow i przegladaj logi audytowe integracji.",
+      "policy": {
+        "title": "Blokada polityki dostawcow",
+        "subtitle": "Blokuj wybor dostawcy per kraj/typ, aby uniknac nieoczekiwanych lancuchow fallback.",
+        "locked": "Zablokuj polityke",
+        "apply": "Zastosuj polityke",
+        "updated": "Polityka integracji zostala zaktualizowana.",
+        "error": "Nie udalo sie zaktualizowac polityki integracji.",
+        "lockOn": "Zablokowana",
+        "lockOff": "Odblokowana"
+      },
       "summary": {
         "fxRates": "Zapisane kursy FX",
         "taxChecks": "Logi walidacji podatkowej"
@@ -380,6 +390,7 @@
         "run": "Uruchom testy smoke",
         "resultsTitle": "Ostatni przebieg smoke",
         "ok": "OK",
+        "warning": "Ostrzezenie",
         "failed": "Blad",
         "success": "Testy smoke integracji zakonczone.",
         "error": "Czesc testow smoke integracji nie powiodla sie."
@@ -393,7 +404,9 @@
           "pair": "Para",
           "value": "Kurs",
           "provider": "Dostawca",
+          "attribution": "Atrybucja",
           "effectiveDate": "Data efektywna",
+          "published": "Publikacja",
           "type": "Typ",
           "method": "Metoda",
           "retrieved": "Pobrano"

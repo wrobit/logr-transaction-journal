@@ -52,4 +52,16 @@ describe("integration provider policy", () => {
     const policy = await resolveProviderPolicy("PL", "bank_import");
     expect(policy).toEqual(["gocardless_bad"]);
   });
+
+  it("ignores lock marker in resolved provider list", async () => {
+    selectMock.mockReturnValueOnce(
+      createSelectChain([
+        { providerName: "__LOCKED__" },
+        { providerName: "nbp" },
+      ]),
+    );
+
+    const policy = await resolveProviderPolicy("PL", "rate");
+    expect(policy).toEqual(["nbp"]);
+  });
 });

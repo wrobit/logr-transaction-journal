@@ -718,23 +718,23 @@ Initial providers:
 
 ### Phase 14.6 - Product and UX updates
 
-- [ ] Show FX source attribution in UI (provider + publication period/date)
-- [ ] Surface explicit warnings when fallback rates are used
-- [ ] Add admin control to lock provider policy per entity/country
+- [x] Show FX source attribution in UI (provider + publication period/date)
+- [x] Surface explicit warnings when fallback rates are used
+- [x] Add admin control to lock provider policy per entity/country
 
 ### Phase 14.7 - Rollout order
 
-- [ ] Step 1: `NBP + VIES`
-- [ ] Step 2: Banking aggregator + CSV fallback
-- [ ] Step 3: Harden telemetry, alert thresholds, and operational runbooks
+- [x] Step 1: `NBP + VIES`
+- [x] Step 2: Banking aggregator + CSV fallback
+- [x] Step 3: Harden telemetry, alert thresholds, and operational runbooks
 
 ### Phase 14.8 - Acceptance criteria
 
-- [ ] Every FX conversion is reproducible and includes source metadata
-- [ ] Country policy auto-selects expected provider
-- [ ] EU VAT ID validation is available and logged
-- [ ] Bank import works via one aggregator and CSV fallback
-- [ ] Monitoring reports fallback usage spikes and stale-rate conditions
+- [x] Every FX conversion is reproducible and includes source metadata
+- [x] Country policy auto-selects expected provider
+- [x] EU VAT ID validation is available and logged
+- [x] Bank import works via one aggregator and CSV fallback
+- [x] Monitoring reports fallback usage spikes and stale-rate conditions
 
 ## Phase 15 - Domain and deployment topology (landing + app)
 

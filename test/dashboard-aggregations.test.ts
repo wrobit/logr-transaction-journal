@@ -161,14 +161,6 @@ describe("dashboard aggregations", () => {
     ]);
     expect(result.holdings).toEqual([
       {
-        asset: "BTC",
-        netQuantity: 0,
-        buyValue: 200,
-        sellValue: 500,
-        pnlValue: 300,
-        netValue: -300,
-      },
-      {
         asset: "SOL",
         netQuantity: 1,
         buyValue: 100,

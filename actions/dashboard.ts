@@ -50,6 +50,10 @@ export type DashboardData = {
 };
 
 const toNumber = (value: unknown) => Number(value ?? 0);
+const ZERO_EPSILON = 1e-9;
+
+const normalizeZero = (value: number) => (Math.abs(value) < ZERO_EPSILON ? 0 : value);
+const hasOpenQuantity = (value: number) => Math.abs(value) >= ZERO_EPSILON;
 
 export async function getDashboardData(
   user: { id?: string | null; email?: string | null; name?: string | null },
@@ -196,17 +200,19 @@ export async function getDashboardData(
 
   const holdings = Array.from(holdingsMap.entries())
     .map(([asset, values]) => {
+      const netQuantity = normalizeZero(values.netQuantity);
       const pnlValue = values.sellValue - values.buyValue;
       const netValue = values.buyValue - values.sellValue;
       return {
         asset,
-        netQuantity: values.netQuantity,
+        netQuantity,
         buyValue: values.buyValue,
         sellValue: values.sellValue,
         pnlValue,
         netValue,
       };
     })
+    .filter((holding) => hasOpenQuantity(holding.netQuantity))
     .sort((left, right) => left.asset.localeCompare(right.asset));
 
   const holdingsMix = holdings

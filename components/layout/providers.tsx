@@ -6,13 +6,18 @@ import { NextIntlClientProvider } from "next-intl";
 import { SessionProvider } from "next-auth/react";
 import { Toaster } from "sonner";
 
+import { CookieConsentBanner } from "@/components/layout/cookie-consent-banner";
+import type { CookieConsentValue } from "@/lib/privacy/consent";
+
 export function Providers({
   children,
+  initialCookieConsent,
   locale,
   messages,
   session,
 }: {
   children: React.ReactNode;
+  initialCookieConsent: CookieConsentValue | null;
   locale: string;
   messages: AbstractIntlMessages;
   session: Session | null;
@@ -27,6 +32,7 @@ export function Providers({
           }}
         />
         {children}
+        <CookieConsentBanner initialConsent={initialCookieConsent} />
       </NextIntlClientProvider>
     </SessionProvider>
   );

@@ -19,10 +19,108 @@
     "entries": "Wpisy",
     "dashboard": "Panel",
     "profile": "Profil",
+    "privacyPolicy": "Polityka prywatnosci",
     "contact": "Kontakt",
     "github": "GitHub",
     "buyMeACoffee": "Buy Me a Coffee",
     "email": "Napisz do Piotra Wrobla"
+  },
+  "cookieConsent": {
+    "label": "Zgoda na cookies",
+    "title": "Analityczne cookies",
+    "description": "Logr uzywa opcjonalnych cookies Google Analytics, aby rozumiec sposob korzystania z produktu. Laduja sie tylko po akceptacji.",
+    "privacyLink": "Polityka prywatnosci",
+    "accept": "Akceptuj analityke",
+    "reject": "Odrzuc"
+  },
+  "privacyPolicy": {
+    "eyebrow": "Informacje prawne",
+    "title": "Polityka prywatnosci",
+    "intro": "Ta polityka wyjasnia, jak Logr przetwarza dane osobowe, dane konta, szyfrowane wpisy transakcji, logi techniczne, cookies i opcjonalna analityke.",
+    "effectiveDate": "Data obowiazywania: 9 sierpnia 2026",
+    "sections": {
+      "controller": {
+        "title": "Administrator danych",
+        "body": "Administratorem danych osobowych przetwarzanych w Logr jest Piotr Wrobel. Logr to prywatny szyfrowany dziennik transakcji krypto do zapisywania transakcji, obliczania wartosci i przygotowania danych do eksportu.",
+        "items": {
+          "first": "Kontakt w sprawach prywatnosci: piotr.wrobel@quadrantive.com.",
+          "second": "Aplikacja zbiera tylko dane potrzebne do utworzenia i obslugi konta.",
+          "third": "Nie dodawaj do notatek ani importow dokumentow tozsamosci, danych zdrowotnych ani innych wrazliwych informacji niezwiazanych z aplikacja."
+        }
+      },
+      "data": {
+        "title": "Dane przetwarzane przez Logr",
+        "body": "Logr przetwarza informacje potrzebne do uwierzytelniania, utrzymania preferencji konta i przechowywania wpisow dziennika.",
+        "items": {
+          "first": "Dane konta: imie, nazwisko, login, adres e-mail, identyfikatory dostawcow logowania, rola, znaczniki czasu i waluta wyswietlania.",
+          "second": "Dane transakcji: aktywo, operacja, ilosc, cena, waluta kwotowana, prowizja, zrodlo, notatka, wyliczone wartosci, kursy, historia importu i dane eksportu.",
+          "third": "Dane techniczne: cookies sesji, preferencja jezyka, status zgody, logi audytu, kontekst bledow i metadane odpowiedzi integracji."
+        }
+      },
+      "purpose": {
+        "title": "Cele i podstawa przetwarzania",
+        "body": "Dane sa przetwarzane, aby udostepnic usluge Logr, zabezpieczyc konta, obliczac wartosci transakcji, obslugiwac importy i eksporty oraz ulepszac aplikacje z opcjonalna analityka.",
+        "items": {
+          "first": "Swiadczenie uslugi: dostep do konta, dziennik transakcji, wycena PLN, widoki panelu, przeplywy podatkowe/eksportowe i ustawienia profilu.",
+          "second": "Bezpieczenstwo i integralnosc: uwierzytelnianie, szyfrowane przechowywanie, logi audytu, zapobieganie naduzyciom i diagnostyka.",
+          "third": "Opcjonalna analityka: Google Analytics jest uzywany tylko po zgodzie, aby rozumiec zagregowane korzystanie z produktu."
+        }
+      },
+      "security": {
+        "title": "Szyfrowanie i bezpieczenstwo",
+        "body": "Logr opiera sie na szyfrowanych rekordach uzytkownika i ograniczonym dostepie operacyjnym.",
+        "items": {
+          "first": "Wpisy transakcji i notatki sa szyfrowane przed zapisem przy uzyciu mechanizmow szyfrowania aplikacji.",
+          "second": "Sekrety runtime, dane dostepowe do bazy i klucze szyfrujace musza pozostac poza commitowanym kodem zrodlowym.",
+          "third": "Dostep administratora jest ograniczony do utrzymania, wsparcia uzytkownika, przegladu audytu oraz badania naduzyc lub niezawodnosci."
+        }
+      },
+      "processors": {
+        "title": "Podmioty przetwarzajace i integracje",
+        "body": "Logr moze uzywac zewnetrznych dostawcow tylko tam, gdzie jest to potrzebne do hostingu, logowania, analityki, kursow walut, walidacji podatkowej, importu bankowego albo kontaktu.",
+        "items": {
+          "first": "Logowanie moze korzystac z e-maila/hasla, Google albo GitHub, zaleznie od wybranej metody.",
+          "second": "Dostawcy kursow, walidacji podatkowej, importu bankowego i danych rynkowych moga otrzymac minimalne dane techniczne potrzebne do zwrocenia wyniku.",
+          "third": "Google Analytics otrzymuje zdarzenia uzycia tylko po zaakceptowaniu zgody analitycznej."
+        }
+      },
+      "cookies": {
+        "title": "Cookies i analityka",
+        "body": "Logr uzywa niezbednych cookies pierwszej strony dla sesji, jezyka i zgody. Cookies analityczne sa opcjonalne.",
+        "items": {
+          "first": "Niezbedne cookies utrzymuja zalogowanie, zapamietuja jezyk i przechowuja informacje, czy analityka zostala zaakceptowana albo odrzucona.",
+          "second": "Jesli odrzucisz analityke, Logr nie laduje skryptu Google Analytics.",
+          "third": "Jesli zaakceptujesz analityke, Logr laduje Google Analytics z ustawionym identyfikatorem pomiaru i anonimizacja IP."
+        }
+      },
+      "rights": {
+        "title": "Twoje prawa",
+        "body": "Mozesz zarzadzac danymi profilu w aplikacji oraz zadac dostepu, sprostowania, usuniecia, ograniczenia, przeniesienia albo sprzeciwu, jezeli ma to zastosowanie.",
+        "items": {
+          "first": "Mozesz aktualizowac dane profilu i walute wyswietlania na stronie profilu.",
+          "second": "Mozesz usunac konto na stronie profilu; usuniecie usuwa konto, wpisy, wyceny i notatki.",
+          "third": "W sprawach prywatnosci napisz na piotr.wrobel@quadrantive.com z adresu e-mail powiazanego z kontem."
+        }
+      },
+      "retention": {
+        "title": "Okres przechowywania",
+        "body": "Logr przechowuje dane tak dlugo, jak jest to potrzebne do obslugi konta, potrzeb operacyjnych oraz integralnosci bezpieczenstwa i audytu.",
+        "items": {
+          "first": "Wpisy dziennika pozostaja zapisane do czasu edycji, usuniecia, eksportu albo usuniecia konta.",
+          "second": "Logi audytu i techniczne moga byc przechowywane dla bezpieczenstwa, diagnostyki i zapobiegania naduzyciom.",
+          "third": "Po usunieciu konta pozostale kopie operacyjne lub logi wygasaja zgodnie z harmonogramami dostawcow i utrzymania."
+        }
+      },
+      "contact": {
+        "title": "Kontakt",
+        "body": "Pytania o prywatnosc, cookies, analityke albo usuniecie konta nalezy wyslac do Piotra Wrobla.",
+        "items": {
+          "first": "E-mail: piotr.wrobel@quadrantive.com.",
+          "second": "Podaj e-mail konta, aby mozna bylo dopasowac prosbe do wlasciwego profilu.",
+          "third": "Nie wysylaj e-mailem hasel, kluczy prywatnych, seed phrase ani dokumentow tozsamosci."
+        }
+      }
+    }
   },
   "auth": {
     "oauthGoogle": "Kontynuuj z Google",
@@ -516,6 +614,10 @@
     "register": {
       "title": "Rejestracja",
       "description": "Utworz konto Logr, aby sledzic transakcje krypto."
+    },
+    "privacyPolicy": {
+      "title": "Polityka prywatnosci",
+      "description": "Sprawdz, jak Logr przetwarza dane konta, szyfrowane wpisy, cookies i opcjonalna analityke."
     },
     "admin": {
       "title": "Admin",

@@ -90,6 +90,7 @@ describe("metadata routes", () => {
     expect(sitemap()).toEqual([
       expect.objectContaining({ url: "https://logr.example.com/login" }),
       expect.objectContaining({ url: "https://logr.example.com/register" }),
+      expect.objectContaining({ url: "https://logr.example.com/privacy-policy" }),
     ]);
   });
 

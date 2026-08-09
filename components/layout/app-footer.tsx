@@ -14,6 +14,7 @@ const productLinks = [
   { href: "/", labelKey: "entries" },
   { href: "/dashboard", labelKey: "dashboard" },
   { href: "/profile", labelKey: "profile" },
+  { href: "/privacy-policy", labelKey: "privacyPolicy" },
 ] as const;
 
 const socialLinks = [

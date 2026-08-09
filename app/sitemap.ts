@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 
 import { getSiteUrl, isProduction } from "@/lib/metadata";
 
-const publicRoutes = ["/login", "/register"] as const;
+const publicRoutes = ["/login", "/register", "/privacy-policy"] as const;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   if (!isProduction) {

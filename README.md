@@ -170,6 +170,13 @@ pnpm install
 pnpm dev
 ```
 
+## Environment Variables
+
+- `DATABASE_URL` connects the app to Postgres/Neon.
+- `LOGR_KEK` is a 32-byte base64 key-encryption key for encrypted user data.
+- `NEXT_PUBLIC_BUYMEACOFFEE_URL` controls the support link.
+- `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID` enables Google Analytics after the user accepts analytics cookies.
+
 ## Support
 
 Logr is open source and community-supported. All product features are free to use.
@@ -194,6 +201,6 @@ MIT. See `LICENSE`.
 
 ## Contact
 
-Contact me via e-mail: piotrwrobel.ajiiz@gmail.com
+Contact me via e-mail: piotr.wrobel@quadrantive.com
 
 Initialized with 🖤

@@ -19,10 +19,108 @@
     "entries": "Entries",
     "dashboard": "Dashboard",
     "profile": "Profile",
+    "privacyPolicy": "Privacy policy",
     "contact": "Contact",
     "github": "GitHub",
     "buyMeACoffee": "Buy Me a Coffee",
     "email": "Email Piotr Wrobel"
+  },
+  "cookieConsent": {
+    "label": "Cookie consent",
+    "title": "Analytics cookies",
+    "description": "Logr uses optional Google Analytics cookies to understand product usage. They load only if you accept.",
+    "privacyLink": "Privacy policy",
+    "accept": "Accept analytics",
+    "reject": "Reject"
+  },
+  "privacyPolicy": {
+    "eyebrow": "Legal",
+    "title": "Privacy policy",
+    "intro": "This policy explains how Logr processes personal data, account data, encrypted transaction records, technical logs, cookies, and optional analytics.",
+    "effectiveDate": "Effective date: August 9, 2026",
+    "sections": {
+      "controller": {
+        "title": "Controller",
+        "body": "The controller of personal data processed in Logr is Piotr Wrobel. Logr is a private encrypted crypto transaction journal used to record transactions, calculate values, and prepare export-ready records.",
+        "items": {
+          "first": "Contact for privacy matters: piotr.wrobel@quadrantive.com.",
+          "second": "The app is designed to collect only data needed to create and operate your account.",
+          "third": "You should not add identity documents, health data, or other sensitive unrelated information to notes or imports."
+        }
+      },
+      "data": {
+        "title": "Data Logr processes",
+        "body": "Logr processes the information needed to authenticate users, keep account preferences, and store journal entries.",
+        "items": {
+          "first": "Account data: name, login, email address, authentication provider identifiers, role, timestamps, and display currency.",
+          "second": "Transaction data: asset, operation, quantity, price, quote currency, commission, source, note, calculated values, rates, import history, and export data.",
+          "third": "Technical data: session cookies, locale preference, consent status, audit logs, error context, and integration response metadata."
+        }
+      },
+      "purpose": {
+        "title": "Purposes and legal basis",
+        "body": "Data is processed to provide the Logr service, secure user accounts, calculate transaction values, support imports and exports, and improve the app with optional analytics.",
+        "items": {
+          "first": "Service delivery: account access, transaction journaling, PLN valuation, dashboard views, tax/export workflows, and profile settings.",
+          "second": "Security and integrity: authentication, encrypted storage, audit logs, abuse prevention, and troubleshooting.",
+          "third": "Optional analytics: Google Analytics is used only after consent to understand aggregated product usage."
+        }
+      },
+      "security": {
+        "title": "Encryption and security",
+        "body": "Logr is built around encrypted user records and limited operational access.",
+        "items": {
+          "first": "Transaction entries and notes are encrypted before storage using application encryption controls.",
+          "second": "Runtime secrets, database credentials, and encryption keys must stay outside committed source code.",
+          "third": "Admin access is limited to operational maintenance, user support, audit review, and abuse or reliability investigation."
+        }
+      },
+      "processors": {
+        "title": "Processors and integrations",
+        "body": "Logr may use external providers only where needed for hosting, authentication, analytics, exchange-rate lookups, tax validation, bank import, or email/contact flows.",
+        "items": {
+          "first": "Authentication may use email/password, Google, or GitHub depending on the login method you choose.",
+          "second": "Rate, tax, bank-import, and market-data providers may receive the minimum technical request data needed to return the requested result.",
+          "third": "Google Analytics receives usage events only after analytics consent is accepted."
+        }
+      },
+      "cookies": {
+        "title": "Cookies and analytics",
+        "body": "Logr uses necessary first-party cookies for sessions, locale, and consent. Analytics cookies are optional.",
+        "items": {
+          "first": "Necessary cookies keep you signed in, remember the selected language, and store whether analytics were accepted or rejected.",
+          "second": "If you reject analytics, the Google Analytics script is not loaded by Logr.",
+          "third": "If you accept analytics, Logr loads Google Analytics using the configured measurement id and IP anonymization."
+        }
+      },
+      "rights": {
+        "title": "Your rights",
+        "body": "You can manage your profile data in the app and may request access, correction, deletion, restriction, portability, or objection where applicable.",
+        "items": {
+          "first": "You can update profile details and display currency from the profile page.",
+          "second": "You can delete your account from the profile page; deletion removes your account, entries, valuations, and notes.",
+          "third": "For privacy requests, contact piotr.wrobel@quadrantive.com from the email connected to your account."
+        }
+      },
+      "retention": {
+        "title": "Retention",
+        "body": "Logr keeps data for as long as needed to provide the account, meet operational needs, and preserve security/audit integrity.",
+        "items": {
+          "first": "Journal entries remain stored until you edit, delete, export, or delete the account.",
+          "second": "Audit and technical logs may be retained for security, troubleshooting, and abuse prevention.",
+          "third": "After account deletion, remaining operational backups or logs expire according to provider and maintenance schedules."
+        }
+      },
+      "contact": {
+        "title": "Contact",
+        "body": "Questions about privacy, cookies, analytics, or account deletion should be sent to Piotr Wrobel.",
+        "items": {
+          "first": "Email: piotr.wrobel@quadrantive.com.",
+          "second": "Include the account email so the request can be matched to the correct profile.",
+          "third": "Do not send passwords, private keys, seed phrases, or identity documents by email."
+        }
+      }
+    }
   },
   "auth": {
     "oauthGoogle": "Continue with Google",
@@ -516,6 +614,10 @@
     "register": {
       "title": "Register",
       "description": "Create a Logr account to track crypto transactions."
+    },
+    "privacyPolicy": {
+      "title": "Privacy policy",
+      "description": "Read how Logr processes account data, encrypted entries, cookies, and optional analytics."
     },
     "admin": {
       "title": "Admin",

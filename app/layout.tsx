@@ -16,6 +16,7 @@ import {
   buildPageMetadata,
   metadataBase,
 } from "@/lib/metadata";
+import { cookieConsentName, isCookieConsentValue } from "@/lib/privacy/consent";
 import "./globals.css";
 
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
@@ -68,6 +69,8 @@ export default async function RootLayout({
   const cookieStore = await cookies();
   const localeCookie = cookieStore.get(LOCALE_COOKIE_NAME)?.value;
   const locale = isAppLocale(localeCookie) ? localeCookie : DEFAULT_LOCALE;
+  const cookieConsent = cookieStore.get(cookieConsentName)?.value;
+  const initialCookieConsent = isCookieConsentValue(cookieConsent) ? cookieConsent : null;
   const messages = await getLocaleMessages(locale);
 
   const session = await getServerSession(authOptions);
@@ -76,7 +79,12 @@ export default async function RootLayout({
   return (
     <html lang={locale} className={`${figtree.variable} dark`}>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <Providers session={session} locale={locale} messages={messages}>
+        <Providers
+          session={session}
+          locale={locale}
+          messages={messages}
+          initialCookieConsent={initialCookieConsent}
+        >
           <AppShell showTicker={showTicker}>{children}</AppShell>
         </Providers>
         {showTicker ? <FooterTicker /> : null}

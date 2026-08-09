@@ -158,7 +158,6 @@ export function ImportExportPanel({
           >
             <option value="kraken">Kraken</option>
             <option value="binance">Binance</option>
-            <option value="zondacrypto">ZondaCrypto</option>
           </select>
         </label>
 

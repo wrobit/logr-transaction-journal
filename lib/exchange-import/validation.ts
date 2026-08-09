@@ -7,11 +7,12 @@ import type {
   ImportIssue,
   ImportOperationType,
 } from "@/lib/exchange-import/types";
+import { EXCHANGE_CSV_PROVIDERS } from "@/lib/exchange-import/types";
 
 const positiveDecimalPattern = /^\d+(?:\.\d+)?$/;
 
 const canonicalTransactionSchema = z.object({
-  provider: z.enum(["kraken", "zondacrypto", "binance"]),
+  provider: z.enum(EXCHANGE_CSV_PROVIDERS),
   externalId: z.string().trim().min(1),
   executedAt: z
     .string()

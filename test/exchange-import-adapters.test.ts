@@ -7,10 +7,10 @@ import { describe, expect, it } from "vitest";
 import { parseBinanceCsv } from "@/lib/exchange-import/adapters/binance";
 import { parseKrakenCsv } from "@/lib/exchange-import/adapters/kraken";
 import { parseExchangeCsv } from "@/lib/exchange-import/adapters";
-import { parseZondaCryptoCsv } from "@/lib/exchange-import/adapters/zondacrypto";
 import { decodeCsvInput } from "@/lib/exchange-import/csv";
 
 const fixturePath = (path: string) => resolve(process.cwd(), "test/fixtures/exchange-import", path);
+const samplePath = (path: string) => resolve(process.cwd(), "public/samples", path);
 
 describe("exchange CSV adapters", () => {
   it("parses Kraken trades CSV into canonical row", () => {
@@ -53,20 +53,6 @@ describe("exchange CSV adapters", () => {
     }
   });
 
-  it("parses ZondaCrypto transactions CSV with semicolon delimiter", () => {
-    const result = parseZondaCryptoCsv({
-      content: [
-        "market;time;userAction;amount;rate;commissionValue;id",
-        "ETH-PLN;1704110400000;Buy;0,5;10400,10;12,00;z-1",
-      ].join("\n"),
-    });
-
-    expect(result.provider).toBe("zondacrypto");
-    expect(result.delimiter).toBe(";");
-    expect(result.rows).toHaveLength(1);
-    expect(result.rows[0]?.status).toBe("valid");
-  });
-
   it("auto-detects provider using headers", () => {
     const result = parseExchangeCsv({
       content: [
@@ -100,6 +86,34 @@ describe("exchange CSV adapters", () => {
     expect(result.rows.every((row) => row.status === "valid")).toBe(true);
   });
 
+  it("parses reusable Kraken sample CSV", () => {
+    const content = readFileSync(samplePath("kraken-import-sample.csv"), "utf8");
+    const result = parseKrakenCsv({ content });
+    const validRows = result.rows.filter((row) => row.status === "valid");
+    const buyRows = validRows.filter((row) => row.transaction.operation === "BUY");
+    const sellRows = validRows.filter((row) => row.transaction.operation === "SELL");
+
+    expect(result.provider).toBe("kraken");
+    expect(result.rows).toHaveLength(60);
+    expect(validRows).toHaveLength(60);
+    expect(buyRows).toHaveLength(30);
+    expect(sellRows).toHaveLength(30);
+  });
+
+  it("parses reusable Binance sample CSV", () => {
+    const content = readFileSync(samplePath("binance-import-sample.csv"), "utf8");
+    const result = parseBinanceCsv({ content });
+    const validRows = result.rows.filter((row) => row.status === "valid");
+    const buyRows = validRows.filter((row) => row.transaction.operation === "BUY");
+    const sellRows = validRows.filter((row) => row.transaction.operation === "SELL");
+
+    expect(result.provider).toBe("binance");
+    expect(result.rows).toHaveLength(60);
+    expect(validRows).toHaveLength(60);
+    expect(buyRows).toHaveLength(30);
+    expect(sellRows).toHaveLength(30);
+  });
+
   it("parses Binance fixture CSV", () => {
     const content = readFileSync(fixturePath("binance/spot-valid.csv"), "utf8");
     const result = parseBinanceCsv({ content });
@@ -108,11 +122,4 @@ describe("exchange CSV adapters", () => {
     expect(result.rows.every((row) => row.status === "valid")).toBe(true);
   });
 
-  it("parses Zonda fixture CSV", () => {
-    const content = readFileSync(fixturePath("zondacrypto/transactions-valid.csv"), "utf8");
-    const result = parseZondaCryptoCsv({ content });
-
-    expect(result.rows.length).toBe(2);
-    expect(result.rows.every((row) => row.status === "valid")).toBe(true);
-  });
 });

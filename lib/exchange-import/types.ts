@@ -1,4 +1,4 @@
-export const EXCHANGE_CSV_PROVIDERS = ["kraken", "zondacrypto", "binance"] as const;
+export const EXCHANGE_CSV_PROVIDERS = ["kraken", "binance"] as const;
 export type ExchangeCsvProvider = (typeof EXCHANGE_CSV_PROVIDERS)[number];
 
 export const IMPORT_OPERATION_TYPES = ["BUY", "SELL"] as const;

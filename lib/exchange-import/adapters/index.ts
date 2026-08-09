@@ -1,7 +1,6 @@
 import { normalizeHeader } from "@/lib/exchange-import/csv";
 import { parseBinanceCsv } from "@/lib/exchange-import/adapters/binance";
 import { parseKrakenCsv } from "@/lib/exchange-import/adapters/kraken";
-import { parseZondaCryptoCsv } from "@/lib/exchange-import/adapters/zondacrypto";
 import type { ExchangeCsvParseResult, ExchangeCsvProvider } from "@/lib/exchange-import/types";
 
 export function parseExchangeCsv(input: {
@@ -17,10 +16,6 @@ export function parseExchangeCsv(input: {
     return parseBinanceCsv(input);
   }
 
-  if (input.provider === "zondacrypto") {
-    return parseZondaCryptoCsv(input);
-  }
-
   const headerLine = readFirstLine(input.content);
   const normalized = headerLine.split(/[,;\t]/).map((header) => normalizeHeader(header));
 
@@ -30,10 +25,6 @@ export function parseExchangeCsv(input: {
 
   if (normalized.includes("dateutc") && normalized.includes("executed") && normalized.includes("fee")) {
     return parseBinanceCsv(input);
-  }
-
-  if (normalized.includes("market") && normalized.includes("useraction") && normalized.includes("commissionvalue")) {
-    return parseZondaCryptoCsv(input);
   }
 
   return parseBinanceCsv(input);

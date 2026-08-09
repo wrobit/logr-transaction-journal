@@ -14,13 +14,11 @@ import {
 import { revalidatePath } from "next/cache";
 
 import { getAdminSession } from "@/lib/auth/admin";
-import { logAdminAction, getEntriesCountForUser } from "@/actions/admin-audit";
+import { getEntriesCountForUser } from "@/actions/admin-audit";
 import { db } from "@/lib/db";
-import { entries, users } from "@/lib/db/schema";
+import { adminAuditLogs, entries, users } from "@/lib/db/schema";
 import { dayjs } from "@/lib/dayjs";
-import { getUserDek, resolveEntryPayload } from "@/lib/entries/encryption";
-import { serializeEntry } from "@/lib/entries/serialize";
-import type { EntryView } from "@/lib/entries/types";
+import { hasRecentAuthentication } from "@/lib/auth/session";
 
 const ADMIN_USERS_PAGE_SIZE = 50;
 
@@ -179,30 +177,6 @@ export async function getAdminUser(userId: string) {
   return user ?? null;
 }
 
-export async function getAdminUserEntries(userId: string): Promise<EntryView[]> {
-  const session = await getAdminSession();
-
-  if (!session) {
-    return [];
-  }
-
-  const rows = await db
-    .select()
-    .from(entries)
-    .where(and(eq(entries.userId, userId), isNull(entries.deletedAt)))
-    .orderBy(desc(entries.createdAt))
-    .limit(50);
-
-  const dek = await getUserDek(userId);
-
-  return Promise.all(
-    rows.map(async (row) => {
-      const payload = await resolveEntryPayload(row, dek);
-      return serializeEntry(row, payload);
-    }),
-  );
-}
-
 export async function softDeleteUser(userId: string): Promise<AdminActionResult> {
   const session = await getAdminSession();
 
@@ -218,17 +192,20 @@ export async function softDeleteUser(userId: string): Promise<AdminActionResult>
     return { status: "error", message: "You cannot deactivate your own account." };
   }
 
-  await db
-    .update(users)
-    .set({
-      deletedAt: dayjs.utc().toDate(),
-    })
-    .where(eq(users.id, userId));
+  if (!hasRecentAuthentication(session.user.authenticatedAt)) {
+    return { status: "error", message: "Sign in again before deactivating a user." };
+  }
 
-  await logAdminAction({
-    actorUserId: session.user.id,
-    action: "user.deactivated",
-    targetUserId: userId,
+  await db.transaction(async (tx) => {
+    await tx
+      .update(users)
+      .set({ deletedAt: dayjs.utc().toDate() })
+      .where(eq(users.id, userId));
+    await tx.insert(adminAuditLogs).values({
+      actorUserId: session.user.id,
+      action: "user.deactivated",
+      targetUserId: userId,
+    });
   });
 
   revalidatePath("/admin/users");
@@ -248,17 +225,13 @@ export async function restoreUser(userId: string): Promise<AdminActionResult> {
     return { status: "error", message: "User ID is required." };
   }
 
-  await db
-    .update(users)
-    .set({
-      deletedAt: null,
-    })
-    .where(eq(users.id, userId));
-
-  await logAdminAction({
-    actorUserId: session.user.id,
-    action: "user.restored",
-    targetUserId: userId,
+  await db.transaction(async (tx) => {
+    await tx.update(users).set({ deletedAt: null }).where(eq(users.id, userId));
+    await tx.insert(adminAuditLogs).values({
+      actorUserId: session.user.id,
+      action: "user.restored",
+      targetUserId: userId,
+    });
   });
 
   revalidatePath("/admin/users");
@@ -278,15 +251,20 @@ export async function purgeUserEntries(userId: string): Promise<AdminActionResul
     return { status: "error", message: "User ID is required." };
   }
 
+  if (!hasRecentAuthentication(session.user.authenticatedAt)) {
+    return { status: "error", message: "Sign in again before purging entries." };
+  }
+
   const entriesCount = await getEntriesCountForUser(userId);
 
-  await db.delete(entries).where(eq(entries.userId, userId));
-
-  await logAdminAction({
-    actorUserId: session.user.id,
-    action: "entries.purged",
-    targetUserId: userId,
-    metadata: { entriesPurged: entriesCount },
+  await db.transaction(async (tx) => {
+    await tx.delete(entries).where(eq(entries.userId, userId));
+    await tx.insert(adminAuditLogs).values({
+      actorUserId: session.user.id,
+      action: "entries.purged",
+      targetUserId: userId,
+      metadata: { entriesPurged: entriesCount },
+    });
   });
 
   revalidatePath("/admin/users");

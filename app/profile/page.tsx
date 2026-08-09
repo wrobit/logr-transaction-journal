@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 
 import { getProfile } from "@/actions/profile";
 import { ProfileView } from "@/components/profile/profile-view";
-import { authOptions } from "@/lib/auth/options";
+import { requireActiveUser } from "@/lib/auth/session";
 import { getServerTranslator } from "@/lib/i18n/translate";
 import { buildPageMetadata } from "@/lib/metadata";
 
@@ -18,11 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function ProfilePage() {
-  const session = await getServerSession(authOptions);
-
-  if (!session?.user?.id) {
-    redirect("/login");
-  }
+  const { session } = await requireActiveUser();
 
   const profile = await getProfile(session.user);
 

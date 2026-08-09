@@ -333,7 +333,9 @@ export function AdminIntegrationsView({ overview }: AdminIntegrationsViewProps) 
                   <tr key={row.id} className="bg-background">
                     <td className="px-3 py-3">{row.countryCode}</td>
                     <td className="px-3 py-3 text-muted-foreground">{row.idType}</td>
-                    <td className="px-3 py-3 text-muted-foreground">{row.maskedValue}</td>
+                    <td className="px-3 py-3 font-mono text-muted-foreground">
+                      {row.identifierHash.slice(0, 12)}
+                    </td>
                     <td className="px-3 py-3">
                       <Badge variant={row.result === "valid" ? "secondary" : "outline"}>{row.result}</Badge>
                     </td>

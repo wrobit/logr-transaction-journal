@@ -58,7 +58,7 @@ export function AdminUserActionDialog({
         toast.error(result.message ?? t("failed"));
       }
     });
-  }, [action, successMessage, userId]);
+  }, [action, successMessage, t, userId]);
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>

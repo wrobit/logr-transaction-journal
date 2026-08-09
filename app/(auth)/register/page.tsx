@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 
 import { RegisterForm } from "@/components/auth/register-form";
 import { getServerTranslator } from "@/lib/i18n/translate";
 import { buildPageMetadata } from "@/lib/metadata";
+import { isPublicRegistrationEnabled } from "@/lib/auth/registration";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getServerTranslator();
@@ -15,5 +17,9 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function RegisterPage() {
+  if (!isPublicRegistrationEnabled()) {
+    redirect("/login");
+  }
+
   return <RegisterForm />;
 }

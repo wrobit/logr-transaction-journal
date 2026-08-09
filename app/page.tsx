@@ -1,11 +1,9 @@
 import type { Metadata } from "next";
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
 
 import { listExchangeImportHistoryAction } from "@/actions/exchange-import";
 import { listEntries } from "@/actions/entries";
 import { EntriesView } from "@/components/entries/entries-view";
-import { authOptions } from "@/lib/auth/options";
+import { requireActiveUser } from "@/lib/auth/session";
 import { ENTRY_PAGE_SIZE, parseEntryQuery } from "@/lib/entries/query";
 import { getServerTranslator } from "@/lib/i18n/translate";
 import { buildPageMetadata } from "@/lib/metadata";
@@ -26,11 +24,7 @@ type PageProps = {
 };
 
 export default async function Page({ searchParams }: PageProps) {
-  const session = await getServerSession(authOptions);
-
-  if (!session?.user?.id) {
-    redirect("/login");
-  }
+  const { session } = await requireActiveUser();
 
   const resolvedSearchParams = await searchParams;
   const query = parseEntryQuery(resolvedSearchParams ?? {});

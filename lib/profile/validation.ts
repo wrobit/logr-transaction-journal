@@ -3,12 +3,6 @@ import { z } from "zod";
 import { feedbackReasons } from "@/lib/profile/feedback";
 import { DISPLAY_CURRENCIES } from "@/lib/currency/display";
 
-const optionalTextField = (label: string) =>
-  z.preprocess(
-    (value) => (typeof value === "string" && value.trim() === "" ? undefined : value),
-    z.string().trim().min(1, `${label} is required.`).optional(),
-  );
-
 export const profileUpdateSchema = z.object({
   firstName: z.string().trim().min(1, "First name is required."),
   lastName: z.string().trim().min(1, "Last name is required."),
@@ -28,7 +22,6 @@ export const deleteAccountSchema = z.object({
     (value) => (value ? String(value) : undefined),
     feedbackReasonSchema.optional(),
   ),
-  notes: optionalTextField("Notes"),
 });
 
 export type ProfileUpdateInput = z.infer<typeof profileUpdateSchema>;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useCallback, useEffect, useState, useTransition } from "react";
+import { useActionState, useCallback, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
@@ -54,17 +54,6 @@ export function ProfileView({
     email: profile.email,
     displayCurrency: profile.displayCurrency,
   });
-
-  useEffect(() => {
-    setProfileState(profile);
-    setFormValues({
-      firstName: profile.firstName,
-      lastName: profile.lastName,
-      login: profile.login,
-      email: profile.email,
-      displayCurrency: profile.displayCurrency,
-    });
-  }, [profile]);
 
   const actionHandler = useCallback(
     async (prevState: UpdateProfileState, formData: FormData) => {
@@ -227,14 +216,9 @@ export function ProfileView({
               type="email"
               autoComplete="email"
               value={formValues.email}
-              onChange={(event) =>
-                setFormValues((prev) => ({
-                  ...prev,
-                  email: event.target.value,
-                }))
-              }
+              readOnly
               required
-              className={inputClassName}
+              className={`${inputClassName} cursor-not-allowed opacity-70`}
             />
             {state.errors?.email ? (
               <p className="text-xs text-red-400">{state.errors.email}</p>
@@ -306,11 +290,13 @@ export function ProfileView({
         </div>
       </section>
 
-      <DeleteAccountDialog
-        open={deleteOpen}
-        onOpenChange={setDeleteOpen}
-        action={deleteAction}
-      />
+      {deleteOpen ? (
+        <DeleteAccountDialog
+          open
+          onOpenChange={setDeleteOpen}
+          action={deleteAction}
+        />
+      ) : null}
     </div>
   );
 }

@@ -68,11 +68,11 @@
       },
       "security": {
         "title": "Encryption and security",
-        "body": "Logr is built around encrypted user records and limited operational access.",
+        "body": "Logr encrypts journal entries at rest and separates account administration from journal content access.",
         "items": {
           "first": "Transaction entries and notes are encrypted before storage using application encryption controls.",
-          "second": "Runtime secrets, database credentials, and encryption keys must stay outside committed source code.",
-          "third": "Admin access is limited to operational maintenance, user support, audit review, and abuse or reliability investigation."
+          "second": "Application administrators cannot read journal contents. Infrastructure operators holding both the database and encryption key could technically decrypt them during an authorized recovery operation.",
+          "third": "Runtime secrets, database credentials, and encryption keys remain outside source code and are restricted to operational recovery and maintenance."
         }
       },
       "processors": {
@@ -98,7 +98,7 @@
         "body": "You can manage your profile data in the app and may request access, correction, deletion, restriction, portability, or objection where applicable.",
         "items": {
           "first": "You can update profile details and display currency from the profile page.",
-          "second": "You can delete your account from the profile page; deletion removes your account, entries, valuations, and notes.",
+          "second": "You can delete your account from the profile page; confirmed deletion permanently removes your account, entries, imports, valuations, and notes.",
           "third": "For privacy requests, contact piotr.wrobel@quadrantive.com from the email connected to your account."
         }
       },
@@ -349,8 +349,6 @@
       "beforeYouGo": "Before you go",
       "feedbackPrompt": "Share a quick reason, then confirm deletion.",
       "reasonOptional": "Why are you leaving? (optional)",
-      "notesLabel": "Anything else to share?",
-      "notesPlaceholder": "Optional feedback",
       "typeDelete": "Type DELETE to confirm",
       "sessionEnds": "Your session will end immediately after deletion.",
       "cancel": "Cancel",
@@ -579,7 +577,7 @@
         "taxColumns": {
           "country": "Country",
           "idType": "ID type",
-          "masked": "Masked value",
+          "masked": "Identifier hash",
           "result": "Result",
           "provider": "Provider",
           "checked": "Checked"
@@ -661,6 +659,8 @@
     "authRequiredEntryDelete": "You must be signed in to delete entries.",
     "userMissing": "User record missing. Please sign in again.",
     "emailInUse": "Email is already in use.",
+    "emailManagedByProvider": "Email is managed by your sign-in provider.",
+    "recentAuthenticationRequired": "Sign out and sign in again before deleting your account.",
     "loginInUse": "Login is already in use.",
     "profileNotFound": "Profile not found.",
     "entryIdMissing": "Entry id is missing.",

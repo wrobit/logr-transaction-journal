@@ -1,5 +1,7 @@
 ignoredBuiltDependencies:
-  - bcrypt
+  - '@parcel/watcher'
+  - '@sentry/cli'
+  - '@swc/core'
   - esbuild
   - msw
   - sharp

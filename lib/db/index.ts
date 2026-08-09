@@ -1,5 +1,6 @@
-import { neon } from "@neondatabase/serverless";
-import { drizzle } from "drizzle-orm/neon-http";
+import { attachDatabasePool } from "@vercel/functions";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { Pool } from "pg";
 
 import * as schema from "./schema";
 
@@ -13,6 +14,16 @@ if (!resolvedDatabaseUrl) {
   throw new Error("DATABASE_URL is not set");
 }
 
-const sql = neon(resolvedDatabaseUrl);
+const pool = new Pool({
+  connectionString: resolvedDatabaseUrl,
+  max: Number(process.env.DATABASE_POOL_MAX ?? 5),
+  idleTimeoutMillis: 10_000,
+  connectionTimeoutMillis: 8_000,
+});
 
-export const db = drizzle(sql, { schema });
+if (process.env.VERCEL) {
+  attachDatabasePool(pool);
+}
+
+export const db = drizzle(pool, { schema });
+export { pool as dbPool };

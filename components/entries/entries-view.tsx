@@ -26,7 +26,6 @@ export type EntriesViewProps = {
   importHistory: Array<{
     id: string;
     provider: string;
-    filename: string | null;
     importedRows: number;
     failedRows: number;
     createdAt: Date;
@@ -329,6 +328,7 @@ export function EntriesView({
       </div>
 
       <EditEntryDialog
+        key={editingEntry?.id ?? "no-entry"}
         entry={editingEntry}
         open={Boolean(editingEntry)}
         onOpenChange={(nextOpen) => {

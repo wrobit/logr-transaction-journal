@@ -1,5 +1,17 @@
 export type CsvDelimiter = "," | ";" | "\t";
 
+export const MAX_CSV_BYTES = 5 * 1024 * 1024;
+export const MAX_CSV_ROWS = 10_000;
+export const MAX_CSV_COLUMNS = 100;
+export const MAX_CSV_CELL_LENGTH = 10_000;
+
+export class CsvLimitError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "CsvLimitError";
+  }
+}
+
 export function decodeCsvInput(input: string | Uint8Array): {
   text: string;
   encoding: "utf-8" | "utf-8-bom" | "utf-16le" | "utf-16be";
@@ -59,14 +71,48 @@ export function detectDelimiter(headerLine: string): CsvDelimiter {
 }
 
 export function parseCsvRows(text: string, delimiter: CsvDelimiter): string[][] {
+  if (new TextEncoder().encode(text).byteLength > MAX_CSV_BYTES) {
+    throw new CsvLimitError("CSV file exceeds the 5 MB limit.");
+  }
+
   const rows: string[][] = [];
   let currentField = "";
   let currentRow: string[] = [];
   let inQuotes = false;
 
+  const assertFieldLimit = () => {
+    if (currentField.length > MAX_CSV_CELL_LENGTH) {
+      throw new CsvLimitError("CSV cell exceeds the maximum length.");
+    }
+  };
+
+  const pushField = () => {
+    assertFieldLimit();
+    currentRow.push(currentField.trim());
+    if (currentRow.length > MAX_CSV_COLUMNS) {
+      throw new CsvLimitError("CSV row exceeds the column limit.");
+    }
+    currentField = "";
+  };
+
+  const pushRow = () => {
+    pushField();
+    if (!isRowEmpty(currentRow)) {
+      rows.push(currentRow);
+      if (rows.length > MAX_CSV_ROWS) {
+        throw new CsvLimitError("CSV file exceeds the row limit.");
+      }
+    }
+    currentRow = [];
+  };
+
   for (let index = 0; index < text.length; index += 1) {
     const char = text[index]!;
     const next = text[index + 1];
+
+    if (currentField.length > MAX_CSV_CELL_LENGTH) {
+      throw new CsvLimitError("CSV cell exceeds the maximum length.");
+    }
 
     if (char === '"') {
       if (inQuotes && next === '"') {
@@ -79,8 +125,7 @@ export function parseCsvRows(text: string, delimiter: CsvDelimiter): string[][] 
     }
 
     if (!inQuotes && char === delimiter) {
-      currentRow.push(currentField.trim());
-      currentField = "";
+      pushField();
       continue;
     }
 
@@ -89,13 +134,7 @@ export function parseCsvRows(text: string, delimiter: CsvDelimiter): string[][] 
         index += 1;
       }
 
-      currentRow.push(currentField.trim());
-      if (!isRowEmpty(currentRow)) {
-        rows.push(currentRow);
-      }
-
-      currentField = "";
-      currentRow = [];
+      pushRow();
       continue;
     }
 
@@ -103,10 +142,7 @@ export function parseCsvRows(text: string, delimiter: CsvDelimiter): string[][] 
   }
 
   if (currentField || currentRow.length > 0) {
-    currentRow.push(currentField.trim());
-    if (!isRowEmpty(currentRow)) {
-      rows.push(currentRow);
-    }
+    pushRow();
   }
 
   return rows;

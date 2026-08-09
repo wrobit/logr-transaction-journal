@@ -90,18 +90,22 @@ Logr is a personal crypto journal that treats each transaction as an immutable a
 - **Database**: Neon (PostgreSQL)
 - **ORM**: Drizzle
 - **UI**: shadcn/ui + Tailwind CSS
-- **Auth**: NextAuth (Credentials provider)
+- **Auth**: NextAuth (Google and GitHub OAuth)
 - **Validation**: zod
-- **Passwords**: bcrypt
 - **Charts (optional)**: Recharts or Chart.js
 
 ## Data Model
 
 ### `users`
 
-- `id`, `email`, `login`, `passwordHash`
+- `id`, `email`, `login`, `role`
 - `firstName`, `lastName`, `createdAt`, `updatedAt`
 - `encryptionKeyEncrypted`, `encryptionVersion`
+
+### `oauth_accounts`
+
+- `userId`, `provider`, `providerAccountId`, `providerEmail`
+- Unique provider identity; accounts are never merged by matching email alone
 
 ### `entries`
 
@@ -117,7 +121,7 @@ Logr is a personal crypto journal that treats each transaction as an immutable a
 ## Encryption
 
 - Uses AES-256-GCM with per-user data keys (DEKs)
-- `LOGR_KEK` (32-byte base64) wraps each user DEK
+- `ENTRY_KEK` (32-byte base64) wraps each user DEK
 - All entry fields are encrypted except `date`
 - Missing/rotated KEK without rewrap makes data unrecoverable
 - DEK rotation re-encrypts all entries for a user
@@ -172,10 +176,12 @@ pnpm dev
 
 ## Environment Variables
 
-- `DATABASE_URL` connects the app to Postgres/Neon.
-- `LOGR_KEK` is a 32-byte base64 key-encryption key for encrypted user data.
-- `NEXT_PUBLIC_BUYMEACOFFEE_URL` controls the support link.
-- `NEXT_PUBLIC_GOOGLE_ANALYTICS_ID` enables Google Analytics after the user accepts analytics cookies.
+Copy `.env.example` and configure the documented runtime, migration, OAuth, encryption,
+Upstash, Turnstile, and optional monitoring variables. Production startup validates all
+required values. Never expose `MIGRATION_DATABASE_URL` to the application runtime.
+
+See `docs/production-deployment.md` for the production checklist and
+`docs/security-runbook.md` for key rotation and incident procedures.
 
 ## Support
 

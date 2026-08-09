@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import { z } from "zod";
 
 import { authOptions } from "@/lib/auth/options";
+import { hasRecentAuthentication } from "@/lib/auth/session";
 import {
   ensureUserId,
   getUserByEmail,
@@ -100,6 +101,10 @@ export async function updateProfile(
     };
   }
 
+  if (parsed.data.email !== existingUser.email) {
+    return { status: "error", errors: { email: t("errors.emailManagedByProvider") } };
+  }
+
   const [emailOwner, loginOwner] = await Promise.all([
     parsed.data.email !== existingUser.email
       ? getUserByEmail(parsed.data.email)
@@ -129,7 +134,6 @@ export async function updateProfile(
       firstName: parsed.data.firstName,
       lastName: parsed.data.lastName,
       login: parsed.data.login,
-      email: parsed.data.email,
       displayCurrency: parsed.data.displayCurrency,
       updatedAt: dayjs.utc().toDate(),
     })
@@ -171,10 +175,16 @@ export async function deleteAccount(
     };
   }
 
+  if (!hasRecentAuthentication(session.user.authenticatedAt)) {
+    return {
+      status: "error",
+      message: t("errors.recentAuthenticationRequired"),
+    };
+  }
+
   const parsed = deleteAccountSchema.safeParse({
     confirmation: formData.get("confirmation"),
     reason: formData.get("reason"),
-    notes: formData.get("notes"),
   });
 
   if (!parsed.success) {
@@ -184,23 +194,25 @@ export async function deleteAccount(
     };
   }
 
-  const shouldStoreFeedback = Boolean(parsed.data.reason || parsed.data.notes);
+  const deleted = await db.transaction(async (tx) => {
+    await tx.delete(feedbacks).where(eq(feedbacks.userId, userId));
 
-  if (shouldStoreFeedback) {
-    await db.insert(feedbacks).values({
-      userId,
-      reason: parsed.data.reason ?? null,
-      notes: parsed.data.notes ?? null,
-    });
-  }
+    const shouldStoreFeedback = Boolean(parsed.data.reason);
+    if (shouldStoreFeedback) {
+      await tx.insert(feedbacks).values({
+        userId: null,
+        reason: parsed.data.reason ?? null,
+        notes: null,
+      });
+    }
 
-  const [deleted] = await db
-    .update(users)
-    .set({
-      deletedAt: dayjs.utc().toDate(),
-    })
-    .where(eq(users.id, userId))
-    .returning({ id: users.id });
+    const [removed] = await tx
+      .delete(users)
+      .where(eq(users.id, userId))
+      .returning({ id: users.id });
+
+    return removed;
+  });
 
   if (!deleted) {
     return { status: "error", message: t("errors.profileNotFound") };

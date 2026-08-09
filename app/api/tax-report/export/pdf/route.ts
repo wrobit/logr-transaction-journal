@@ -6,6 +6,8 @@ import { ensureUserId } from "@/lib/auth/users";
 import { getRequestLocale } from "@/lib/i18n/translate";
 import { renderTaxReportPdf } from "@/lib/tax/pdf";
 import { generateTaxReport } from "@/lib/tax/report";
+import { SENSITIVE_RESPONSE_HEADERS } from "@/lib/http/headers";
+import { checkRateLimit } from "@/lib/security/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -15,6 +17,11 @@ export async function GET(request: Request) {
 
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const rateLimit = await checkRateLimit("expensiveAction", `tax-pdf:${userId}`);
+  if (!rateLimit.success) {
+    return NextResponse.json({ error: "Too many export requests." }, { status: 429 });
   }
 
   const url = new URL(request.url);
@@ -45,7 +52,7 @@ export async function GET(request: Request) {
     headers: {
       "Content-Type": "application/pdf",
       "Content-Disposition": `attachment; filename=${filename}`,
-      "Cache-Control": "no-store",
+      ...SENSITIVE_RESPONSE_HEADERS,
     },
   });
 }

@@ -1,6 +1,6 @@
 import { createHash } from "node:crypto";
 
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray, sql } from "drizzle-orm";
 
 import { parseExchangeCsv } from "@/lib/exchange-import/adapters";
 import type {
@@ -29,6 +29,7 @@ import { getNbpRate } from "@/lib/nbp";
 
 import type { CanonicalImportTransaction, ExchangeCsvProvider } from "@/lib/exchange-import/types";
 import { validateCanonicalTransaction } from "@/lib/exchange-import/validation";
+import { csvEscape } from "@/lib/export/csv";
 
 const DEFAULT_ENTRY_COUNTRY_CODE = "PL";
 const RATE_CURRENCY_ALIASES: Record<string, string> = {
@@ -133,57 +134,64 @@ export async function confirmExchangeImport(input: {
     };
   }
 
-  const rowFingerprints = validatedRows.map((row) => buildRowFingerprint(row));
-  const uniqueInPayload = new Set<string>();
-  const duplicateInPayload = new Set<string>();
-  for (const hash of rowFingerprints) {
-    if (uniqueInPayload.has(hash)) {
-      duplicateInPayload.add(hash);
-      continue;
-    }
-    uniqueInPayload.add(hash);
-  }
-
-  const existingRows = await db
-    .select({ rowHash: exchangeImportRows.rowHash })
-    .from(exchangeImportRows)
-    .innerJoin(
-      exchangeImportBatches,
-      eq(exchangeImportRows.batchId, exchangeImportBatches.id),
-    )
-    .where(
-      and(
-        eq(exchangeImportBatches.userId, input.userId),
-        inArray(exchangeImportRows.rowHash, Array.from(uniqueInPayload)),
-        eq(exchangeImportRows.status, "imported"),
-      ),
-    );
-
-  const existingHashes = new Set(existingRows.map((row) => row.rowHash));
-
-  const [batch] = await db
-    .insert(exchangeImportBatches)
-    .values({
-      userId: input.userId,
-      provider: input.provider,
-      filename: input.filename ?? null,
-      status: "completed",
-      totalRows: validatedRows.length,
-      validRows: validatedRows.length,
-      metadata: {
-        source: "entries_workspace",
-      },
-    })
-    .returning({ id: exchangeImportBatches.id });
-
-  if (!batch) {
-    return {
-      status: "error",
-      message: "Failed to create import batch.",
-    };
-  }
-
   const dek = await getUserDek(input.userId);
+  const preparedRows = await Promise.all(
+    validatedRows.map(async (transaction) => {
+      const rowHash = buildRowFingerprint(transaction);
+
+      try {
+        const entryDate = dayjs.utc(transaction.executedAt).toDate();
+        const fullPrice = Number(transaction.fullPrice);
+        const rateResolution = await resolvePlnRateWithAttribution({
+          quoteCurrency: transaction.quoteCurrency,
+          entryDate,
+        });
+        const valuePln = calculateValuePln(fullPrice, rateResolution.rate);
+        const payload = {
+          operation: transaction.operation,
+          baseAsset: transaction.baseAsset,
+          quoteCurrency: transaction.quoteCurrency,
+          quantity: toFixedString(Number(transaction.quantity), NUMERIC_SCALES.quantity),
+          pricePerUnit: toFixedString(Number(transaction.pricePerUnit), NUMERIC_SCALES.pricePerUnit),
+          fullPrice: toFixedString(
+            toFixedNumber(fullPrice, NUMERIC_SCALES.fullPrice),
+            NUMERIC_SCALES.fullPrice,
+          ),
+          commission:
+            transaction.commission === null
+              ? null
+              : toFixedString(
+                  toFixedNumber(Number(transaction.commission), NUMERIC_SCALES.commission),
+                  NUMERIC_SCALES.commission,
+                ),
+          source: `${transaction.sourceName} CSV`,
+          note: `Imported from ${transaction.sourceName} (${transaction.externalId})`,
+          nbpRateDate: dayjs.utc(rateResolution.rateDate).format("YYYY-MM-DD"),
+          nbpRate: toFixedString(
+            toFixedNumber(rateResolution.rate, NUMERIC_SCALES.nbpRate),
+            NUMERIC_SCALES.nbpRate,
+          ),
+          valuePln: toFixedString(
+            toFixedNumber(valuePln, NUMERIC_SCALES.valuePln),
+            NUMERIC_SCALES.valuePln,
+          ),
+          rateAttribution: rateResolution.attribution,
+        };
+
+        return {
+          status: "ready" as const,
+          transaction,
+          rowHash,
+          entryDate,
+          encryptedPayload: encryptEntryPayload(payload, dek),
+        };
+      } catch {
+        return { status: "failed" as const, transaction, rowHash };
+      }
+    }),
+  );
+
+  const uniqueFingerprints = Array.from(new Set(preparedRows.map((row) => row.rowHash)));
   const failedRows: Array<{ rowNumber: number; reason: string }> = [];
   const failedReportRows: Array<{
     rowNumber: number;
@@ -196,176 +204,132 @@ export async function confirmExchangeImport(input: {
     rawRow: Record<string, string>;
   }> = [];
 
-  let importedCount = 0;
-  let duplicateCount = 0;
+  const importResult = await db.transaction(async (tx) => {
+    await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${input.userId}))`);
 
-  for (const transaction of validatedRows) {
-    const rowHash = buildRowFingerprint(transaction);
+    const existingRows = await tx
+      .select({ rowHash: exchangeImportRows.rowHash })
+      .from(exchangeImportRows)
+      .innerJoin(exchangeImportBatches, eq(exchangeImportRows.batchId, exchangeImportBatches.id))
+      .where(
+        and(
+          eq(exchangeImportBatches.userId, input.userId),
+          inArray(exchangeImportRows.rowHash, uniqueFingerprints),
+          eq(exchangeImportRows.status, "imported"),
+        ),
+      );
+    const seenHashes = new Set(existingRows.map((row) => row.rowHash));
 
-    if (duplicateInPayload.has(rowHash) || existingHashes.has(rowHash)) {
-      duplicateCount += 1;
-      failedReportRows.push({
-        rowNumber: transaction.rowNumber,
-        status: "duplicate",
-        reason: "Duplicate row fingerprint.",
-        externalId: transaction.externalId,
-        market: `${transaction.baseAsset}/${transaction.quoteCurrency}`,
-        operation: transaction.operation,
-        quantity: transaction.quantity,
-        rawRow: transaction.rawRow,
-      });
-      await db.insert(exchangeImportRows).values({
-        batchId: batch.id,
-        rowNumber: transaction.rowNumber,
-        rowHash,
-        status: "duplicate",
-        issues: [{ code: "duplicate", message: "Duplicate row fingerprint." }],
-        rawRow: transaction.rawRow,
-        transaction,
-      });
-      continue;
+    const [batch] = await tx
+      .insert(exchangeImportBatches)
+      .values({
+        userId: input.userId,
+        provider: input.provider,
+        status: "completed",
+        totalRows: validatedRows.length,
+        validRows: validatedRows.length,
+        metadata: { source: "entries_workspace" },
+      })
+      .returning({ id: exchangeImportBatches.id });
+    if (!batch) {
+      throw new Error("Failed to create import batch.");
     }
 
-    try {
-      const entryDate = dayjs.utc(transaction.executedAt).toDate();
-      const fullPrice = Number(transaction.fullPrice);
+    let importedCount = 0;
+    let duplicateCount = 0;
 
-      const rateResolution = await resolvePlnRateWithAttribution({
-        quoteCurrency: transaction.quoteCurrency,
-        entryDate,
-      });
-
-      const valuePln = calculateValuePln(fullPrice, rateResolution.rate);
-
-      const payload = {
-        operation: transaction.operation,
-        baseAsset: transaction.baseAsset,
-        quoteCurrency: transaction.quoteCurrency,
-        quantity: toFixedString(Number(transaction.quantity), NUMERIC_SCALES.quantity),
-        pricePerUnit: toFixedString(Number(transaction.pricePerUnit), NUMERIC_SCALES.pricePerUnit),
-        fullPrice: toFixedString(toFixedNumber(fullPrice, NUMERIC_SCALES.fullPrice), NUMERIC_SCALES.fullPrice),
-        commission:
-          transaction.commission === null
-            ? null
-            : toFixedString(
-                toFixedNumber(Number(transaction.commission), NUMERIC_SCALES.commission),
-                NUMERIC_SCALES.commission,
-              ),
-        source: `${transaction.sourceName} CSV`,
-        note: `Imported from ${transaction.sourceName} (${transaction.externalId})`,
-        nbpRateDate: dayjs.utc(rateResolution.rateDate).format("YYYY-MM-DD"),
-        nbpRate: toFixedString(
-          toFixedNumber(rateResolution.rate, NUMERIC_SCALES.nbpRate),
-          NUMERIC_SCALES.nbpRate,
-        ),
-        valuePln: toFixedString(
-          toFixedNumber(valuePln, NUMERIC_SCALES.valuePln),
-          NUMERIC_SCALES.valuePln,
-        ),
-        rateAttribution: rateResolution.attribution,
-      };
-
-      const encryptedPayload = encryptEntryPayload(payload, dek);
-
-      const [created] = await db
-        .insert(entries)
-        .values({
-          userId: input.userId,
-          date: entryDate,
-          encryptedPayload,
-          encryptionVersion: ENTRY_ENCRYPTION_VERSION,
-          importBatchId: batch.id,
-        })
-        .returning({ id: entries.id });
-
-      if (!created) {
-        failedRows.push({ rowNumber: transaction.rowNumber, reason: "Entry insert failed." });
+    for (const prepared of preparedRows) {
+      const { transaction, rowHash } = prepared;
+      if (seenHashes.has(rowHash)) {
+        duplicateCount += 1;
         failedReportRows.push({
           rowNumber: transaction.rowNumber,
-          status: "failed",
-          reason: "Entry insert failed.",
+          status: "duplicate",
+          reason: "Duplicate row fingerprint.",
           externalId: transaction.externalId,
           market: `${transaction.baseAsset}/${transaction.quoteCurrency}`,
           operation: transaction.operation,
           quantity: transaction.quantity,
           rawRow: transaction.rawRow,
         });
-        await db.insert(exchangeImportRows).values({
+        await tx.insert(exchangeImportRows).values({
+          batchId: batch.id,
+          rowNumber: transaction.rowNumber,
+          rowHash,
+          status: "duplicate",
+          issues: [{ code: "duplicate" }],
+        });
+        continue;
+      }
+      seenHashes.add(rowHash);
+
+      if (prepared.status === "failed") {
+        const reason = "This row could not be imported.";
+        failedRows.push({ rowNumber: transaction.rowNumber, reason });
+        failedReportRows.push({
+          rowNumber: transaction.rowNumber,
+          status: "failed",
+          reason,
+          externalId: transaction.externalId,
+          market: `${transaction.baseAsset}/${transaction.quoteCurrency}`,
+          operation: transaction.operation,
+          quantity: transaction.quantity,
+          rawRow: transaction.rawRow,
+        });
+        await tx.insert(exchangeImportRows).values({
           batchId: batch.id,
           rowNumber: transaction.rowNumber,
           rowHash,
           status: "failed",
-          issues: [{ code: "insert_failed", message: "Failed to insert entry." }],
-          rawRow: transaction.rawRow,
-          transaction,
+          issues: [{ code: "import_failed" }],
         });
         continue;
       }
 
-      importedCount += 1;
+      const [created] = await tx
+        .insert(entries)
+        .values({
+          userId: input.userId,
+          date: prepared.entryDate,
+          encryptedPayload: prepared.encryptedPayload,
+          encryptionVersion: ENTRY_ENCRYPTION_VERSION,
+          importBatchId: batch.id,
+        })
+        .returning({ id: entries.id });
+      if (!created) {
+        throw new Error("Entry insert failed.");
+      }
 
-      await db.insert(exchangeImportRows).values({
+      await tx.insert(exchangeImportRows).values({
         batchId: batch.id,
         rowNumber: transaction.rowNumber,
         rowHash,
         status: "imported",
         issues: [],
-        rawRow: transaction.rawRow,
-        transaction,
         entryId: created.id,
       });
-    } catch (error) {
-      const reason = error instanceof Error ? error.message : "Unexpected import error.";
-      failedRows.push({
-        rowNumber: transaction.rowNumber,
-        reason,
-      });
-      failedReportRows.push({
-        rowNumber: transaction.rowNumber,
-        status: "failed",
-        reason,
-        externalId: transaction.externalId,
-        market: `${transaction.baseAsset}/${transaction.quoteCurrency}`,
-        operation: transaction.operation,
-        quantity: transaction.quantity,
-        rawRow: transaction.rawRow,
-      });
-
-      await db.insert(exchangeImportRows).values({
-        batchId: batch.id,
-        rowNumber: transaction.rowNumber,
-        rowHash,
-        status: "failed",
-        issues: [{ code: "unexpected_error", message: "Unexpected import error." }],
-        rawRow: transaction.rawRow,
-        transaction,
-      });
+      importedCount += 1;
     }
-  }
 
-  const failedCount = failedRows.length;
+    const failedCount = failedRows.length;
+    await tx
+      .update(exchangeImportBatches)
+      .set({
+        importedRows: importedCount,
+        failedRows: failedCount,
+        updatedAt: dayjs.utc().toDate(),
+        metadata: { source: "entries_workspace", duplicates: duplicateCount },
+      })
+      .where(eq(exchangeImportBatches.id, batch.id));
 
-  await db
-    .update(exchangeImportBatches)
-    .set({
-      importedRows: importedCount,
-      failedRows: failedCount,
-      updatedAt: dayjs.utc().toDate(),
-      metadata: {
-        source: "entries_workspace",
-        duplicates: duplicateCount,
-      },
-    })
-    .where(eq(exchangeImportBatches.id, batch.id));
+    return { batchId: batch.id, importedCount, failedCount, duplicateCount };
+  });
 
   const failedReportCsv = buildFailedRowsCsv(failedReportRows);
 
   return {
     status: "success",
-    batchId: batch.id,
-    importedCount,
-    failedCount,
-    duplicateCount,
+    ...importResult,
     failedRows,
     failedReportCsv,
   };
@@ -376,7 +340,6 @@ export async function listRecentImportBatches(userId: string) {
     .select({
       id: exchangeImportBatches.id,
       provider: exchangeImportBatches.provider,
-      filename: exchangeImportBatches.filename,
       importedRows: exchangeImportBatches.importedRows,
       failedRows: exchangeImportBatches.failedRows,
       createdAt: exchangeImportBatches.createdAt,
@@ -430,10 +393,6 @@ function buildFailedRowsCsv(
   });
 
   return [header, ...body].join("\n");
-}
-
-function csvEscape(value: string) {
-  return `"${value.replace(/"/g, '""')}"`;
 }
 
 async function resolvePlnRateWithAttribution(input: {

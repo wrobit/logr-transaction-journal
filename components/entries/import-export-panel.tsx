@@ -19,7 +19,6 @@ import { buildEntryQueryParams, type EntryQuery } from "@/lib/entries/query";
 type ImportHistoryItem = {
   id: string;
   provider: string;
-  filename: string | null;
   importedRows: number;
   failedRows: number;
   createdAt: Date;
@@ -258,7 +257,7 @@ export function ImportExportPanel({
               <ul className="space-y-1 text-xs text-foreground">
                 {history.map((item) => (
                   <li key={item.id}>
-                    {item.provider.toUpperCase()} - {item.filename ?? "csv"} - {item.importedRows}/
+                    {item.provider.toUpperCase()} - CSV - {item.importedRows}/
                     {item.failedRows}
                   </li>
                 ))}

@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
-import { getServerSession } from "next-auth";
-import { redirect } from "next/navigation";
 
 import { getDashboardData } from "@/actions/dashboard";
 import { DashboardView } from "@/components/dashboard/dashboard-view";
-import { authOptions } from "@/lib/auth/options";
+import { requireActiveUser } from "@/lib/auth/session";
 import { parseDashboardQuery } from "@/lib/dashboard/query";
 import { getServerTranslator } from "@/lib/i18n/translate";
 import { buildPageMetadata } from "@/lib/metadata";
@@ -25,11 +23,7 @@ type PageProps = {
 };
 
 export default async function DashboardPage({ searchParams }: PageProps) {
-  const session = await getServerSession(authOptions);
-
-  if (!session?.user?.id) {
-    redirect("/login");
-  }
+  const { session } = await requireActiveUser();
 
   const resolvedSearchParams = await searchParams;
   const query = parseDashboardQuery(resolvedSearchParams ?? {});

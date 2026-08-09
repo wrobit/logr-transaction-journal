@@ -78,6 +78,7 @@ export async function importBankTransactions(input: BankImportInput): Promise<Ba
       };
 
       await persistBankImportAudit(result, {
+        userId: input.userId,
         countryCode,
       });
 
@@ -92,7 +93,7 @@ export async function importBankTransactions(input: BankImportInput): Promise<Ba
         context: {
           countryCode,
           provider: provider.name,
-          userId: input.userId,
+          userHash: hashSnapshot(input.userId).slice(0, 16),
         },
       });
 
@@ -130,8 +131,8 @@ export async function importBankTransactions(input: BankImportInput): Promise<Ba
   };
 
   await persistBankImportAudit(result, {
+    userId: input.userId,
     countryCode,
-    csvFilename: input.csvFilename ?? null,
   });
 
   return result;
@@ -140,22 +141,21 @@ export async function importBankTransactions(input: BankImportInput): Promise<Ba
 async function persistBankImportAudit(
   result: BankImportResult,
   metadata: {
+    userId: string;
     countryCode: string;
-    csvFilename?: string | null;
   },
 ) {
   await db.insert(bankImportAuditBatches).values({
+    userId: metadata.userId,
     providerName: result.provider,
-    accountRef: result.accountRef,
+    accountRef: hashSnapshot(result.accountRef),
     batchId: `batch_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
     importedCount: result.importedCount,
     failedCount: result.failedCount,
     metadata: {
       source: result.source,
       countryCode: metadata.countryCode,
-      warnings: result.warnings,
-      csvFilename: metadata.csvFilename ?? null,
-      transactionSample: result.transactions.slice(0, 5),
+      warningCount: result.warnings.length,
     },
   });
 }

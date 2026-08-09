@@ -52,5 +52,5 @@ performed, and screenshots or recordings for visible UI changes.
 ## Security & Configuration Tips
 
 Do not commit `.env*` files. Required runtime secrets include `DATABASE_URL` for
-Neon/Postgres and `LOGR_KEK` for encrypted user data. Treat encryption and database
+Neon/Postgres and `ENTRY_KEK` for encrypted user data. Treat encryption and database
 reset commands with care; `pnpm db:reset` and `pnpm db:purge` can destroy data.

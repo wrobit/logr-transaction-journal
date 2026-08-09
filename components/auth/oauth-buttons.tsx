@@ -7,9 +7,24 @@ import { signIn } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 
 const CALLBACK_URL = "/";
+export type OAuthProvider = "google" | "github";
 
-export function OauthButtons() {
+type OauthButtonsProps = {
+  disabled?: boolean;
+  onProviderClick?: (provider: OAuthProvider) => Promise<void>;
+};
+
+export function OauthButtons({ disabled = false, onProviderClick }: OauthButtonsProps) {
   const t = useTranslations("auth");
+
+  const startSignIn = async (provider: OAuthProvider) => {
+    if (onProviderClick) {
+      await onProviderClick(provider);
+      return;
+    }
+
+    await signIn(provider, { callbackUrl: CALLBACK_URL });
+  };
 
   return (
     <div className="space-y-2">
@@ -17,7 +32,8 @@ export function OauthButtons() {
         type="button"
         variant="outline"
         className="w-full cursor-pointer justify-center gap-2 border-border bg-background text-foreground hover:bg-muted"
-        onClick={() => signIn("google", { callbackUrl: CALLBACK_URL })}
+        disabled={disabled}
+        onClick={() => startSignIn("google")}
       >
         <Chrome className="size-4" />
         {t("oauthGoogle")}
@@ -26,7 +42,8 @@ export function OauthButtons() {
         type="button"
         variant="outline"
         className="w-full cursor-pointer justify-center gap-2 border-border bg-background text-foreground hover:bg-muted"
-        onClick={() => signIn("github", { callbackUrl: CALLBACK_URL })}
+        disabled={disabled}
+        onClick={() => startSignIn("github")}
       >
         <Github className="size-4" />
         {t("oauthGithub")}

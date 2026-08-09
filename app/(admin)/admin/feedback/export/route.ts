@@ -5,14 +5,23 @@ import { parseAdminFeedbackQuery } from "@/lib/admin/feedback-query";
 import { getAdminFeedbackExportRows } from "@/actions/admin-feedback";
 import { getFeedbackReasonLabel } from "@/lib/admin/feedback-helpers";
 import { dayjs } from "@/lib/dayjs";
-
-const csvEscape = (value: string) => `"${value.replace(/"/g, '""')}"`;
+import { csvEscape } from "@/lib/export/csv";
+import { SENSITIVE_RESPONSE_HEADERS } from "@/lib/http/headers";
+import { checkRateLimit } from "@/lib/security/rate-limit";
 
 export async function GET(request: Request) {
   const session = await getAdminSession();
 
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const rateLimit = await checkRateLimit(
+    "expensiveAction",
+    `admin-feedback-export:${session.user.id}`,
+  );
+  if (!rateLimit.success) {
+    return NextResponse.json({ error: "Too many export requests." }, { status: 429 });
   }
 
   const params = Object.fromEntries(new URL(request.url).searchParams.entries());
@@ -28,7 +37,7 @@ export async function GET(request: Request) {
       row.userEmail ?? "",
       row.userLogin ?? "",
     ];
-    return values.map((value) => csvEscape(String(value))).join(",");
+    return values.map(csvEscape).join(",");
   });
 
   const csv = [header, ...lines].join("\n");
@@ -38,6 +47,7 @@ export async function GET(request: Request) {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
       "Content-Disposition": "attachment; filename=entry-feedback.csv",
+      ...SENSITIVE_RESPONSE_HEADERS,
     },
   });
 }

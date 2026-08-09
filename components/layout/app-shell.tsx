@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 
+import { AppFooter } from "@/components/layout/app-footer";
 import { Navbar } from "@/components/layout/navbar";
 
 const AUTH_ROUTES = new Set(["/login", "/register", "/goodbye"]);
@@ -26,6 +27,7 @@ export function AppShell({
         <div className="flex min-h-screen flex-1 flex-col">
           <Navbar />
           <main className={`flex-1 ${showTicker ? "pb-12" : ""}`}>{children}</main>
+          <AppFooter hasTicker={showTicker} />
         </div>
       </div>
     </div>

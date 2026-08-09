@@ -13,6 +13,17 @@
     "profile": "Profile",
     "logout": "Logout"
   },
+  "footer": {
+    "description": "Encrypted crypto transaction journaling with deterministic PLN valuation and export-ready records.",
+    "pages": "Pages",
+    "entries": "Entries",
+    "dashboard": "Dashboard",
+    "profile": "Profile",
+    "contact": "Contact",
+    "github": "GitHub",
+    "buyMeACoffee": "Buy Me a Coffee",
+    "email": "Email Piotr Wrobel"
+  },
   "auth": {
     "oauthGoogle": "Continue with Google",
     "oauthGithub": "Continue with GitHub",

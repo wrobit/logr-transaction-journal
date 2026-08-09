@@ -13,6 +13,17 @@
     "profile": "Profil",
     "logout": "Wyloguj"
   },
+  "footer": {
+    "description": "Szyfrowany dziennik transakcji krypto z deterministyczna wycena PLN i danymi gotowymi do eksportu.",
+    "pages": "Strony",
+    "entries": "Wpisy",
+    "dashboard": "Panel",
+    "profile": "Profil",
+    "contact": "Kontakt",
+    "github": "GitHub",
+    "buyMeACoffee": "Buy Me a Coffee",
+    "email": "Napisz do Piotra Wrobla"
+  },
   "auth": {
     "oauthGoogle": "Kontynuuj z Google",
     "oauthGithub": "Kontynuuj z GitHub",

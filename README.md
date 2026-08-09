@@ -17,6 +17,10 @@ A minimal, personal crypto transaction journal focused on correctness, transpare
 - [NBP Integration](#nbp-integration)
 - [Project Structure](#project-structure)
 - [Getting Started](#getting-started)
+- [Support](#support)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
 
 ## Introduction
 
@@ -166,13 +170,27 @@ pnpm install
 pnpm dev
 ```
 
+## Support
+
+Logr is open source and community-supported. All product features are free to use.
+If the project saves you time or helps with your records, you can support ongoing
+maintenance through the Buy Me a Coffee link exposed by `NEXT_PUBLIC_BUYMEACOFFEE_URL`.
+
 ## Contributing
 
-We do not accept public contributions to this project. It is a private repository meant for internal development only. Therefore, we kindly decline pull requests or other forms of contribution from the community.
+Community contributions are welcome. Before opening a larger pull request, please
+start with an issue or short proposal so the scope stays aligned with the project.
+
+Useful contribution areas include:
+
+- Bug fixes with a clear reproduction case
+- Tests for financial calculations, import parsing, encryption, and formatting
+- Documentation improvements
+- Small UI and accessibility refinements
 
 ## License
 
-Proprietary — all rights reserved. See `LICENSE`.
+MIT. See `LICENSE`.
 
 ## Contact
 

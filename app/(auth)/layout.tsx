@@ -8,8 +8,17 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="relative min-h-screen bg-neutral-950 text-white">
-      <div className="absolute inset-x-3 top-6 flex items-center justify-between gap-4 md:inset-x-4">
+    <div className="relative min-h-screen overflow-hidden bg-neutral-950 text-white">
+      <Image
+        src="/images/auth-background-bw.png"
+        alt=""
+        fill
+        sizes="100vw"
+        className="pointer-events-none object-cover opacity-80"
+        priority
+      />
+      <div className="pointer-events-none absolute inset-0 bg-black/35" />
+      <div className="absolute inset-x-3 top-6 z-10 flex items-center justify-between gap-4 md:inset-x-4">
         <Image
           src="/logo.svg"
           alt="Logr"
@@ -20,7 +29,7 @@ export default function AuthLayout({
         />
         <LocaleSwitcher />
       </div>
-      <div className="flex min-h-screen items-center justify-center px-3 py-16 md:px-4">
+      <div className="relative z-10 flex min-h-screen items-center justify-center px-3 py-16 md:px-4">
         <div className="w-full max-w-sm">{children}</div>
       </div>
     </div>

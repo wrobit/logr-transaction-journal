@@ -38,8 +38,12 @@ export function AppFooter({ hasTicker = false }: { hasTicker?: boolean }) {
   const t = useTranslations("footer");
 
   return (
-    <footer className={`bg-black px-3 pt-2 md:px-4 ${hasTicker ? "pb-20" : "pb-8"}`}>
-      <div className="mx-auto w-full max-w-7xl rounded-md border border-white/10 bg-neutral-950 px-5 py-8 text-neutral-200 shadow-2xl shadow-black/40 md:px-8 md:py-10">
+    <footer
+      className={`border-t border-white/10 bg-neutral-950 px-4 pt-8 text-neutral-200 md:px-5 md:pt-10 ${
+        hasTicker ? "pb-20" : "pb-8 md:pb-10"
+      }`}
+    >
+      <div className="mx-auto w-full max-w-7xl px-5 md:px-8">
         <div className="grid gap-8 md:grid-cols-[minmax(0,1.4fr)_minmax(10rem,0.6fr)_minmax(12rem,0.7fr)] md:gap-10">
           <div className="space-y-5">
             <Link href="/" className="inline-flex items-center">

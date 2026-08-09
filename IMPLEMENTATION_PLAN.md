@@ -610,14 +610,14 @@ Initial providers:
 
 ### Phase 13.10 - Post-domain metadata (later)
 
-- [ ] Set `metadataBase` to production URL
-- [ ] Set `openGraph.url` and canonical URLs
-- [ ] Replace placeholder social images with branded assets
-- [ ] Revisit robots policy for production
-- [ ] Swap placeholder icons (`icon.svg`, `apple-touch-icon.svg`, `og-placeholder.svg`) for branded assets
-- [ ] Review sitemap outputs once public routes finalize (may need adjustments)
-- [ ] Verify rendered metadata for key routes
-- [ ] Validate Open Graph/Twitter tags
+- [x] Set `metadataBase` to production URL
+- [x] Set `openGraph.url` and canonical URLs
+- [x] Replace placeholder social images with branded assets
+- [x] Revisit robots policy for production
+- [x] Swap placeholder icons (`icon.svg`, `apple-touch-icon.svg`, `og-placeholder.svg`) for branded assets
+- [x] Review sitemap outputs once public routes finalize (may need adjustments)
+- [x] Verify rendered metadata for key routes
+- [x] Validate Open Graph/Twitter tags
 
 ## Phase 14 - Polish Integrations (later phase)
 

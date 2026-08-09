@@ -7,13 +7,15 @@ import { AdminFeedbackPagination } from "@/components/admin/admin-feedback-pagin
 import { AdminFeedbackTable } from "@/components/admin/admin-feedback-table";
 import { buildAdminFeedbackQueryParams, parseAdminFeedbackQuery } from "@/lib/admin/feedback-query";
 import { getServerTranslator } from "@/lib/i18n/translate";
+import { buildPageMetadata } from "@/lib/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getServerTranslator();
-  return {
+  return buildPageMetadata({
     title: t("metadata.adminFeedback.title"),
     description: t("metadata.adminFeedback.description"),
-  };
+    path: "/admin/feedback",
+  });
 }
 
 type PageProps = {

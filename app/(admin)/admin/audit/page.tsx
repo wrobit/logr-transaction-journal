@@ -6,13 +6,15 @@ import { AdminAuditPagination } from "@/components/admin/admin-audit-pagination"
 import { AdminAuditTable } from "@/components/admin/admin-audit-table";
 import { parseAdminAuditQuery } from "@/lib/admin/audit-query";
 import { getServerTranslator } from "@/lib/i18n/translate";
+import { buildPageMetadata } from "@/lib/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getServerTranslator();
-  return {
+  return buildPageMetadata({
     title: t("metadata.adminAudit.title"),
     description: t("metadata.adminAudit.description"),
-  };
+    path: "/admin/audit",
+  });
 }
 
 type PageProps = {

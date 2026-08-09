@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Logr encrypted crypto transaction journal">
+  <defs>
+    <linearGradient id="surface" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#050505" />
+      <stop offset="0.62" stop-color="#101011" />
+      <stop offset="1" stop-color="#23252b" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#surface)" />
+  <rect x="76" y="78" width="1048" height="474" rx="28" fill="#0f0f10" stroke="#2d2d31" />
+  <g transform="translate(126 120)">
+    <circle cx="72" cy="72" r="72" fill="black" />
+    <path d="M71.4719 72.5275H109.5V109.499H71.4719V72.5275Z" fill="white" />
+    <rect x="34.5" y="34.5" width="75" height="38.0282" fill="white" />
+  </g>
+  <text x="126" y="316" fill="#f8fafc" font-size="82" font-family="Figtree, Inter, system-ui, -apple-system, sans-serif" font-weight="700">Logr</text>
+  <text x="126" y="380" fill="#d4d4d8" font-size="34" font-family="Figtree, Inter, system-ui, -apple-system, sans-serif" font-weight="500">Encrypted crypto transaction journal</text>
+  <text x="126" y="434" fill="#a1a1aa" font-size="26" font-family="Figtree, Inter, system-ui, -apple-system, sans-serif">PLN valuation, NBP rates, and audit-ready records.</text>
+  <g transform="translate(742 130)">
+    <circle cx="150" cy="150" r="150" fill="black" />
+    <path d="M148.9 151.1H228.1V228.1H148.9V151.1Z" fill="white" />
+    <rect x="71.9" y="71.9" width="156.2" height="79.2" fill="white" />
+  </g>
+</svg>

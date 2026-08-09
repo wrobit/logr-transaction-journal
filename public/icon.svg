@@ -1,15 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512" role="img" aria-label="Logr icon">
-  <rect width="512" height="512" rx="96" fill="#0a0a0a" />
-  <text
-    x="50%"
-    y="54%"
-    fill="#ffffff"
-    font-size="220"
-    font-family="Inter, system-ui, -apple-system, sans-serif"
-    font-weight="700"
-    text-anchor="middle"
-    dominant-baseline="middle"
-  >
-    L
-  </text>
+<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Logr icon">
+  <circle cx="96" cy="96" r="96" fill="black" />
+  <path d="M95.2958 96.7034H146V145.999H95.2958V96.7034Z" fill="white" />
+  <rect x="46" y="45.9999" width="100" height="50.7042" fill="white" />
 </svg>

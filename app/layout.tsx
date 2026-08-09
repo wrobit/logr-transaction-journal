@@ -10,6 +10,12 @@ import { authOptions } from "@/lib/auth/options";
 import { DEFAULT_LOCALE, LOCALE_COOKIE_NAME, isAppLocale } from "@/lib/i18n/config";
 import { getLocaleMessages } from "@/lib/i18n/messages";
 import { getServerTranslator } from "@/lib/i18n/translate";
+import {
+  appTagline,
+  appTitle,
+  buildPageMetadata,
+  metadataBase,
+} from "@/lib/metadata";
 import "./globals.css";
 
 const figtree = Figtree({ subsets: ["latin"], variable: "--font-sans" });
@@ -24,49 +30,27 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const appTitle = "Logr";
-const appTagline = "The best minimalistic encrypted crypto journal";
-const isProduction = process.env.NODE_ENV === "production";
-
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getServerTranslator();
   const description = t("metadata.root.description");
+  const rootMetadata = buildPageMetadata({
+    title: appTitle,
+    description,
+    path: "/",
+  });
 
   return {
+    ...rootMetadata,
+    metadataBase,
     title: {
       default: `Logr - ${appTagline}`,
       template: "Logr - %s",
     },
-    description,
     applicationName: appTitle,
     authors: [{ name: appTitle }],
     keywords: ["crypto journal", "transaction ledger", "NBP rates", "PLN valuation", "accounting"],
-    robots: {
-      index: isProduction,
-      follow: isProduction,
-    },
-    openGraph: {
-      title: `Logr - ${appTagline}`,
-      description,
-      siteName: appTitle,
-      type: "website",
-      images: [
-        {
-          url: "/og-placeholder.svg",
-          width: 1200,
-          height: 630,
-          alt: "Logr crypto journal",
-        },
-      ],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: `Logr - ${appTagline}`,
-      description,
-      images: ["/og-placeholder.svg"],
-    },
     icons: {
       icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
       shortcut: ["/favicon.ico"],

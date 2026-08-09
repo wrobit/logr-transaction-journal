@@ -6,13 +6,15 @@ import { AdminUsersPagination } from "@/components/admin/admin-users-pagination"
 import { AdminUsersTable } from "@/components/admin/admin-users-table";
 import { requireAdminSession } from "@/lib/auth/admin";
 import { getServerTranslator } from "@/lib/i18n/translate";
+import { buildPageMetadata } from "@/lib/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getServerTranslator();
-  return {
+  return buildPageMetadata({
     title: t("metadata.adminUsers.title"),
     description: t("metadata.adminUsers.description"),
-  };
+    path: "/admin/users",
+  });
 }
 
 type PageProps = {

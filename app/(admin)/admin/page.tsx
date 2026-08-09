@@ -4,13 +4,15 @@ import { getAdminAnalyticsData } from "@/actions/admin-analytics";
 import { AdminAnalyticsView } from "@/components/admin/admin-analytics-view";
 import { parseAdminAnalyticsQuery } from "@/lib/admin/analytics-query";
 import { getServerTranslator } from "@/lib/i18n/translate";
+import { buildPageMetadata } from "@/lib/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getServerTranslator();
-  return {
+  return buildPageMetadata({
     title: t("metadata.admin.title"),
     description: t("metadata.admin.description"),
-  };
+    path: "/admin",
+  });
 }
 
 type PageProps = {

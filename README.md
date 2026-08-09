@@ -16,7 +16,6 @@ A minimal, personal crypto transaction journal focused on correctness, transpare
 - [Encryption](#encryption)
 - [NBP Integration](#nbp-integration)
 - [Project Structure](#project-structure)
-- [MVP Acceptance Criteria](#mvp-acceptance-criteria)
 - [Getting Started](#getting-started)
 
 ## Introduction
@@ -157,15 +156,6 @@ Flow on entry creation:
 - `actions/entries.ts`
 - `actions/summary.ts`
 - `actions/profile.ts`
-
-## MVP Acceptance Criteria
-
-- User can register and log in
-- User can add a transaction entry
-- PLN value is calculated using correct NBP rate
-- Entries are listed and filterable by date
-- Summary correctly shows holdings and PnL
-- User can delete their account safely
 
 ## Getting Started
 

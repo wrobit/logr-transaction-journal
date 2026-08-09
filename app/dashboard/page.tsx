@@ -7,13 +7,15 @@ import { DashboardView } from "@/components/dashboard/dashboard-view";
 import { authOptions } from "@/lib/auth/options";
 import { parseDashboardQuery } from "@/lib/dashboard/query";
 import { getServerTranslator } from "@/lib/i18n/translate";
+import { buildPageMetadata } from "@/lib/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getServerTranslator();
-  return {
+  return buildPageMetadata({
     title: t("metadata.dashboard.title"),
     description: t("metadata.dashboard.description"),
-  };
+    path: "/dashboard",
+  });
 }
 
 type PageProps = {

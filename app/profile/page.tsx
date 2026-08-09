@@ -6,13 +6,15 @@ import { getProfile } from "@/actions/profile";
 import { ProfileView } from "@/components/profile/profile-view";
 import { authOptions } from "@/lib/auth/options";
 import { getServerTranslator } from "@/lib/i18n/translate";
+import { buildPageMetadata } from "@/lib/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getServerTranslator();
-  return {
+  return buildPageMetadata({
     title: t("metadata.profile.title"),
     description: t("metadata.profile.description"),
-  };
+    path: "/profile",
+  });
 }
 
 export default async function ProfilePage() {

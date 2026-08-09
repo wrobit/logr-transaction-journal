@@ -8,13 +8,15 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { requireAdminSession } from "@/lib/auth/admin";
 import { dayjs } from "@/lib/dayjs";
 import { getServerTranslator } from "@/lib/i18n/translate";
+import { buildPageMetadata } from "@/lib/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getServerTranslator();
-  return {
+  return buildPageMetadata({
     title: t("metadata.adminUser.title"),
     description: t("metadata.adminUser.description"),
-  };
+    path: "/admin/users",
+  });
 }
 
 const formatDate = (value?: Date | null) =>

@@ -8,13 +8,15 @@ import { EntriesView } from "@/components/entries/entries-view";
 import { authOptions } from "@/lib/auth/options";
 import { ENTRY_PAGE_SIZE, parseEntryQuery } from "@/lib/entries/query";
 import { getServerTranslator } from "@/lib/i18n/translate";
+import { buildPageMetadata } from "@/lib/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getServerTranslator();
-  return {
-    title: `Logr - ${t("metadata.entries.title")}`,
+  return buildPageMetadata({
+    title: t("metadata.entries.title"),
     description: t("metadata.entries.description"),
-  };
+    path: "/",
+  });
 }
 
 type PageProps = {

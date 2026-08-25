@@ -2,33 +2,23 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Turnstile } from "@marsidev/react-turnstile";
 import { useTranslations } from "next-intl";
 import { signIn } from "next-auth/react";
 
 import { OauthButtons, type OAuthProvider } from "@/components/auth/oauth-buttons";
 
-const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim();
-
 export function RegisterForm() {
   const t = useTranslations("auth");
-  const [turnstileToken, setTurnstileToken] = useState(
-    turnstileSiteKey ? "" : "development-bypass",
-  );
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const startSignup = async (provider: OAuthProvider) => {
-    if (!turnstileToken) {
-      return;
-    }
-
     setError(null);
     setIsSubmitting(true);
     const response = await fetch("/api/auth/signup-intent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ provider, turnstileToken }),
+      body: JSON.stringify({ provider }),
     });
 
     if (!response.ok) {
@@ -47,22 +37,7 @@ export function RegisterForm() {
         <p className="text-sm text-muted-foreground">{t("registerSubtitle")}</p>
       </div>
 
-      {turnstileSiteKey ? (
-        <div className="flex justify-center">
-          <Turnstile
-            siteKey={turnstileSiteKey}
-            onSuccess={setTurnstileToken}
-            onExpire={() => setTurnstileToken("")}
-            onError={() => setTurnstileToken("")}
-            options={{ theme: "auto" }}
-          />
-        </div>
-      ) : null}
-
-      <OauthButtons
-        disabled={!turnstileToken || isSubmitting}
-        onProviderClick={startSignup}
-      />
+      <OauthButtons disabled={isSubmitting} onProviderClick={startSignup} />
 
       {error ? <p className="text-center text-xs text-red-400">{error}</p> : null}
 

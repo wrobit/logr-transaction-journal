@@ -71,7 +71,7 @@ visible alongside the journal.
   breakdowns.
 - **International UI** — English and Polish copy with locale-aware dates and numbers.
 - **Private-by-default operations** — OAuth authentication, gated public registration,
-  rate limiting, Turnstile support, audit logging, and hard account deletion.
+  audit logging, and hard account deletion.
 
 ## How valuation works
 
@@ -97,15 +97,14 @@ PLN value  = full price × NBP quote/PLN rate
 | Database | PostgreSQL on Neon, Drizzle ORM |
 | Authentication | NextAuth with Google and GitHub OAuth |
 | Validation | Zod |
-| Abuse protection | Upstash Redis rate limiting, Cloudflare Turnstile |
 | Testing | Vitest, Testing Library, jsdom |
 
 ## Quick start
 
 ### Prerequisites
 
-- Node.js 20 or newer
-- pnpm 9 or newer
+- Node.js 22
+- pnpm 10
 - A PostgreSQL database
 - Google and/or GitHub OAuth credentials
 
@@ -128,8 +127,7 @@ pnpm dev
 Open [http://localhost:2206](http://localhost:2206).
 
 Public signup is disabled in the example configuration. Keep
-`PUBLIC_REGISTRATION_ENABLED=false` until OAuth, recovery, monitoring, rate limiting, and
-production smoke tests are ready.
+`PUBLIC_REGISTRATION_ENABLED=false` until OAuth and production smoke tests are ready.
 
 ## Configuration
 
@@ -142,7 +140,7 @@ The essential groups are:
 | Auth | `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, OAuth provider credentials |
 | Encryption | `ENTRY_KEK` |
 | Public URLs | `NEXT_PUBLIC_SITE_URL`, optional support and analytics URLs |
-| Registration | `PUBLIC_REGISTRATION_ENABLED`, Upstash and Turnstile credentials |
+| Registration | `PUBLIC_REGISTRATION_ENABLED` |
 | Administration | `ADMIN_EMAIL_ALLOWLIST` |
 
 Never expose `MIGRATION_DATABASE_URL` to the application runtime or commit `.env*` files.

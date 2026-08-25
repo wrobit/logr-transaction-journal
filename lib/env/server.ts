@@ -18,11 +18,6 @@ const productionEnvironmentSchema = z.object({
   GOOGLE_CLIENT_SECRET: z.string().min(1),
   GITHUB_ID: z.string().min(1),
   GITHUB_SECRET: z.string().min(1),
-  UPSTASH_REDIS_REST_URL: z.string().url(),
-  UPSTASH_REDIS_REST_TOKEN: z.string().min(1),
-  TURNSTILE_SECRET_KEY: z.string().min(1),
-  NEXT_PUBLIC_TURNSTILE_SITE_KEY: z.string().min(1),
-  TURNSTILE_ALLOWED_HOSTNAMES: z.string().min(1),
   PUBLIC_REGISTRATION_ENABLED: z.enum(["true", "false"]),
 });
 

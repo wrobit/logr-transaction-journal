@@ -16,6 +16,6 @@ Do not replace `ENTRY_KEK` during a normal redeploy. Rotation requires a tested 
 
 ## Exposed credentials
 
-- Database, OAuth, Upstash, or Turnstile: revoke the credential, replace it in Vercel, and redeploy.
+- Database or OAuth: revoke the credential, replace it in Vercel, and redeploy.
 - `NEXTAUTH_SECRET`: replace it and redeploy; existing sessions will be invalidated.
 - `ENTRY_KEK`: preserve the old key and disable writes until a tested rewrap/recovery path is ready. Replacing it directly makes existing journals unreadable.

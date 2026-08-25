@@ -25,10 +25,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.1.0",
-    "@marsidev/react-turnstile": "^1.5.5",
     "@react-pdf/renderer": "^4.3.2",
-    "@upstash/ratelimit": "^2.0.8",
-    "@upstash/redis": "^1.38.2",
     "@vercel/functions": "^3.9.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

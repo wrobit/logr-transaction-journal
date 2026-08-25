@@ -11,8 +11,8 @@ Target: `app.logr.space`. Goal: launch a free-to-use beta with the least operati
   - required auth: Google and GitHub OAuth credentials with callbacks for `https://app.logr.space/api/auth/callback/google` and `https://app.logr.space/api/auth/callback/github`
   - required signup protection: Upstash Redis REST credentials and Cloudflare Turnstile keys/hostnames
   - `PUBLIC_REGISTRATION_ENABLED=false` until smoke tests pass
-- [ ] Do **not** add `MIGRATION_DATABASE_URL` to Vercel runtime variables; use it only locally for migrations.
-- [ ] Store an offline copy of `ENTRY_KEK`; database backups are useless without it.
+- [x] Do **not** add `MIGRATION_DATABASE_URL` to Vercel runtime variables; use it only locally for migrations.
+- [x] Store an offline copy of `ENTRY_KEK`; database backups are useless without it.
 
 ## 2. Deploy
 

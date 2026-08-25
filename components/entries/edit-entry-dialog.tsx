@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useCallback, useEffect, useMemo, useState } from "react";
+import { useActionState, useCallback, useMemo, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 
 import {
@@ -65,31 +65,17 @@ export function EditEntryDialog({
 }: EditEntryDialogProps) {
   const locale = useLocale();
   const t = useTranslations("entries");
-  const [operation, setOperation] = useState(DEFAULT_OPERATION);
-  const [baseAsset, setBaseAsset] = useState(DEFAULT_ASSET);
-  const [quoteCurrency, setQuoteCurrency] = useState(DEFAULT_CURRENCY);
-  const [date, setDate] = useState("");
-  const [quantity, setQuantity] = useState("");
-  const [pricePerUnit, setPricePerUnit] = useState("");
-  const [commission, setCommission] = useState("");
-  const [source, setSource] = useState("");
-  const [note, setNote] = useState("");
-
-  useEffect(() => {
-    if (!entry) {
-      return;
-    }
-
-    setOperation(entry.operation ?? DEFAULT_OPERATION);
-    setBaseAsset(entry.baseAsset ?? DEFAULT_ASSET);
-    setQuoteCurrency(entry.quoteCurrency ?? DEFAULT_CURRENCY);
-    setDate(entry.date ?? "");
-    setQuantity(entry.quantity ?? "");
-    setPricePerUnit(entry.pricePerUnit ?? "");
-    setCommission(entry.commission ?? "");
-    setSource(entry.source ?? "");
-    setNote(entry.note ?? "");
-  }, [entry]);
+  const [operation, setOperation] = useState<string>(entry?.operation ?? DEFAULT_OPERATION);
+  const [baseAsset, setBaseAsset] = useState(entry?.baseAsset ?? DEFAULT_ASSET);
+  const [quoteCurrency, setQuoteCurrency] = useState(
+    entry?.quoteCurrency ?? DEFAULT_CURRENCY,
+  );
+  const [date, setDate] = useState(entry?.date ?? "");
+  const [quantity, setQuantity] = useState(entry?.quantity ?? "");
+  const [pricePerUnit, setPricePerUnit] = useState(entry?.pricePerUnit ?? "");
+  const [commission, setCommission] = useState(entry?.commission ?? "");
+  const [source, setSource] = useState(entry?.source ?? "");
+  const [note, setNote] = useState(entry?.note ?? "");
 
   const actionHandler = useCallback(
     async (prevState: UpdateEntryState, formData: FormData) => {

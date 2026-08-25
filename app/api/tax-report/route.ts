@@ -4,6 +4,7 @@ import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth/options";
 import { ensureUserId } from "@/lib/auth/users";
 import { generateTaxReport } from "@/lib/tax/report";
+import { SENSITIVE_RESPONSE_HEADERS } from "@/lib/http/headers";
 
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
@@ -32,5 +33,5 @@ export async function GET(request: Request) {
     year: parsedYear,
   });
 
-  return NextResponse.json(report);
+  return NextResponse.json(report, { headers: SENSITIVE_RESPONSE_HEADERS });
 }

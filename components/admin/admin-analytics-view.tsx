@@ -95,7 +95,7 @@ export function AdminAnalyticsView({ data, query }: AdminAnalyticsViewProps) {
       };
       return config;
     }, {});
-  }, [data.feedbackReasons]);
+  }, [data.feedbackReasons, tr]);
 
   const feedbackReasonData = useMemo(
     () =>

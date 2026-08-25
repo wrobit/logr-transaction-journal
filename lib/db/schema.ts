@@ -42,7 +42,6 @@ export const users = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
     email: text("email").notNull().unique(),
     login: text("login").notNull().unique(),
-    passwordHash: text("password_hash").notNull(),
     firstName: text("first_name").notNull(),
     lastName: text("last_name").notNull(),
     role: userRoleEnum("role").notNull().default("user"),
@@ -58,6 +57,32 @@ export const users = pgTable(
     roleIndex: index("users_role_idx").on(table.role),
     lastLoginAtIndex: index("users_last_login_at_idx").on(table.lastLoginAt),
   })
+);
+
+export const oauthAccounts = pgTable(
+  "oauth_accounts",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    provider: text("provider").notNull(),
+    providerAccountId: text("provider_account_id").notNull(),
+    providerEmail: text("provider_email").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true, mode: "date" })
+      .defaultNow()
+      .notNull(),
+    lastLoginAt: timestamp("last_login_at", { withTimezone: true, mode: "date" })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => ({
+    providerAccountUnique: uniqueIndex("oauth_accounts_provider_account_idx").on(
+      table.provider,
+      table.providerAccountId,
+    ),
+    userIndex: index("oauth_accounts_user_idx").on(table.userId),
+  }),
 );
 
 export const entries = pgTable(
@@ -159,12 +184,11 @@ export const taxValidationLogs = pgTable(
     id: uuid("id").defaultRandom().primaryKey(),
     countryCode: text("country_code").notNull(),
     idType: text("id_type").notNull(),
-    maskedValue: text("masked_value").notNull(),
+    identifierHash: text("identifier_hash").notNull(),
     result: text("result").notNull(),
     providerName: text("provider_name").notNull(),
     checkedAt: timestamp("checked_at", { withTimezone: true, mode: "date" }).notNull(),
     responseHash: text("response_hash"),
-    rawSnapshot: jsonb("raw_snapshot"),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
   },
   (table) => ({
@@ -181,6 +205,9 @@ export const bankImportAuditBatches = pgTable(
   "bank_import_audit_batches",
   {
     id: uuid("id").defaultRandom().primaryKey(),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
     providerName: text("provider_name").notNull(),
     accountRef: text("account_ref").notNull(),
     batchId: text("batch_id").notNull(),
@@ -195,6 +222,10 @@ export const bankImportAuditBatches = pgTable(
       table.accountRef,
       table.batchId,
     ),
+    userCreatedIndex: index("bank_import_audit_user_created_idx").on(
+      table.userId,
+      table.createdAt,
+    ),
   }),
 );
 
@@ -206,7 +237,6 @@ export const exchangeImportBatches = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: "cascade" }),
     provider: text("provider").notNull(),
-    filename: text("filename"),
     status: text("status").notNull().default("completed"),
     totalRows: integer("total_rows").notNull().default(0),
     validRows: integer("valid_rows").notNull().default(0),
@@ -232,8 +262,6 @@ export const exchangeImportRows = pgTable(
     rowHash: text("row_hash").notNull(),
     status: text("status").notNull(),
     issues: jsonb("issues"),
-    rawRow: jsonb("raw_row"),
-    transaction: jsonb("transaction"),
     entryId: uuid("entry_id").references(() => entries.id, { onDelete: "set null" }),
     createdAt: timestamp("created_at", { withTimezone: true, mode: "date" }).defaultNow().notNull(),
   },
@@ -255,9 +283,9 @@ export const adminAuditLogs = pgTable(
   "admin_audit_logs",
   {
     id: uuid("id").defaultRandom().primaryKey(),
-    actorUserId: uuid("actor_user_id")
-      .notNull()
-      .references(() => users.id, { onDelete: "cascade" }),
+    actorUserId: uuid("actor_user_id").references(() => users.id, {
+      onDelete: "set null",
+    }),
     targetUserId: uuid("target_user_id").references(() => users.id, {
       onDelete: "set null",
     }),
@@ -275,6 +303,9 @@ export const adminAuditLogs = pgTable(
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
+
+export type OauthAccount = typeof oauthAccounts.$inferSelect;
+export type NewOauthAccount = typeof oauthAccounts.$inferInsert;
 
 export type Entry = typeof entries.$inferSelect;
 export type NewEntry = typeof entries.$inferInsert;

@@ -50,7 +50,7 @@ export class ViesTaxValidationProvider implements TaxValidationProvider {
         maskedValue: maskIdentifier(vatValue),
         status: valid ? "valid" : "invalid",
         checkedAt,
-        rawSnapshot: { xml },
+        rawSnapshot: { valid },
       };
     } catch {
       return {

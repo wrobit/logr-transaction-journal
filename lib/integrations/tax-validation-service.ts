@@ -16,12 +16,11 @@ export async function validateTaxIdentifier(input: {
     await db.insert(taxValidationLogs).values({
       countryCode: result.countryCode,
       idType: result.idType,
-      maskedValue: result.maskedValue || maskIdentifier(result.value),
+      identifierHash: hashSnapshot(result.value.trim().normalize("NFKC").toUpperCase()),
       result: result.status,
       providerName: result.provider,
       checkedAt: new Date(result.checkedAt),
       responseHash: hashSnapshot(result.rawSnapshot),
-      rawSnapshot: result.rawSnapshot,
     });
 
     if (result.status !== "unavailable" && result.status !== "timeout") {

@@ -9,8 +9,8 @@ import { entries } from "@/lib/db/schema";
 import { getUserDek, resolveEntryPayload } from "@/lib/entries/encryption";
 import { buildEntryWhere, parseEntryQuery } from "@/lib/entries/query";
 import { serializeEntry } from "@/lib/entries/serialize";
-
-const csvEscape = (value: string) => `"${value.replace(/"/g, '""')}"`;
+import { csvEscape } from "@/lib/export/csv";
+import { SENSITIVE_RESPONSE_HEADERS } from "@/lib/http/headers";
 
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
@@ -86,7 +86,7 @@ export async function GET(request: Request) {
       entry.id,
     ];
 
-    return values.map((value) => csvEscape(String(value))).join(",");
+    return values.map(csvEscape).join(",");
   });
 
   const csv = [header, ...lines].join("\n");
@@ -96,6 +96,7 @@ export async function GET(request: Request) {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
       "Content-Disposition": "attachment; filename=entries-export.csv",
+      ...SENSITIVE_RESPONSE_HEADERS,
     },
   });
 }

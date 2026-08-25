@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useCallback, useEffect, useState } from "react";
+import { useActionState, useCallback, useState } from "react";
 import { useTranslations } from "next-intl";
 import { signOut } from "next-auth/react";
 
@@ -22,7 +22,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 
 const labelClassName = "text-xs text-muted-foreground";
 const inputClassName =
@@ -45,16 +44,6 @@ export function DeleteAccountDialog({
   const [step, setStep] = useState<DeleteStep>("warning");
   const [confirmation, setConfirmation] = useState("");
   const [reason, setReason] = useState("");
-  const [notes, setNotes] = useState("");
-
-  useEffect(() => {
-    if (open) {
-      setStep("warning");
-      setConfirmation("");
-      setReason("");
-      setNotes("");
-    }
-  }, [open]);
 
   const actionHandler = useCallback(
     async (prevState: DeleteAccountState, formData: FormData) => {
@@ -122,20 +111,6 @@ export function DeleteAccountDialog({
                     </label>
                   ))}
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="notes" className={labelClassName}>
-                  {t("deleteDialog.notesLabel")}
-                </Label>
-                <Textarea
-                  id="notes"
-                  name="notes"
-                  value={notes}
-                  onChange={(event) => setNotes(event.target.value)}
-                  placeholder={t("deleteDialog.notesPlaceholder")}
-                  className="min-h-[120px] rounded-none border-border bg-background text-sm text-foreground"
-                />
               </div>
 
               <div className="space-y-2">

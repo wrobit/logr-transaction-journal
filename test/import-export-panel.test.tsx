@@ -168,7 +168,10 @@ describe("ImportExportPanel", () => {
     fireEvent.change(fileInput, { target: { files: [file] } });
     fireEvent.submit(screen.getByRole("button", { name: /preview import/i }).closest("form") as HTMLFormElement);
 
-    await waitFor(() => expect(previewAction).toHaveBeenCalledOnce());
+    await waitFor(() => {
+      expect(previewAction).toHaveBeenCalledOnce();
+      expect(screen.getByRole("button", { name: /confirm import/i })).toBeEnabled();
+    });
 
     fireEvent.click(screen.getByRole("button", { name: /confirm import/i }));
 

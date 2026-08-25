@@ -14,7 +14,7 @@ export type AdminAuditRow = {
   id: string;
   action: AdminAuditAction;
   createdAt: Date;
-  actorId: string;
+  actorId: string | null;
   actorEmail: string | null;
   actorLogin: string | null;
   targetId: string | null;
@@ -98,7 +98,7 @@ export async function getAdminAuditLogs(query: AdminAuditQuery): Promise<AdminAu
       metadata: adminAuditLogs.metadata,
     })
     .from(adminAuditLogs)
-    .innerJoin(actor, eq(adminAuditLogs.actorUserId, actor.id))
+    .leftJoin(actor, eq(adminAuditLogs.actorUserId, actor.id))
     .leftJoin(target, eq(adminAuditLogs.targetUserId, target.id))
     .orderBy(desc(adminAuditLogs.createdAt))
     .limit(ADMIN_AUDIT_PAGE_SIZE)

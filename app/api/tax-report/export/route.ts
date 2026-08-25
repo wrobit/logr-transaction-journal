@@ -4,8 +4,8 @@ import { NextResponse } from "next/server";
 import { authOptions } from "@/lib/auth/options";
 import { ensureUserId } from "@/lib/auth/users";
 import { generateTaxReport } from "@/lib/tax/report";
-
-const csvEscape = (value: string) => `"${value.replace(/"/g, '""')}"`;
+import { csvEscape } from "@/lib/export/csv";
+import { SENSITIVE_RESPONSE_HEADERS } from "@/lib/http/headers";
 
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
@@ -73,7 +73,7 @@ export async function GET(request: Request) {
       row.entryId,
     ];
 
-    return values.map((value) => csvEscape(String(value))).join(",");
+    return values.map(csvEscape).join(",");
   });
 
   const csv = [header, ...lines].join("\n");
@@ -84,6 +84,7 @@ export async function GET(request: Request) {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
       "Content-Disposition": `attachment; filename=${filename}`,
+      ...SENSITIVE_RESPONSE_HEADERS,
     },
   });
 }

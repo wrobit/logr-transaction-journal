@@ -6,6 +6,7 @@ import { ensureUserId } from "@/lib/auth/users";
 import { getRequestLocale } from "@/lib/i18n/translate";
 import { renderTaxReportPdf } from "@/lib/tax/pdf";
 import { generateTaxReport } from "@/lib/tax/report";
+import { SENSITIVE_RESPONSE_HEADERS } from "@/lib/http/headers";
 
 export const runtime = "nodejs";
 
@@ -45,7 +46,7 @@ export async function GET(request: Request) {
     headers: {
       "Content-Type": "application/pdf",
       "Content-Disposition": `attachment; filename=${filename}`,
-      "Cache-Control": "no-store",
+      ...SENSITIVE_RESPONSE_HEADERS,
     },
   });
 }

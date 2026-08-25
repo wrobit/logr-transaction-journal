@@ -17,15 +17,13 @@ if (!process.env.DATABASE_URL) {
 }
 
 async function loadDeps() {
-  const [{ hashPassword }, { db }, schemaModule, encryptionModule] = await Promise.all([
-    import("../lib/auth/password"),
+  const [{ db }, schemaModule, encryptionModule] = await Promise.all([
     import("../lib/db"),
     import("../lib/db/schema"),
     import("../lib/entries/encryption"),
   ]);
 
   return {
-    hashPassword,
     db,
     entries: schemaModule.entries,
     users: schemaModule.users,
@@ -37,7 +35,6 @@ async function loadDeps() {
 const TEST_USER = {
   email: "test@test.pl",
   login: "test@test.pl",
-  password: "test123",
   firstName: "Test",
   lastName: "Admin",
 } as const;
@@ -108,7 +105,6 @@ function buildPayload(input: {
 type SeedDeps = Awaited<ReturnType<typeof loadDeps>>;
 
 async function ensureTestAdminUser(deps: SeedDeps) {
-  const passwordHash = await deps.hashPassword(TEST_USER.password);
   const [existing] = await deps.db
     .select()
     .from(deps.users)
@@ -120,7 +116,6 @@ async function ensureTestAdminUser(deps: SeedDeps) {
       .update(deps.users)
       .set({
         login: TEST_USER.login,
-        passwordHash,
         firstName: TEST_USER.firstName,
         lastName: TEST_USER.lastName,
         role: "admin",
@@ -142,7 +137,6 @@ async function ensureTestAdminUser(deps: SeedDeps) {
     .values({
       email: TEST_USER.email,
       login: TEST_USER.login,
-      passwordHash,
       firstName: TEST_USER.firstName,
       lastName: TEST_USER.lastName,
       role: "admin",

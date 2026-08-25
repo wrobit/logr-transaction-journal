@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 
-import { getAdminUser, getAdminUserEntries } from "@/actions/admin-users";
-import { AdminUserEntriesTable } from "@/components/admin/admin-user-entries-table";
+import { getAdminUser } from "@/actions/admin-users";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { requireAdminSession } from "@/lib/auth/admin";
@@ -35,8 +34,6 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
   if (!user) {
     redirect("/admin/users");
   }
-
-  const entries = await getAdminUserEntries(user.id);
 
   return (
     <div className="space-y-6">
@@ -84,14 +81,6 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
           </div>
         </CardContent>
       </Card>
-
-      <div className="space-y-2">
-        <h3 className="text-sm font-semibold">{t("admin.userDetail.entriesTitle")}</h3>
-        <p className="text-xs text-muted-foreground">
-          {t("admin.userDetail.entriesSubtitle")}
-        </p>
-      </div>
-      <AdminUserEntriesTable entries={entries} />
     </div>
   );
 }

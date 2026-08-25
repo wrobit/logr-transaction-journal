@@ -68,11 +68,11 @@
       },
       "security": {
         "title": "Szyfrowanie i bezpieczenstwo",
-        "body": "Logr opiera sie na szyfrowanych rekordach uzytkownika i ograniczonym dostepie operacyjnym.",
+        "body": "Logr szyfruje wpisy dziennika w bazie i oddziela administracje kontem od dostepu do tresci dziennika.",
         "items": {
           "first": "Wpisy transakcji i notatki sa szyfrowane przed zapisem przy uzyciu mechanizmow szyfrowania aplikacji.",
-          "second": "Sekrety runtime, dane dostepowe do bazy i klucze szyfrujace musza pozostac poza commitowanym kodem zrodlowym.",
-          "third": "Dostep administratora jest ograniczony do utrzymania, wsparcia uzytkownika, przegladu audytu oraz badania naduzyc lub niezawodnosci."
+          "second": "Administratorzy aplikacji nie moga czytac tresci dziennika. Operator infrastruktury posiadajacy baze i klucz szyfrujacy moze technicznie odszyfrowac dane podczas autoryzowanego odzyskiwania.",
+          "third": "Sekrety runtime, dane dostepowe do bazy i klucze szyfrujace pozostaja poza kodem i sa ograniczone do odzyskiwania oraz utrzymania."
         }
       },
       "processors": {
@@ -98,7 +98,7 @@
         "body": "Mozesz zarzadzac danymi profilu w aplikacji oraz zadac dostepu, sprostowania, usuniecia, ograniczenia, przeniesienia albo sprzeciwu, jezeli ma to zastosowanie.",
         "items": {
           "first": "Mozesz aktualizowac dane profilu i walute wyswietlania na stronie profilu.",
-          "second": "Mozesz usunac konto na stronie profilu; usuniecie usuwa konto, wpisy, wyceny i notatki.",
+          "second": "Mozesz usunac konto na stronie profilu; potwierdzone usuniecie trwale usuwa konto, wpisy, importy, wyceny i notatki.",
           "third": "W sprawach prywatnosci napisz na piotr.wrobel@quadrantive.com z adresu e-mail powiazanego z kontem."
         }
       },
@@ -349,8 +349,6 @@
       "beforeYouGo": "Zanim odejdziesz",
       "feedbackPrompt": "Podaj krotki powod, a potem potwierdz usuniecie.",
       "reasonOptional": "Dlaczego odchodzisz? (opcjonalnie)",
-      "notesLabel": "Chcesz dodac cos jeszcze?",
-      "notesPlaceholder": "Opcjonalna opinia",
       "typeDelete": "Wpisz DELETE, aby potwierdzic",
       "sessionEnds": "Po usunieciu sesja zostanie natychmiast zakonczona.",
       "cancel": "Anuluj",
@@ -579,7 +577,7 @@
         "taxColumns": {
           "country": "Kraj",
           "idType": "Typ ID",
-          "masked": "Zamaskowana wartosc",
+          "masked": "Skrot identyfikatora",
           "result": "Wynik",
           "provider": "Dostawca",
           "checked": "Sprawdzono"
@@ -661,6 +659,8 @@
     "authRequiredEntryDelete": "Musisz byc zalogowany, aby usuwac wpisy.",
     "userMissing": "Brak rekordu uzytkownika. Zaloguj sie ponownie.",
     "emailInUse": "Adres e-mail jest juz zajety.",
+    "emailManagedByProvider": "Adres e-mail jest zarzadzany przez dostawce logowania.",
+    "recentAuthenticationRequired": "Wyloguj sie i zaloguj ponownie przed usunieciem konta.",
     "loginInUse": "Login jest juz zajety.",
     "profileNotFound": "Nie znaleziono profilu.",
     "entryIdMissing": "Brakuje identyfikatora wpisu.",

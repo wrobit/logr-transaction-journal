@@ -1,22 +1,29 @@
-import crypto from "crypto";
-
 import { and, eq, isNull } from "drizzle-orm";
 
 import { db } from "@/lib/db";
-import { users } from "@/lib/db/schema";
-import { hashPassword } from "@/lib/auth/password";
-import type { RegisterInput } from "@/lib/auth/validation";
+import { oauthAccounts, users } from "@/lib/db/schema";
 
 const DEFAULT_LAST_NAME = "User";
 const adminAllowlist = new Set(
   (process.env.ADMIN_EMAIL_ALLOWLIST ?? "")
     .split(",")
-    .map((email) => email.trim().toLowerCase())
+    .map((email) => normalizeEmail(email))
     .filter(Boolean),
 );
 
+export class OAuthAccountCollisionError extends Error {
+  constructor() {
+    super("An account already exists for this email with another sign-in provider.");
+    this.name = "OAuthAccountCollisionError";
+  }
+}
+
+export function normalizeEmail(email: string) {
+  return email.trim().normalize("NFKC").toLowerCase();
+}
+
 function isEmailAllowlisted(email: string) {
-  return adminAllowlist.has(email.trim().toLowerCase());
+  return adminAllowlist.has(normalizeEmail(email));
 }
 
 function resolveUserRole(email: string) {
@@ -24,10 +31,11 @@ function resolveUserRole(email: string) {
 }
 
 export async function getUserByEmail(email: string) {
+  const normalizedEmail = normalizeEmail(email);
   const [user] = await db
     .select()
     .from(users)
-    .where(and(eq(users.email, email), isNull(users.deletedAt)))
+    .where(and(eq(users.email, normalizedEmail), isNull(users.deletedAt)))
     .limit(1);
 
   return user ?? null;
@@ -46,7 +54,6 @@ export async function getUserById(id: string) {
 export async function ensureUserId({
   id,
   email,
-  name,
 }: {
   id?: string | null;
   email?: string | null;
@@ -64,73 +71,158 @@ export async function ensureUserId({
   }
 
   const existingByEmail = await getUserByEmail(email);
-  if (existingByEmail) {
-    return existingByEmail.id;
-  }
-
-  const created = await createOauthUser({ email, name });
-  return created.id;
+  return existingByEmail?.id ?? null;
 }
 
 export async function getUserByLogin(login: string) {
   const [user] = await db
     .select()
     .from(users)
-    .where(and(eq(users.login, login), isNull(users.deletedAt)))
+    .where(and(eq(users.login, login.trim()), isNull(users.deletedAt)))
     .limit(1);
 
   return user ?? null;
 }
 
-export async function createCredentialsUser(input: RegisterInput) {
-  const passwordHash = await hashPassword(input.password);
+export async function getUserByOauthAccount(provider: string, providerAccountId: string) {
+  const [result] = await db
+    .select({ user: users, account: oauthAccounts })
+    .from(oauthAccounts)
+    .innerJoin(users, eq(oauthAccounts.userId, users.id))
+    .where(
+      and(
+        eq(oauthAccounts.provider, provider),
+        eq(oauthAccounts.providerAccountId, providerAccountId),
+        isNull(users.deletedAt),
+      ),
+    )
+    .limit(1);
 
-  const [user] = await db
-    .insert(users)
-    .values({
-      email: input.email,
-      login: input.login,
-      passwordHash,
-      firstName: input.firstName,
-      lastName: input.lastName,
-      role: resolveUserRole(input.email),
-    })
-    .returning();
+  return result ?? null;
+}
 
-  return user;
+export async function claimLegacyOauthUser({
+  provider,
+  providerAccountId,
+  email,
+}: {
+  provider: string;
+  providerAccountId: string;
+  email: string;
+}) {
+  const normalizedEmail = normalizeEmail(email);
+
+  return db.transaction(async (tx) => {
+    const [user] = await tx
+      .select()
+      .from(users)
+      .where(and(eq(users.email, normalizedEmail), isNull(users.deletedAt)))
+      .limit(1);
+
+    if (!user) {
+      return null;
+    }
+
+    const [linkedAccount] = await tx
+      .select({ id: oauthAccounts.id })
+      .from(oauthAccounts)
+      .where(eq(oauthAccounts.userId, user.id))
+      .limit(1);
+
+    if (linkedAccount) {
+      return null;
+    }
+
+    await tx.insert(oauthAccounts).values({
+      userId: user.id,
+      provider,
+      providerAccountId,
+      providerEmail: normalizedEmail,
+    });
+    await tx.update(users).set({ lastLoginAt: new Date() }).where(eq(users.id, user.id));
+
+    return user;
+  });
 }
 
 export async function createOauthUser({
+  provider,
+  providerAccountId,
   email,
   name,
 }: {
+  provider: string;
+  providerAccountId: string;
   email: string;
   name?: string | null;
 }) {
+  const normalizedEmail = normalizeEmail(email);
   const { firstName, lastName } = splitName(name);
-  const passwordHash = await hashPassword(crypto.randomUUID());
 
-  const [user] = await db
-    .insert(users)
-    .values({
-      email,
-      login: email,
-      passwordHash,
-      firstName,
-      lastName,
-      role: resolveUserRole(email),
-    })
-    .returning();
+  return db.transaction(async (tx) => {
+    const [existingAccount] = await tx
+      .select({ user: users })
+      .from(oauthAccounts)
+      .innerJoin(users, eq(oauthAccounts.userId, users.id))
+      .where(
+        and(
+          eq(oauthAccounts.provider, provider),
+          eq(oauthAccounts.providerAccountId, providerAccountId),
+          isNull(users.deletedAt),
+        ),
+      )
+      .limit(1);
 
-  return user;
+    if (existingAccount) {
+      return existingAccount.user;
+    }
+
+    const [emailOwner] = await tx
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.email, normalizedEmail))
+      .limit(1);
+
+    if (emailOwner) {
+      throw new OAuthAccountCollisionError();
+    }
+
+    const [createdUser] = await tx
+      .insert(users)
+      .values({
+        email: normalizedEmail,
+        login: normalizedEmail,
+        firstName,
+        lastName,
+        role: resolveUserRole(normalizedEmail),
+      })
+      .returning();
+
+    if (!createdUser) {
+      throw new Error("Failed to create OAuth user.");
+    }
+
+    await tx.insert(oauthAccounts).values({
+      userId: createdUser.id,
+      provider,
+      providerAccountId,
+      providerEmail: normalizedEmail,
+    });
+
+    return createdUser;
+  });
 }
 
 export async function updateUserLoginMetadata({
   userId,
   email,
+  provider,
+  providerAccountId,
 }: {
   userId: string;
   email?: string | null;
+  provider?: string;
+  providerAccountId?: string;
 }) {
   const updates: Partial<typeof users.$inferInsert> = {
     lastLoginAt: new Date(),
@@ -143,8 +235,20 @@ export async function updateUserLoginMetadata({
   const [user] = await db
     .update(users)
     .set(updates)
-    .where(eq(users.id, userId))
+    .where(and(eq(users.id, userId), isNull(users.deletedAt)))
     .returning();
+
+  if (provider && providerAccountId) {
+    await db
+      .update(oauthAccounts)
+      .set({ lastLoginAt: new Date() })
+      .where(
+        and(
+          eq(oauthAccounts.provider, provider),
+          eq(oauthAccounts.providerAccountId, providerAccountId),
+        ),
+      );
+  }
 
   return user ?? null;
 }
@@ -154,7 +258,7 @@ function splitName(name?: string | null) {
     return { firstName: "Logr", lastName: DEFAULT_LAST_NAME };
   }
 
-  const [firstName, ...rest] = name.trim().split(" ");
+  const [firstName, ...rest] = name.trim().split(/\s+/);
   return {
     firstName: firstName || "Logr",
     lastName: rest.join(" ") || DEFAULT_LAST_NAME,

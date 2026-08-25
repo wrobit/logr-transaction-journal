@@ -36,7 +36,7 @@ export type AdminIntegrationOverview = {
     id: string;
     countryCode: string;
     idType: string;
-    maskedValue: string;
+    identifierHash: string;
     result: string;
     providerName: string;
     checkedAt: Date;
@@ -86,7 +86,7 @@ export async function getAdminIntegrationOverview(
         id: taxValidationLogs.id,
         countryCode: taxValidationLogs.countryCode,
         idType: taxValidationLogs.idType,
-        maskedValue: taxValidationLogs.maskedValue,
+        identifierHash: taxValidationLogs.identifierHash,
         result: taxValidationLogs.result,
         providerName: taxValidationLogs.providerName,
         checkedAt: taxValidationLogs.checkedAt,
@@ -155,57 +155,53 @@ export async function setAdminIntegrationPolicyLock(input: {
     return { status: "error" as const, message: "Provider is not allowed for the selected type." };
   }
 
-  await db
-    .update(countryIntegrationPolicies)
-    .set({ isActive: false })
-    .where(
-      and(
-        eq(countryIntegrationPolicies.countryCode, countryCode),
-        eq(countryIntegrationPolicies.providerType, providerType),
-      ),
-    );
+  await db.transaction(async (tx) => {
+    await tx
+      .update(countryIntegrationPolicies)
+      .set({ isActive: false })
+      .where(
+        and(
+          eq(countryIntegrationPolicies.countryCode, countryCode),
+          eq(countryIntegrationPolicies.providerType, providerType),
+        ),
+      );
 
-  await db
-    .insert(countryIntegrationPolicies)
-    .values({
-      countryCode,
-      providerType,
-      providerName,
-      priority: 1,
-      isActive: true,
-    })
-    .onConflictDoUpdate({
-      target: [
-        countryIntegrationPolicies.countryCode,
-        countryIntegrationPolicies.providerType,
-        countryIntegrationPolicies.providerName,
-      ],
-      set: {
-        isActive: true,
+    await tx
+      .insert(countryIntegrationPolicies)
+      .values({
+        countryCode,
+        providerType,
+        providerName,
         priority: 1,
-      },
-    });
+        isActive: true,
+      })
+      .onConflictDoUpdate({
+        target: [
+          countryIntegrationPolicies.countryCode,
+          countryIntegrationPolicies.providerType,
+          countryIntegrationPolicies.providerName,
+        ],
+        set: { isActive: true, priority: 1 },
+      });
 
-  await db
-    .insert(countryIntegrationPolicies)
-    .values({
-      countryCode,
-      providerType,
-      providerName: POLICY_LOCK_PROVIDER,
-      priority: 0,
-      isActive: input.locked,
-    })
-    .onConflictDoUpdate({
-      target: [
-        countryIntegrationPolicies.countryCode,
-        countryIntegrationPolicies.providerType,
-        countryIntegrationPolicies.providerName,
-      ],
-      set: {
-        isActive: input.locked,
+    await tx
+      .insert(countryIntegrationPolicies)
+      .values({
+        countryCode,
+        providerType,
+        providerName: POLICY_LOCK_PROVIDER,
         priority: 0,
-      },
-    });
+        isActive: input.locked,
+      })
+      .onConflictDoUpdate({
+        target: [
+          countryIntegrationPolicies.countryCode,
+          countryIntegrationPolicies.providerType,
+          countryIntegrationPolicies.providerName,
+        ],
+        set: { isActive: input.locked, priority: 0 },
+      });
+  });
 
   revalidatePath("/admin/integrations");
 

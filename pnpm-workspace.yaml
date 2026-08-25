@@ -1,5 +1,4 @@
 ignoredBuiltDependencies:
-  - bcrypt
   - esbuild
   - msw
   - sharp

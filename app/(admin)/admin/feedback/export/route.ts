@@ -5,8 +5,8 @@ import { parseAdminFeedbackQuery } from "@/lib/admin/feedback-query";
 import { getAdminFeedbackExportRows } from "@/actions/admin-feedback";
 import { getFeedbackReasonLabel } from "@/lib/admin/feedback-helpers";
 import { dayjs } from "@/lib/dayjs";
-
-const csvEscape = (value: string) => `"${value.replace(/"/g, '""')}"`;
+import { csvEscape } from "@/lib/export/csv";
+import { SENSITIVE_RESPONSE_HEADERS } from "@/lib/http/headers";
 
 export async function GET(request: Request) {
   const session = await getAdminSession();
@@ -28,7 +28,7 @@ export async function GET(request: Request) {
       row.userEmail ?? "",
       row.userLogin ?? "",
     ];
-    return values.map((value) => csvEscape(String(value))).join(",");
+    return values.map(csvEscape).join(",");
   });
 
   const csv = [header, ...lines].join("\n");
@@ -38,6 +38,7 @@ export async function GET(request: Request) {
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
       "Content-Disposition": "attachment; filename=entry-feedback.csv",
+      ...SENSITIVE_RESPONSE_HEADERS,
     },
   });
 }

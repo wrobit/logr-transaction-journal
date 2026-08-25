@@ -3,9 +3,10 @@
   "version": "0.1.0",
   "license": "MIT",
   "private": true,
+  "packageManager": "pnpm@10.28.2",
   "engines": {
-    "node": ">=20.0.0",
-    "pnpm": ">=9.0.0"
+    "node": "22.x",
+    "pnpm": "10.x"
   },
   "scripts": {
     "dev": "next dev --port 2206",

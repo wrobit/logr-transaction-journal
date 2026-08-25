@@ -6,13 +6,13 @@ import GoogleProvider from "next-auth/providers/google";
 import { SIGNUP_INTENT_COOKIE, verifySignupIntent } from "@/lib/auth/signup-intent";
 import { isPublicRegistrationEnabled } from "@/lib/auth/registration";
 import {
+  claimLegacyOauthUser,
   createOauthUser,
   getUserById,
   getUserByOauthAccount,
   normalizeEmail,
   updateUserLoginMetadata,
 } from "@/lib/auth/users";
-import { checkRateLimit } from "@/lib/security/rate-limit";
 
 const SESSION_MAX_AGE_SECONDS = 7 * 24 * 60 * 60;
 
@@ -81,42 +81,46 @@ export const authOptions: NextAuthOptions = {
         return false;
       }
 
-      const rateLimit = await checkRateLimit(
-        "oauthAccount",
-        `${account.provider}:${account.providerAccountId}`,
-      );
-      if (!rateLimit.success) {
-        return false;
-      }
+      try {
+        const existing = await getUserByOauthAccount(
+          account.provider,
+          account.providerAccountId,
+        );
+        if (existing) {
+          await updateUserLoginMetadata({
+            userId: existing.user.id,
+            email: existing.user.email,
+            provider: account.provider,
+            providerAccountId: account.providerAccountId,
+          });
+          return true;
+        }
 
-      const existing = await getUserByOauthAccount(account.provider, account.providerAccountId);
-      if (existing) {
-        await updateUserLoginMetadata({
-          userId: existing.user.id,
-          email: existing.user.email,
+        const verifiedEmail = await getVerifiedProviderEmail(account.provider, profile, account);
+        if (!verifiedEmail) {
+          return false;
+        }
+
+        const claimedUser = await claimLegacyOauthUser({
           provider: account.provider,
           providerAccountId: account.providerAccountId,
+          email: verifiedEmail,
         });
-        return true;
-      }
+        if (claimedUser) {
+          return true;
+        }
 
-      if (!isPublicRegistrationEnabled()) {
-        return false;
-      }
+        if (!isPublicRegistrationEnabled()) {
+          return false;
+        }
 
-      const cookieStore = await cookies();
-      const intent = cookieStore.get(SIGNUP_INTENT_COOKIE)?.value;
-      if (!verifySignupIntent(intent, account.provider)) {
-        return false;
-      }
-      cookieStore.delete(SIGNUP_INTENT_COOKIE);
+        const cookieStore = await cookies();
+        const intent = cookieStore.get(SIGNUP_INTENT_COOKIE)?.value;
+        if (!verifySignupIntent(intent, account.provider)) {
+          return false;
+        }
+        cookieStore.delete(SIGNUP_INTENT_COOKIE);
 
-      const verifiedEmail = await getVerifiedProviderEmail(account.provider, profile, account);
-      if (!verifiedEmail) {
-        return false;
-      }
-
-      try {
         await createOauthUser({
           provider: account.provider,
           providerAccountId: account.providerAccountId,

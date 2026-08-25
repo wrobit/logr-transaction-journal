@@ -6,6 +6,7 @@ import { authOptions } from "@/lib/auth/options";
 
 const getUserByOauthAccountMock = vi.hoisted(() => vi.fn());
 const getUserByIdMock = vi.hoisted(() => vi.fn());
+const claimLegacyOauthUserMock = vi.hoisted(() => vi.fn());
 const createOauthUserMock = vi.hoisted(() => vi.fn());
 const updateUserLoginMetadataMock = vi.hoisted(() => vi.fn());
 const cookieDeleteMock = vi.hoisted(() => vi.fn());
@@ -21,10 +22,8 @@ vi.mock("@/lib/auth/signup-intent", () => ({
   verifySignupIntent: vi.fn(() => true),
 }));
 vi.mock("@/lib/auth/registration", () => ({ isPublicRegistrationEnabled: vi.fn(() => true) }));
-vi.mock("@/lib/security/rate-limit", () => ({
-  checkRateLimit: vi.fn(async () => ({ success: true })),
-}));
 vi.mock("@/lib/auth/users", () => ({
+  claimLegacyOauthUser: claimLegacyOauthUserMock,
   createOauthUser: createOauthUserMock,
   getUserById: getUserByIdMock,
   getUserByOauthAccount: getUserByOauthAccountMock,
@@ -47,6 +46,8 @@ describe("OAuth authorization callbacks", () => {
   beforeEach(() => {
     getUserByOauthAccountMock.mockReset();
     getUserByIdMock.mockReset();
+    claimLegacyOauthUserMock.mockReset();
+    claimLegacyOauthUserMock.mockResolvedValue(null);
     createOauthUserMock.mockReset();
     updateUserLoginMetadataMock.mockReset();
     cookieDeleteMock.mockReset();
@@ -68,6 +69,31 @@ describe("OAuth authorization callbacks", () => {
 
     expect(result).toBe(true);
     expect(updateUserLoginMetadataMock).toHaveBeenCalledOnce();
+    expect(createOauthUserMock).not.toHaveBeenCalled();
+  });
+
+  it("links an existing pre-OAuth user after the provider verifies their email", async () => {
+    getUserByOauthAccountMock.mockResolvedValue(null);
+    claimLegacyOauthUserMock.mockResolvedValue({
+      id: "user-1",
+      email: "person@example.com",
+      role: "user",
+    });
+
+    const result = await authOptions.callbacks?.signIn?.({
+      user: { id: "provider-1", email: "person@example.com" },
+      account: oauthAccount,
+      profile: googleProfile(true),
+      email: undefined,
+      credentials: undefined,
+    });
+
+    expect(result).toBe(true);
+    expect(claimLegacyOauthUserMock).toHaveBeenCalledWith({
+      provider: "google",
+      providerAccountId: "provider-1",
+      email: "person@example.com",
+    });
     expect(createOauthUserMock).not.toHaveBeenCalled();
   });
 
@@ -100,6 +126,20 @@ describe("OAuth authorization callbacks", () => {
 
     expect(result).toBe(false);
     expect(cookieDeleteMock).toHaveBeenCalledOnce();
+  });
+
+  it("returns a generic rejection when the account lookup fails", async () => {
+    getUserByOauthAccountMock.mockRejectedValue(new Error("database unavailable\nquery details"));
+
+    const result = await authOptions.callbacks?.signIn?.({
+      user: { id: "provider-1" },
+      account: oauthAccount,
+      profile: googleProfile(true),
+      email: undefined,
+      credentials: undefined,
+    });
+
+    expect(result).toBe(false);
   });
 
   it("invalidates a deleted user and refreshes a demoted role from Postgres", async () => {

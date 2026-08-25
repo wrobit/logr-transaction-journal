@@ -1,33 +1,21 @@
-# Security operations runbook
+# Minimal security and recovery notes
 
-## Encryption keys
+## Encryption key
 
-`ENTRY_KEK` is the sole production key-encryption-key name. Keep an offline recovery copy in two secure locations. A database backup without the matching KEK cannot decrypt journals.
+`ENTRY_KEK` wraps each user's journal encryption key. Keep a secure offline copy: a database backup without the matching key cannot decrypt journals.
 
-To rotate it safely:
+Do not replace `ENTRY_KEK` during a normal redeploy. Rotation requires a tested process that rewraps every user key with both the old and new keys available; the app does not automate this yet.
 
-1. Disable journal writes and make a verified encrypted backup.
-2. Restore the backup to an isolated branch and verify decryption with the old KEK.
-3. Generate a new 32-byte random key and keep both keys available to a one-off rewrap job.
-4. Rewrap every user DEK in a transaction or resumable batches; do not re-encrypt entry payloads.
-5. Verify counts and decrypt representative entries before switching runtime configuration.
-6. Retain the old key offline until all rollback and backup retention windows expire, then destroy it deliberately.
+## Manual database recovery
 
-The repository does not automate KEK rotation because a partially completed rotation can permanently destroy data. Build and rehearse the one-off rewrap command against a restored branch before any production rotation.
+1. Export or snapshot the Neon production database on a recurring schedule.
+2. Restore it to a separate Neon branch before using it.
+3. Configure the restored branch with the matching `ENTRY_KEK`.
+4. Verify login, journal decryption, imports, exports, and account deletion.
+5. Switch `DATABASE_URL` only after the restored branch is verified.
 
-## Backup restore drill
+## Exposed credentials
 
-1. Download the encrypted dump and checksum from private R2 on an offline-capable trusted machine.
-2. Decrypt both with the age private key, run `sha256sum --check`, and restore into a new isolated Neon branch.
-3. Configure the application with the restored database and matching `ENTRY_KEK`.
-4. Verify user/account counts, OAuth linkage, journal decryption, imports, exports, and hard deletion.
-5. Record the recovery point, duration, operator, and anomalies. Repeat monthly.
-
-## Credential exposure
-
-- OAuth, Upstash, Turnstile, Sentry, database, or R2: revoke the affected credential, replace it, redeploy, and inspect audit/log data.
-- `NEXTAUTH_SECRET`: rotate it and redeploy; all sessions are invalidated.
-- `ENTRY_KEK`: disable writes, preserve the old key, and use the rehearsed rewrap procedure above. Do not simply replace the environment value.
-- Backup age private key: replace the recipient for future backups, preserve the old key for retained backups, and investigate access to encrypted objects.
-
-Security audit metadata must remain pseudonymous: nullable actor IDs, safe event codes, and no emails, tokens, request bodies, financial rows, addresses, IBANs, or provider response payloads.
+- Database, OAuth, Upstash, or Turnstile: revoke the credential, replace it in Vercel, and redeploy.
+- `NEXTAUTH_SECRET`: replace it and redeploy; existing sessions will be invalidated.
+- `ENTRY_KEK`: preserve the old key and disable writes until a tested rewrap/recovery path is ready. Replacing it directly makes existing journals unreadable.

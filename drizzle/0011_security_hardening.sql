@@ -31,7 +31,27 @@ ALTER TABLE "exchange_import_batches" DROP COLUMN IF EXISTS "filename";
 --> statement-breakpoint
 ALTER TABLE "tax_validation_logs" DROP COLUMN IF EXISTS "raw_snapshot";
 --> statement-breakpoint
-ALTER TABLE "tax_validation_logs" RENAME COLUMN "masked_value" TO "identifier_hash";
+DO $$ BEGIN
+  IF EXISTS (
+    SELECT 1
+    FROM information_schema.columns
+    WHERE table_schema = 'public'
+      AND table_name = 'tax_validation_logs'
+      AND column_name = 'masked_value'
+  ) THEN
+    IF EXISTS (
+      SELECT 1
+      FROM information_schema.columns
+      WHERE table_schema = 'public'
+        AND table_name = 'tax_validation_logs'
+        AND column_name = 'identifier_hash'
+    ) THEN
+      ALTER TABLE "tax_validation_logs" DROP COLUMN "masked_value";
+    ELSE
+      ALTER TABLE "tax_validation_logs" RENAME COLUMN "masked_value" TO "identifier_hash";
+    END IF;
+  END IF;
+END $$;
 --> statement-breakpoint
 UPDATE "tax_validation_logs" SET "identifier_hash" = 'legacy-redacted';
 --> statement-breakpoint

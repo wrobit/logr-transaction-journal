@@ -6,7 +6,6 @@ import { ensureUserId } from "@/lib/auth/users";
 import { generateTaxReport } from "@/lib/tax/report";
 import { csvEscape } from "@/lib/export/csv";
 import { SENSITIVE_RESPONSE_HEADERS } from "@/lib/http/headers";
-import { checkRateLimit } from "@/lib/security/rate-limit";
 
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
@@ -14,11 +13,6 @@ export async function GET(request: Request) {
 
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const rateLimit = await checkRateLimit("expensiveAction", `tax-export:${userId}`);
-  if (!rateLimit.success) {
-    return NextResponse.json({ error: "Too many export requests." }, { status: 429 });
   }
 
   const url = new URL(request.url);

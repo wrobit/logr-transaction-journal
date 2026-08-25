@@ -8,7 +8,7 @@ import {
   signupIntentCookieOptions,
 } from "@/lib/auth/signup-intent";
 import { isPublicRegistrationEnabled } from "@/lib/auth/registration";
-import { checkRateLimit, getClientIp } from "@/lib/security/rate-limit";
+import { checkSignupRateLimit, getClientIp } from "@/lib/security/rate-limit";
 
 const requestSchema = z.object({
   provider: z.enum(["google", "github"]),
@@ -30,7 +30,7 @@ export async function POST(request: Request) {
   }
 
   const ip = getClientIp(request.headers);
-  const rateLimit = await checkRateLimit("signupIp", ip);
+  const rateLimit = await checkSignupRateLimit(ip);
   if (!rateLimit.success) {
     return NextResponse.json({ error: "Signup is temporarily unavailable." }, { status: 429 });
   }

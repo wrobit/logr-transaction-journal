@@ -101,6 +101,50 @@ export async function getUserByOauthAccount(provider: string, providerAccountId:
   return result ?? null;
 }
 
+export async function claimLegacyOauthUser({
+  provider,
+  providerAccountId,
+  email,
+}: {
+  provider: string;
+  providerAccountId: string;
+  email: string;
+}) {
+  const normalizedEmail = normalizeEmail(email);
+
+  return db.transaction(async (tx) => {
+    const [user] = await tx
+      .select()
+      .from(users)
+      .where(and(eq(users.email, normalizedEmail), isNull(users.deletedAt)))
+      .limit(1);
+
+    if (!user) {
+      return null;
+    }
+
+    const [linkedAccount] = await tx
+      .select({ id: oauthAccounts.id })
+      .from(oauthAccounts)
+      .where(eq(oauthAccounts.userId, user.id))
+      .limit(1);
+
+    if (linkedAccount) {
+      return null;
+    }
+
+    await tx.insert(oauthAccounts).values({
+      userId: user.id,
+      provider,
+      providerAccountId,
+      providerEmail: normalizedEmail,
+    });
+    await tx.update(users).set({ lastLoginAt: new Date() }).where(eq(users.id, user.id));
+
+    return user;
+  });
+}
+
 export async function createOauthUser({
   provider,
   providerAccountId,

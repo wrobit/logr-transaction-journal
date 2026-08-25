@@ -1,10 +1,6 @@
-import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
 const isProduction = process.env.NODE_ENV === "production";
-const cspHeader = process.env.CSP_REPORT_ONLY === "true"
-  ? "Content-Security-Policy-Report-Only"
-  : "Content-Security-Policy";
 const contentSecurityPolicy = [
   "default-src 'self'",
   "base-uri 'self'",
@@ -16,7 +12,7 @@ const contentSecurityPolicy = [
   "img-src 'self' data: blob: https://www.google-analytics.com",
   "font-src 'self' data:",
   "frame-src https://challenges.cloudflare.com",
-  "connect-src 'self' https://challenges.cloudflare.com https://www.google-analytics.com https://*.ingest.sentry.io https://*.ingest.de.sentry.io",
+  "connect-src 'self' https://challenges.cloudflare.com https://www.google-analytics.com",
   "worker-src 'self' blob:",
   isProduction ? "upgrade-insecure-requests" : "",
 ]
@@ -24,7 +20,9 @@ const contentSecurityPolicy = [
   .join("; ");
 
 const securityHeaders = [
-  ...(isProduction ? [{ key: cspHeader, value: contentSecurityPolicy }] : []),
+  ...(isProduction
+    ? [{ key: "Content-Security-Policy", value: contentSecurityPolicy }]
+    : []),
   ...(isProduction
     ? [{ key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" }]
     : []),
@@ -61,17 +59,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSentryConfig(nextConfig, {
-  authToken: process.env.SENTRY_AUTH_TOKEN,
-  org: process.env.SENTRY_ORG,
-  project: process.env.SENTRY_PROJECT,
-  silent: true,
-  sourcemaps: {
-    disable: !process.env.SENTRY_AUTH_TOKEN,
-  },
-  webpack: {
-    treeshake: {
-      removeDebugLogging: true,
-    },
-  },
-});
+export default nextConfig;

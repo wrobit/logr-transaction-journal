@@ -11,7 +11,6 @@ import { buildEntryWhere, parseEntryQuery } from "@/lib/entries/query";
 import { serializeEntry } from "@/lib/entries/serialize";
 import { csvEscape } from "@/lib/export/csv";
 import { SENSITIVE_RESPONSE_HEADERS } from "@/lib/http/headers";
-import { checkRateLimit } from "@/lib/security/rate-limit";
 
 export async function GET(request: Request) {
   const session = await getServerSession(authOptions);
@@ -19,11 +18,6 @@ export async function GET(request: Request) {
 
   if (!userId) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const rateLimit = await checkRateLimit("expensiveAction", `entries-export:${userId}`);
-  if (!rateLimit.success) {
-    return NextResponse.json({ error: "Too many export requests." }, { status: 429 });
   }
 
   const params = Object.fromEntries(new URL(request.url).searchParams.entries());

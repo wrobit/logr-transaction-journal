@@ -7,21 +7,12 @@ import { getFeedbackReasonLabel } from "@/lib/admin/feedback-helpers";
 import { dayjs } from "@/lib/dayjs";
 import { csvEscape } from "@/lib/export/csv";
 import { SENSITIVE_RESPONSE_HEADERS } from "@/lib/http/headers";
-import { checkRateLimit } from "@/lib/security/rate-limit";
 
 export async function GET(request: Request) {
   const session = await getAdminSession();
 
   if (!session) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const rateLimit = await checkRateLimit(
-    "expensiveAction",
-    `admin-feedback-export:${session.user.id}`,
-  );
-  if (!rateLimit.success) {
-    return NextResponse.json({ error: "Too many export requests." }, { status: 429 });
   }
 
   const params = Object.fromEntries(new URL(request.url).searchParams.entries());

@@ -105,7 +105,7 @@ Logr is a personal crypto journal that treats each transaction as an immutable a
 ### `oauth_accounts`
 
 - `userId`, `provider`, `providerAccountId`, `providerEmail`
-- Unique provider identity; accounts are never merged by matching email alone
+- Unique provider identity; a verified provider email may claim an existing account only when it has no OAuth link yet
 
 ### `entries`
 
@@ -177,8 +177,8 @@ pnpm dev
 ## Environment Variables
 
 Copy `.env.example` and configure the documented runtime, migration, OAuth, encryption,
-Upstash, Turnstile, and optional monitoring variables. Production startup validates all
-required values. Never expose `MIGRATION_DATABASE_URL` to the application runtime.
+Upstash, and Turnstile variables. Production startup validates all required values. Never
+expose `MIGRATION_DATABASE_URL` to the application runtime.
 
 See `docs/production-deployment.md` for the production checklist and
 `docs/security-runbook.md` for key rotation and incident procedures.

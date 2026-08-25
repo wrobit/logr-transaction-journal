@@ -17,7 +17,6 @@ import {
 import type { CanonicalImportTransaction, ExchangeCsvProvider } from "@/lib/exchange-import/types";
 import { EXCHANGE_CSV_PROVIDERS } from "@/lib/exchange-import/types";
 import { MAX_CSV_BYTES, MAX_CSV_ROWS } from "@/lib/exchange-import/csv";
-import { checkRateLimit } from "@/lib/security/rate-limit";
 
 const ACCEPTED_CSV_TYPES = new Set([
   "",
@@ -70,11 +69,6 @@ export async function previewExchangeImportAction(
     return { status: "error", message: "CSV must be a supported file no larger than 5 MB." };
   }
 
-  const rateLimit = await checkRateLimit("expensiveAction", `preview:${userId}`);
-  if (!rateLimit.success) {
-    return { status: "error", message: "Too many import attempts. Try again later." };
-  }
-
   const content = new Uint8Array(await fileRaw.arrayBuffer());
 
   try {
@@ -105,11 +99,6 @@ export async function confirmExchangeImportAction(input: {
 
   if (input.rows.length === 0 || input.rows.length > MAX_CSV_ROWS) {
     return { status: "error", message: "Import row count is outside the allowed range." };
-  }
-
-  const rateLimit = await checkRateLimit("expensiveAction", `confirm:${userId}`);
-  if (!rateLimit.success) {
-    return { status: "error", message: "Too many import attempts. Try again later." };
   }
 
   const result = await confirmExchangeImport({

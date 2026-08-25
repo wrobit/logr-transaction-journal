@@ -4,9 +4,9 @@ Target: `app.logr.space`. Goal: launch a free-to-use beta with the least operati
 
 ## 1. Accounts and runtime
 
-- [ ] Confirm the app is eligible for Vercel Hobby/free-tier use; upgrade or choose another host if not.
-- [ ] Create one Neon production database/branch on the free tier.
-- [ ] Configure Vercel production env vars from `.env.example`:
+- [x] Confirm the app is eligible for Vercel Hobby/free-tier use; upgrade or choose another host if not.
+- [x] Create one Neon production database/branch on the free tier.
+- [x] Configure Vercel production env vars from `.env.example`:
   - required app secrets: `DATABASE_URL`, `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, `ENTRY_KEK`, `NEXT_PUBLIC_SITE_URL`
   - required auth: Google and GitHub OAuth credentials with callbacks for `https://app.logr.space/api/auth/callback/google` and `https://app.logr.space/api/auth/callback/github`
   - required signup protection: Upstash Redis REST credentials and Cloudflare Turnstile keys/hostnames

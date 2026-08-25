@@ -2,15 +2,6 @@
   <img src="public/logo.svg" alt="Logr" width="240" />
 </p>
 
-```text
-██╗      ██████╗  ██████╗ ██████╗
-██║     ██╔═══██╗██╔════╝ ██╔══██╗
-██║     ██║   ██║██║  ███╗██████╔╝
-██║     ██║   ██║██║   ██║██╔══██╗
-███████╗╚██████╔╝╚██████╔╝██║  ██║
-╚══════╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝
-```
-
 <p align="center">
   <strong>A private, deterministic crypto transaction journal for PLN accounting.</strong>
   <br />

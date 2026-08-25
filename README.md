@@ -1,212 +1,227 @@
 <p align="center">
-  <img src="public/logo.svg" alt="Logr" width="260" />
+  <img src="public/logo.svg" alt="Logr" width="240" />
 </p>
 
-A minimal, personal crypto transaction journal focused on correctness, transparency, and accounting-style clarity. No hype, no trading features — just structured records, PLN valuation via NBP, and clear profit/loss.
+```text
+██╗      ██████╗  ██████╗ ██████╗
+██║     ██╔═══██╗██╔════╝ ██╔══██╗
+██║     ██║   ██║██║  ███╗██████╔╝
+██║     ██║   ██║██║   ██║██╔══██╗
+███████╗╚██████╔╝╚██████╔╝██║  ██║
+╚══════╝ ╚═════╝  ╚═════╝ ╚═╝  ╚═╝
+```
 
-## Table of contents
+<p align="center">
+  <strong>A private, deterministic crypto transaction journal for PLN accounting.</strong>
+  <br />
+  Track buys and sells, preserve official rate attribution, and prepare export-ready records—without trading noise.
+</p>
 
-- [Introduction](#introduction)
-- [Product Goals](#product-goals)
-- [Core Principles](#core-principles)
-- [Features](#features)
-- [Business Rules](#business-rules)
-- [Tech Stack](#tech-stack)
-- [Data Model](#data-model)
-- [Encryption](#encryption)
-- [NBP Integration](#nbp-integration)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Support](#support)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
+<p align="center">
+  <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-6dd5c3?style=for-the-badge" /></a>
+  <a href="https://nextjs.org/"><img alt="Next.js 16" src="https://img.shields.io/badge/Next.js-16-111111?style=for-the-badge&amp;logo=nextdotjs" /></a>
+  <a href="https://www.typescriptlang.org/"><img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&amp;logo=typescript&amp;logoColor=white" /></a>
+  <a href="package.json"><img alt="Node.js 20 or newer" src="https://img.shields.io/badge/Node.js-%E2%89%A520-339933?style=for-the-badge&amp;logo=nodedotjs&amp;logoColor=white" /></a>
+  <a href="package.json"><img alt="pnpm 9 or newer" src="https://img.shields.io/badge/pnpm-%E2%89%A59-F69220?style=for-the-badge&amp;logo=pnpm&amp;logoColor=white" /></a>
+</p>
 
-## Introduction
+<p align="center">
+  <a href="#screenshots">Screenshots</a> ·
+  <a href="#features">Features</a> ·
+  <a href="#quick-start">Quick start</a> ·
+  <a href="docs/production-deployment.md">Deploy</a> ·
+  <a href="docs/security-runbook.md">Security</a>
+</p>
 
-Logr is a personal crypto journal that treats each transaction as an immutable accounting entry. It emphasizes reproducible calculations, official PLN rates, and a clean UI designed for tracking and tax preparation.
+---
 
-## Product Goals
+Logr treats every transaction as an accounting record. Calculations are reproducible,
+currency conversion retains its source and effective date, and sensitive entry data is
+encrypted before it reaches the database. It is built for journaling and tax preparation—not
+trading, custody, portfolio advice, or investment recommendations.
 
-- Capture each transaction as a precise accounting entry
-- Provide accurate PLN valuation using official NBP rates
-- Offer a low-friction UI for personal tracking and tax prep
-- Keep calculations deterministic and reproducible
+## Screenshots
 
-## Core Principles
+### Transaction journal
 
-- One entry equals one immutable transaction record
-- PLN value is always derived from NBP table A
-- All financial calculations are deterministic
-- Built for personal accounting, not trading analytics
+Filter, inspect, add, import, and export records from one dense but readable workspace.
+
+![Logr transaction journal showing filters and encrypted accounting entries](public/screenshots/entries.jpg)
+
+### Realized PnL dashboard
+
+Review realized cost, proceeds, PnL over time, and asset-level holdings from the same
+deterministic journal data.
+
+![Logr dashboard showing realized PnL and holdings charts](public/screenshots/dashboard.jpg)
+
+<details>
+  <summary><strong>CSV import workflow</strong></summary>
+
+Preview supported exchange exports before confirming an import, with recent batch status
+visible alongside the journal.
+
+<img src="public/screenshots/import-export.jpg" alt="Logr CSV import and export workflow" />
+</details>
+
+> Screenshots use seeded sample transactions. Values are illustrative.
 
 ## Features
 
-### Entries (`/`)
+- **Deterministic accounting** — consistent buy, sell, commission, and realized PnL rules.
+- **Official FX attribution** — PLN valuation through NBP rates with the provider, effective
+  date, and publication status retained on each record.
+- **Encrypted journal data** — AES-256-GCM entry encryption with per-user data-encryption
+  keys wrapped by `ENTRY_KEK`.
+- **Safe exchange imports** — preview-and-confirm CSV workflows for Kraken and Binance,
+  including duplicate protection and failed-row export.
+- **Useful exports** — full journal CSV export plus year-specific PIT PDF generation.
+- **Focused analytics** — realized PnL history, buy/sell volume, holdings mix, and asset
+  breakdowns.
+- **International UI** — English and Polish copy with locale-aware dates and numbers.
+- **Private-by-default operations** — OAuth authentication, gated public registration,
+  rate limiting, Turnstile support, audit logging, and hard account deletion.
 
-- Date range filter
-- Entries table with full financial breakdown
-- Primary action: **Add entry**
+## How valuation works
 
-### Summary (`/summary`)
+For each transaction, Logr stores the original quote amount and derives an accounting value
+from an attributable exchange rate:
 
-- Total buy value (PLN)
-- Total sell value (PLN)
-- Total PnL (PLN)
-- Holdings per asset (net quantity + PnL)
+```text
+full price = quantity × unit price
+PLN value  = full price × NBP quote/PLN rate
+```
 
-### Profile (`/profile`)
+- PLN quotes use a rate of `1`.
+- Foreign-currency rates resolve to the appropriate NBP publication.
+- Missing publication days are handled by stepping back to the latest available rate.
+- Dashboard and export calculations operate on the same persisted journal records.
 
-- Read-only user data
-- Delete account flow with confirmation
+## Tech stack
 
-### Dashboard (`/dashboard`)
+| Layer | Technology |
+| --- | --- |
+| Application | Next.js 16 App Router, React 19, TypeScript |
+| UI | Tailwind CSS, Base UI, Recharts |
+| Database | PostgreSQL on Neon, Drizzle ORM |
+| Authentication | NextAuth with Google and GitHub OAuth |
+| Validation | Zod |
+| Abuse protection | Upstash Redis rate limiting, Cloudflare Turnstile |
+| Testing | Vitest, Testing Library, jsdom |
 
-- Optional visual overview (PnL trends, buy vs sell, asset distribution)
+## Quick start
 
-## Business Rules
+### Prerequisites
 
-### PLN Valuation (NBP)
+- Node.js 20 or newer
+- pnpm 9 or newer
+- A PostgreSQL database
+- Google and/or GitHub OAuth credentials
 
-- Rate source: **NBP Table A**
-- Rate date resolution:
-  - Weekday → previous calendar day
-  - Weekend → previous Friday
-  - If NBP has no data (404) → step backwards day-by-day
-- `valuePLN = fullPrice × nbpRate`
-- If quote currency is PLN → `nbpRate = 1`
-
-### Profit / Loss
-
-- Formula: `PnL = Σ(sell.valuePLN) − Σ(buy.valuePLN)`
-- Commission is stored explicitly and:
-  - included in buy cost / sell proceeds (default)
-  - optional separate display (future option)
-
-## Tech Stack
-
-- **Framework**: Next.js (App Router)
-- **Language**: TypeScript
-- **Database**: Neon (PostgreSQL)
-- **ORM**: Drizzle
-- **UI**: shadcn/ui + Tailwind CSS
-- **Auth**: NextAuth (Google and GitHub OAuth)
-- **Validation**: zod
-- **Charts (optional)**: Recharts or Chart.js
-
-## Data Model
-
-### `users`
-
-- `id`, `email`, `login`, `role`
-- `firstName`, `lastName`, `createdAt`, `updatedAt`
-- `encryptionKeyEncrypted`, `encryptionVersion`
-
-### `oauth_accounts`
-
-- `userId`, `provider`, `providerAccountId`, `providerEmail`
-- Unique provider identity; a verified provider email may claim an existing account only when it has no OAuth link yet
-
-### `entries`
-
-- `date` (plaintext for range filters)
-- `encryptedPayload` (all entry fields except `date`)
-- `encryptionVersion`, `createdAt`, `updatedAt`
-
-### `fx_rates_cache`
-
-- `currency`, `rateDate`, `rate`
-- Unique constraint `(currency, rateDate)`
-
-## Encryption
-
-- Uses AES-256-GCM with per-user data keys (DEKs)
-- `ENTRY_KEK` (32-byte base64) wraps each user DEK
-- All entry fields are encrypted except `date`
-- Missing/rotated KEK without rewrap makes data unrecoverable
-- DEK rotation re-encrypts all entries for a user
-
-## NBP Integration
-
-Module: `/lib/nbp`
-
-Responsibilities:
-
-- Resolve correct rate date
-- Fetch NBP rate
-- Handle weekends and missing days
-- Cache results
-
-Flow on entry creation:
-
-1. User submits entry form
-2. Server calculates `fullPrice`
-3. Rate date is resolved
-4. NBP rate fetched or loaded from cache
-5. `valuePLN` computed and persisted
-
-## Project Structure
-
-- `app/(auth)/login`
-- `app/(auth)/register`
-- `app/(protected)/page.tsx` (entries)
-- `app/(protected)/summary`
-- `app/(protected)/profile`
-- `app/(protected)/dashboard`
-- `components/entries/`
-- `components/summary/`
-- `components/profile/`
-- `components/dashboard/`
-- `lib/db/`
-- `lib/nbp/`
-- `lib/auth/`
-- `lib/format/`
-- `actions/entries.ts`
-- `actions/summary.ts`
-- `actions/profile.ts`
-
-## Getting Started
-
-Install dependencies and run the development server:
+### Run locally
 
 ```bash
+git clone https://github.com/wrobit/logr-transaction-journal.git
+cd logr-transaction-journal
 pnpm install
+cp .env.example .env.local
+```
+
+Configure `.env.local`, then apply migrations and start the app:
+
+```bash
+pnpm db:migrate
 pnpm dev
 ```
 
-## Environment Variables
+Open [http://localhost:2206](http://localhost:2206).
 
-Copy `.env.example` and configure the documented runtime, migration, OAuth, encryption,
-Upstash, and Turnstile variables. Production startup validates all required values. Never
-expose `MIGRATION_DATABASE_URL` to the application runtime.
+Public signup is disabled in the example configuration. Keep
+`PUBLIC_REGISTRATION_ENABLED=false` until OAuth, recovery, monitoring, rate limiting, and
+production smoke tests are ready.
 
-See `docs/production-deployment.md` for the production checklist and
-`docs/security-runbook.md` for key rotation and incident procedures.
+## Configuration
 
-## Support
+The complete variable list and safe placeholders live in [`.env.example`](.env.example).
+The essential groups are:
 
-Logr is open source and community-supported. All product features are free to use.
-If the project saves you time or helps with your records, you can support ongoing
-maintenance through the Buy Me a Coffee link exposed by `NEXT_PUBLIC_BUYMEACOFFEE_URL`.
+| Group | Variables |
+| --- | --- |
+| Database | `DATABASE_URL`, `MIGRATION_DATABASE_URL`, `DATABASE_POOL_MAX` |
+| Auth | `NEXTAUTH_URL`, `NEXTAUTH_SECRET`, OAuth provider credentials |
+| Encryption | `ENTRY_KEK` |
+| Public URLs | `NEXT_PUBLIC_SITE_URL`, optional support and analytics URLs |
+| Registration | `PUBLIC_REGISTRATION_ENABLED`, Upstash and Turnstile credentials |
+| Administration | `ADMIN_EMAIL_ALLOWLIST` |
+
+Never expose `MIGRATION_DATABASE_URL` to the application runtime or commit `.env*` files.
+Losing `ENTRY_KEK` without a recovery path makes encrypted records unreadable.
+
+## Development commands
+
+| Command | Purpose |
+| --- | --- |
+| `pnpm dev` | Run the development server on port `2206` |
+| `pnpm build` | Create a production build |
+| `pnpm test` | Run the Vitest suite |
+| `pnpm lint` | Run ESLint |
+| `pnpm type:check` | Run strict TypeScript checks |
+| `pnpm i18n:check` | Verify English and Polish locale-key parity |
+| `pnpm db:generate` | Generate a Drizzle migration |
+| `pnpm db:migrate` | Apply pending migrations |
+| `pnpm db:studio` | Open Drizzle Studio |
+
+For broad changes, run:
+
+```bash
+pnpm lint
+pnpm type:check
+pnpm i18n:check
+pnpm test
+pnpm build
+```
+
+## Project structure
+
+```text
+app/          routes, layouts, auth, admin, and API handlers
+actions/      server-side mutation workflows
+components/   feature and shared UI components
+lib/          domain logic, encryption, auth, database, NBP, exports
+messages/     English and Polish translations
+drizzle/      generated database migrations
+test/         Vitest suites and fixtures
+docs/         deployment, security, and i18n guidance
+public/       brand assets, samples, and product screenshots
+```
+
+## Security and deployment
+
+Production readiness depends on more than a successful build. Before opening registration,
+follow the [production deployment checklist](docs/production-deployment.md), trial destructive
+migrations on an isolated database branch, and validate backup/restore and monitoring.
+
+Encryption key handling and recovery procedures are documented in the
+[security runbook](docs/security-runbook.md). Please report suspected vulnerabilities
+privately to [piotr.wrobel@quadrantive.com](mailto:piotr.wrobel@quadrantive.com).
 
 ## Contributing
 
-Community contributions are welcome. Before opening a larger pull request, please
-start with an issue or short proposal so the scope stays aligned with the project.
+Contributions are welcome. For a larger change, open an issue or short proposal first so the
+scope stays aligned with Logr's deliberately minimal product direction.
 
-Useful contribution areas include:
+High-value contributions include reproducible bug fixes, financial-calculation tests, import
+fixtures, accessibility improvements, and focused documentation updates.
 
-- Bug fixes with a clear reproduction case
-- Tests for financial calculations, import parsing, encryption, and formatting
-- Documentation improvements
-- Small UI and accessibility refinements
+## Support
+
+Logr is free, open source, and community-supported. If it saves you time, you can support
+maintenance through [Buy Me a Coffee](https://buymeacoffee.com/wrobit/e/513107).
 
 ## License
 
-MIT. See `LICENSE`.
+Released under the [MIT License](LICENSE).
 
-## Contact
+---
 
-Contact me via e-mail: piotr.wrobel@quadrantive.com
-
-Initialized with 🖤
+<p align="center">Built carefully for clear records, reproducible calculations, and fewer spreadsheet surprises.</p>

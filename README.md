@@ -12,8 +12,8 @@
   <a href="LICENSE"><img alt="MIT License" src="https://img.shields.io/badge/license-MIT-6dd5c3?style=for-the-badge" /></a>
   <a href="https://nextjs.org/"><img alt="Next.js 16" src="https://img.shields.io/badge/Next.js-16-111111?style=for-the-badge&amp;logo=nextdotjs" /></a>
   <a href="https://www.typescriptlang.org/"><img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&amp;logo=typescript&amp;logoColor=white" /></a>
-  <a href="package.json"><img alt="Node.js 20 or newer" src="https://img.shields.io/badge/Node.js-%E2%89%A520-339933?style=for-the-badge&amp;logo=nodedotjs&amp;logoColor=white" /></a>
-  <a href="package.json"><img alt="pnpm 9 or newer" src="https://img.shields.io/badge/pnpm-%E2%89%A59-F69220?style=for-the-badge&amp;logo=pnpm&amp;logoColor=white" /></a>
+  <a href="package.json"><img alt="Node.js 22" src="https://img.shields.io/badge/Node.js-22-339933?style=for-the-badge&amp;logo=nodedotjs&amp;logoColor=white" /></a>
+  <a href="package.json"><img alt="pnpm 10" src="https://img.shields.io/badge/pnpm-10-F69220?style=for-the-badge&amp;logo=pnpm&amp;logoColor=white" /></a>
 </p>
 
 <p align="center">
@@ -30,6 +30,9 @@ Logr treats every transaction as an accounting record. Calculations are reproduc
 currency conversion retains its source and effective date, and sensitive entry data is
 encrypted before it reaches the database. It is built for journaling and tax preparation—not
 trading, custody, portfolio advice, or investment recommendations.
+
+Logr is not tax, accounting, legal, or investment advice. Verify generated records with a
+qualified professional before filing or making financial decisions.
 
 ## Screenshots
 
@@ -106,7 +109,7 @@ PLN value  = full price × NBP quote/PLN rate
 - Node.js 22
 - pnpm 10
 - A PostgreSQL database
-- Google and/or GitHub OAuth credentials
+- Google and GitHub OAuth credentials
 
 ### Run locally
 
@@ -142,6 +145,7 @@ The essential groups are:
 | Public URLs | `NEXT_PUBLIC_SITE_URL`, optional support and analytics URLs |
 | Registration | `PUBLIC_REGISTRATION_ENABLED` |
 | Administration | `ADMIN_EMAIL_ALLOWLIST` |
+| Integrations | Optional `INTL_*`, HMRC, and GoCardless settings |
 
 Never expose `MIGRATION_DATABASE_URL` to the application runtime or commit `.env*` files.
 Losing `ENTRY_KEK` without a recovery path makes encrypted records unreadable.
@@ -193,6 +197,7 @@ migrations on an isolated database branch, and validate backup/restore and monit
 Encryption key handling and recovery procedures are documented in the
 [security runbook](docs/security-runbook.md). Please report suspected vulnerabilities
 privately to [piotr.wrobel@quadrantive.com](mailto:piotr.wrobel@quadrantive.com).
+See [SECURITY.md](SECURITY.md) for the coordinated disclosure policy.
 
 ## Contributing
 

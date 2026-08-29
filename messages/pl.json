@@ -79,7 +79,7 @@
         "title": "Podmioty przetwarzajace i integracje",
         "body": "Logr moze uzywac zewnetrznych dostawcow tylko tam, gdzie jest to potrzebne do hostingu, logowania, analityki, kursow walut, walidacji podatkowej, importu bankowego albo kontaktu.",
         "items": {
-          "first": "Logowanie moze korzystac z e-maila/hasla, Google albo GitHub, zaleznie od wybranej metody.",
+          "first": "Logowanie korzysta z Google albo GitHub, zaleznie od wybranej metody.",
           "second": "Dostawcy kursow, walidacji podatkowej, importu bankowego i danych rynkowych moga otrzymac minimalne dane techniczne potrzebne do zwrocenia wyniku.",
           "third": "Google Analytics otrzymuje zdarzenia uzycia tylko po zaakceptowaniu zgody analitycznej."
         }

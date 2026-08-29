@@ -79,7 +79,7 @@
         "title": "Processors and integrations",
         "body": "Logr may use external providers only where needed for hosting, authentication, analytics, exchange-rate lookups, tax validation, bank import, or email/contact flows.",
         "items": {
-          "first": "Authentication may use email/password, Google, or GitHub depending on the login method you choose.",
+          "first": "Authentication uses Google or GitHub, depending on the login method you choose.",
           "second": "Rate, tax, bank-import, and market-data providers may receive the minimum technical request data needed to return the requested result.",
           "third": "Google Analytics receives usage events only after analytics consent is accepted."
         }
